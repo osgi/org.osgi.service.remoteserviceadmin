@@ -1,5 +1,4 @@
 # Set javac settings from JDT prefs
--include: ${includes}/jdt.bnd, ${includes}/osgi.tck.junit-platform.bnd, ${includes}/tck.bnd, ${includes}/cmpn.bnd
 
 Bundle-Description					: Remote Services test cases.
 
@@ -11,34 +10,19 @@ Export-Package 					= ${p}.common;version=1.0.0
 	
 Bundle-Category: osgi,test
 
--buildpath = \
-    org.osgi.test.support;version=project, \
-    org.osgi.framework;maven-scope=provided;version=1.8, \
-    org.osgi.resource;maven-scope=provided;version=1.0, \
-    org.osgi.util.tracker;maven-scope=provided;version=1.5, \
-	org.osgi.util.function;version=1.0, \
-	org.osgi.util.promise;version=1.0
 
--runbundles = \
-    org.osgi.impl.service.log;                version=latest, \
-    org.osgi.impl.service.cm;                 version=latest, \
-    org.osgi.impl.service.event;              version=latest, \
-	org.osgi.impl.service.metatype;           version=latest, \
-	org.osgi.impl.service.remoteserviceadmin; version=latest, \
-	org.osgi.util.function;                   version=latest, \
-	org.osgi.util.promise;                    version=latest
 
 -runvm = -Xmx512m
 
--runproperties = ${runproperties}, \
-	rsa.tck.timeout=30000,\
-	rsa.tck.timeout.factor=3,\
-	${p}.framework.properties="org.osgi.service.http.port=@@FREE_PORT@@", \
-	${p}.system.packages.extra="", \
-    ${p}.serverconfig="service.exported.configs,ecf.generic.server.port,ecf.generic.server.hostname,ecf.endpoint.id.ns", \
-    service.exported.configs="ecf.generic.server", \
-    ecf.endpoint.id.ns=org.eclipse.ecf.core.identity.StringID,\
-    ecf.generic.server.hostname=localhost,\
-	ecf.generic.server.port=@@FREE_PORT@@,\
-    org.eclipse.ecf.osgi.services.remoteserviceadmin.disableServiceVersionChecking=true,\
-    ${p}.bundles="${uniq;${repo.osgi.tck.*},${repo;org.osgi.service.event;latest},${repo;org.osgi.impl.service.event;latest},${repo;org.osgi.impl.service.log;latest},${repo;org.osgi.impl.service.cm;latest},${repo;org.osgi.impl.service.metatype;latest},${repo;org.osgi.impl.service.http;latest},${repo;org.osgi.util.function;latest},${repo;org.osgi.util.promise;latest},${repo;org.osgi.impl.service.remoteserviceadmin;latest}}"
+p: org.osgi.test.cases.remoteservices
+
+# Maven build: workspace includes replaced inline (from cnf/includes and build.bnd in osgi/osgi)
+# -make.maven, not -make: the key is a map entry and would displace
+# a project-level -make (webcontainer also builds .war recipes this
+# way). bnd merges all -make.* entries.
+-make.maven: (*).(jar); type=bnd; recipe="bnd/$1.bnd"
+
+testcases.junit3: ${classes;EXTENDS;junit.framework.TestCase;CONCRETE}
+testcases.junit4: ${classes;HIERARCHY_ANNOTATED;org.junit.Test;CONCRETE}
+testcases.junit5: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}
+Test-Cases: ${sort;${uniq;${testcases.junit3};${testcases.junit4};${testcases.junit5}}}
