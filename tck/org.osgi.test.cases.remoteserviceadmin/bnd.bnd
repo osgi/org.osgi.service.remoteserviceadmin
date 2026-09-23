@@ -1,0 +1,46 @@
+# Set javac settings from JDT prefs
+
+Bundle-Description					: Remote Service Admin test cases.
+
+Export-Package 					= ${p}.common;version="1.0.0";-noimport:=true,\
+ ${p}.common;version="2.0.0";-noimport:=true
+
+-conditionalpackage					= org.osgi.test.support.*
+-privatepackage						=  \
+	${p}.*
+Import-Package: ${-signaturetest}, *
+	
+Bundle-Category: osgi,test
+
+-includeresource					= \
+	tb1.jar=tb1.jar, \
+	tb2.jar=tb2.jar, \
+	tb3.jar=tb3.jar, \
+	tb4.jar=tb4.jar, \
+	tb5.jar=tb5.jar, \
+	tb6.jar=tb6.jar, \
+	tb7.jar=tb7.jar, \
+	tb8.jar=tb8.jar, \
+	tbInterfaces.jar=tbInterfaces.jar
+
+-signaturetest                      = org.osgi.service.remoteserviceadmin
+
+
+-fixupmessages.private: "Export * has * private references"
+
+
+-runvm = -Xmx512m
+
+p: org.osgi.test.cases.remoteserviceadmin
+
+# Maven build: workspace includes replaced inline (from cnf/includes and build.bnd in osgi/osgi)
+# -make.maven, not -make: the key is a map entry and would displace
+# a project-level -make (webcontainer also builds .war recipes this
+# way). bnd merges all -make.* entries.
+-make.maven: (*).(jar); type=bnd; recipe="bnd/$1.bnd"
+
+testcases.junit3: ${classes;EXTENDS;junit.framework.TestCase;CONCRETE}
+testcases.junit4: ${classes;HIERARCHY_ANNOTATED;org.junit.Test;CONCRETE}
+testcases.junit5: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}
+Test-Cases: ${sort;${uniq;${testcases.junit3};${testcases.junit4};${testcases.junit5}}}
+-plugin.signaturetest: SignatureTest
