@@ -1,0 +1,41 @@
+# Set javac settings from JDT prefs
+
+Bundle-Description					: Remote Service Admin secure test cases.
+Bundle-Vendor: TIBCO Software Inc.
+Bundle-DocURL: http://www.osgi.org/
+Bundle-ContactAddress: info@mail.osgi.org
+Bundle-Category: osgi,test
+
+
+Export-Package 					= ${p}.common;version=1.0.0
+	
+-conditionalpackage					= org.osgi.test.support.*
+-privatepackage						=  \
+	${p}.*
+	
+Bundle-Category: osgi,test
+
+-includeresource					= \
+	tb_exporter.jar=tb_exporter.jar, \
+	tb_importer.jar=tb_importer.jar, \
+	tb_reader.jar=tb_reader.jar, \
+	tb_exporter_noperm.jar=tb_exporter_noperm.jar, \
+	tb_importer_noperm.jar=tb_importer_noperm.jar, \
+	tb_reader_noperm.jar=tb_reader_noperm.jar
+	
+
+
+-runvm = -Xmx512m
+
+p: org.osgi.test.cases.remoteserviceadmin.secure
+
+# Maven build: workspace includes replaced inline (from cnf/includes and build.bnd in osgi/osgi)
+# -make.maven, not -make: the key is a map entry and would displace
+# a project-level -make (webcontainer also builds .war recipes this
+# way). bnd merges all -make.* entries.
+-make.maven: (*).(jar); type=bnd; recipe="bnd/$1.bnd"
+
+testcases.junit3: ${classes;EXTENDS;junit.framework.TestCase;CONCRETE}
+testcases.junit4: ${classes;HIERARCHY_ANNOTATED;org.junit.Test;CONCRETE}
+testcases.junit5: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}
+Test-Cases: ${sort;${uniq;${testcases.junit3};${testcases.junit4};${testcases.junit5}}}
