@@ -1,0 +1,97 @@
+@options
+@packages
+-classpath
+'/home/stbischof/.m2/repository/org/assertj/assertj-core/3.23.1/assertj-core-3.23.1.jar:/home/stbischof/.m2/repository/net/bytebuddy/byte-buddy/1.12.10/byte-buddy-1.12.10.jar:/home/stbischof/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.8.2/junit-jupiter-api-5.8.2.jar:/home/stbischof/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/stbischof/.m2/repository/org/junit/platform/junit-platform-commons/1.8.2/junit-platform-commons-1.8.2.jar:/home/stbischof/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/stbischof/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.8.2/junit-jupiter-params-5.8.2.jar:/home/stbischof/.m2/repository/org/osgi/tck/org.osgi.test.support/0.0.1-SNAPSHOT/org.osgi.test.support-0.0.1-SNAPSHOT.jar:/home/stbischof/.m2/repository/org/apache/servicemix/bundles/org.apache.servicemix.bundles.junit/4.13.2_1/org.apache.servicemix.bundles.junit-4.13.2_1.jar:/home/stbischof/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/stbischof/.m2/repository/org/osgi/org.osgi.annotation.versioning/1.1.2/org.osgi.annotation.versioning-1.1.2.jar:/home/stbischof/.m2/repository/org/osgi/org.osgi.service.log/1.5.0/org.osgi.service.log-1.5.0.jar:/home/stbischof/.m2/repository/org/osgi/org.osgi.util.converter/1.0.9/org.osgi.util.converter-1.0.9.jar:/home/stbischof/.m2/repository/org/osgi/org.osgi.util.function/1.0.0/org.osgi.util.function-1.0.0.jar:/home/stbischof/.m2/repository/org/osgi/org.osgi.test.common/1.2.0/org.osgi.test.common-1.2.0.jar:/home/stbischof/.m2/repository/org/osgi/org.osgi.test.junit5/1.2.0/org.osgi.test.junit5-1.2.0.jar:/home/stbischof/.m2/repository/org/osgi/org.osgi.test.assertj.framework/1.2.0/org.osgi.test.assertj.framework-1.2.0.jar:/home/stbischof/.m2/repository/org/osgi/org.osgi.framework/1.10.0/org.osgi.framework-1.10.0.jar:/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/api/target/org.osgi.service.remoteserviceadmin-1.1.1-SNAPSHOT.jar:/home/stbischof/.m2/repository/org/osgi/org.osgi.annotation.bundle/2.0.0/org.osgi.annotation.bundle-2.0.0.jar:/home/stbischof/.m2/repository/org/osgi/org.osgi.resource/1.0.1/org.osgi.resource-1.0.1.jar:/home/stbischof/.m2/repository/org/osgi/org.osgi.util.tracker/1.5.4/org.osgi.util.tracker-1.5.4.jar:/home/stbischof/.m2/repository/org/osgi/osgi.annotation/8.0.1/osgi.annotation-8.0.1.jar'
+-encoding
+'UTF-8'
+-protected
+--release
+8
+-sourcepath
+'/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/src/main/java:/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/generated-sources/annotations'
+-author
+-bottom
+'Copyright &#169; 1980 <a href="https://www.eclipse.org/">Eclipse Foundation</a>. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs'
+-docencoding
+'UTF-8'
+-Xdoclint:none
+-doctitle
+'org.osgi.test.cases.remoteserviceadmin.secure 1.1.1-SNAPSHOT API'
+-linkoffline
+'https://docs.oracle.com/javase/8/docs/api' '/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/javadoc-bundle-options'
+-linkoffline
+'https://projects.eclipse.org/projects/technology.osgi/org.osgi.service.remoteserviceadmin.reactor/org.osgi.service.remoteserviceadmin/apidocs' '/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/api/target/apidocs'
+-notimestamp
+-tag
+"Immutable:t:Immutable"
+-tag
+"ThreadSafe:t:ThreadSafe"
+-tag
+"NotThreadSafe:t:NotThreadSafe"
+-tag
+"GuardedBy:mf:Guarded By:"
+-tag
+"security:m:Required Permissions"
+-tag
+"noimplement:t:Consumers of this API must not implement this interface"
+-tag
+"implNote:a:Implementation Note:"
+-use
+-version
+-windowtitle
+'org.osgi.test.cases.remoteserviceadmin.secure 1.1.1-SNAPSHOT API'
+org.osgi.test.cases.remoteserviceadmin.secure
+org.osgi.test.cases.remoteserviceadmin.secure.common
+org.osgi.test.cases.remoteserviceadmin.secure.tb.exporter
+org.osgi.test.cases.remoteserviceadmin.secure.tb.importer
+org.osgi.test.cases.remoteserviceadmin.secure.tb.reader
+org.osgi.test.cases.remoteserviceadmin.secure.tb.reader_noperm
+/home/stbischof/.m2/repository/org/assertj/assertj-core/3.23.1/assertj-core-3.23.1.jar = 1654017732000
+/home/stbischof/.m2/repository/net/bytebuddy/byte-buddy/1.12.10/byte-buddy-1.12.10.jar = 1651391532000
+/home/stbischof/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.8.2/junit-jupiter-api-5.8.2.jar = 1638113945000
+/home/stbischof/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar = 1559849067000
+/home/stbischof/.m2/repository/org/junit/platform/junit-platform-commons/1.8.2/junit-platform-commons-1.8.2.jar = 1638113947000
+/home/stbischof/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar = 1624798415000
+/home/stbischof/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.8.2/junit-jupiter-params-5.8.2.jar = 1638113966000
+/home/stbischof/.m2/repository/org/osgi/tck/org.osgi.test.support/0.0.1-SNAPSHOT/org.osgi.test.support-0.0.1-SNAPSHOT.jar = 1788283843000
+/home/stbischof/.m2/repository/org/apache/servicemix/bundles/org.apache.servicemix.bundles.junit/4.13.2_1/org.apache.servicemix.bundles.junit-4.13.2_1.jar = 1614582078000
+/home/stbischof/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar = 1341868082000
+/home/stbischof/.m2/repository/org/osgi/org.osgi.annotation.versioning/1.1.2/org.osgi.annotation.versioning-1.1.2.jar = 1634136809000
+/home/stbischof/.m2/repository/org/osgi/org.osgi.service.log/1.5.0/org.osgi.service.log-1.5.0.jar = 1607402552000
+/home/stbischof/.m2/repository/org/osgi/org.osgi.util.converter/1.0.9/org.osgi.util.converter-1.0.9.jar = 1644360816000
+/home/stbischof/.m2/repository/org/osgi/org.osgi.util.function/1.0.0/org.osgi.util.function-1.0.0.jar = 1439906642000
+/home/stbischof/.m2/repository/org/osgi/org.osgi.test.common/1.2.0/org.osgi.test.common-1.2.0.jar = 1657649209000
+/home/stbischof/.m2/repository/org/osgi/org.osgi.test.junit5/1.2.0/org.osgi.test.junit5-1.2.0.jar = 1657649208000
+/home/stbischof/.m2/repository/org/osgi/org.osgi.test.assertj.framework/1.2.0/org.osgi.test.assertj.framework-1.2.0.jar = 1657649212000
+/home/stbischof/.m2/repository/org/osgi/org.osgi.framework/1.10.0/org.osgi.framework-1.10.0.jar = 1607377478000
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/api/target/org.osgi.service.remoteserviceadmin-1.1.1-SNAPSHOT.jar = 1790091340729
+/home/stbischof/.m2/repository/org/osgi/org.osgi.annotation.bundle/2.0.0/org.osgi.annotation.bundle-2.0.0.jar = 1644360733000
+/home/stbischof/.m2/repository/org/osgi/org.osgi.resource/1.0.1/org.osgi.resource-1.0.1.jar = 1607391117000
+/home/stbischof/.m2/repository/org/osgi/org.osgi.util.tracker/1.5.4/org.osgi.util.tracker-1.5.4.jar = 1634136906000
+/home/stbischof/.m2/repository/org/osgi/osgi.annotation/8.0.1/osgi.annotation-8.0.1.jar = 1634136808000
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/src/main/java = 1790012136790
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/generated-sources/annotations = 1790091439496
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/element-list = 1790093597459
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/overview-tree.html = 1790093597615
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/index.html = 1790093597626
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/allclasses-index.html = 1790093597671
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/allpackages-index.html = 1790093597677
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/module-search-index.js = 1790093597681
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/package-search-index.js = 1790093597682
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/type-search-index.js = 1790093597683
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/member-search-index.js = 1790093597684
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/tag-search-index.js = 1790093597685
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/index-all.html = 1790093597716
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/search.html = 1790093597720
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/overview-summary.html = 1790093597724
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/help-doc.html = 1790093597757
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/stylesheet.css = 1790093597764
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/script.js = 1790093597766
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/copy.svg = 1790093597767
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/link.svg = 1790093597768
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/search.js = 1790093597772
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/target/apidocs/search-page.js = 1790093597774

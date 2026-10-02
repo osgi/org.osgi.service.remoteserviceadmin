@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.osgi.test.cases.remoteservices.common"},{"l":"org.osgi.test.cases.remoteservices.impl"},{"l":"org.osgi.test.cases.remoteservices.junit"}];updateSearchResults();

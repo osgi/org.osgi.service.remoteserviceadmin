@@ -1,0 +1,7 @@
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/src/main/java/org/osgi/test/cases/remoteserviceadmin/secure/MultiFrameworkTestCase.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/src/main/java/org/osgi/test/cases/remoteserviceadmin/secure/RemoteServiceAdminSecureTest.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/src/main/java/org/osgi/test/cases/remoteserviceadmin/secure/common/A.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/src/main/java/org/osgi/test/cases/remoteserviceadmin/secure/tb/exporter/Activator.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/src/main/java/org/osgi/test/cases/remoteserviceadmin/secure/tb/importer/Activator.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/src/main/java/org/osgi/test/cases/remoteserviceadmin/secure/tb/reader/Activator.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteserviceadmin.secure/src/main/java/org/osgi/test/cases/remoteserviceadmin/secure/tb/reader_noperm/Activator.java

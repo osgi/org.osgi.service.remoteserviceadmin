@@ -1,0 +1,9 @@
+org/osgi/test/cases/remoteserviceadmin/secure/MultiFrameworkTestCase.class
+org/osgi/test/cases/remoteserviceadmin/secure/tb/exporter/Activator$TestRemoteServiceAdminListener.class
+org/osgi/test/cases/remoteserviceadmin/secure/tb/importer/Activator.class
+org/osgi/test/cases/remoteserviceadmin/secure/tb/reader_noperm/Activator.class
+org/osgi/test/cases/remoteserviceadmin/secure/tb/reader/Activator.class
+org/osgi/test/cases/remoteserviceadmin/secure/common/A.class
+org/osgi/test/cases/remoteserviceadmin/secure/tb/exporter/Activator.class
+org/osgi/test/cases/remoteserviceadmin/secure/RemoteServiceAdminSecureTest.class
+org/osgi/test/cases/remoteserviceadmin/secure/tb/importer/Activator$TestRemoteServiceAdminListener.class

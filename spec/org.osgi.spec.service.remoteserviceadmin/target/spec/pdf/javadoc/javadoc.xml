@@ -1,0 +1,2080 @@
+<?xml version='1.0' encoding='utf-8'?>
+<top>
+  <package name='org.osgi.service.remoteserviceadmin' fqn='org.osgi.service.remoteserviceadmin' qn='org.osgi.service.remoteserviceadmin'>
+<org.osgi.annotation.versioning.Version><value>1.1</value>
+</org.osgi.annotation.versioning.Version>
+   <lead>
+Remote Service Admin Package Version 1.1.
+   </lead>
+   <description>
+Remote Service Admin Package Version 1.1.
+ 
+ <p>
+ Bundles wishing to use this package must list the package in the
+ Import-Package header of the bundle's manifest. This package has two types of
+ users: the consumers that use the API in this package and the providers that
+ implement the API in this package.
+ 
+ </p><p>
+ Example import for consumers using the API in this package:
+ </p><p>
+ {@code  Import-Package: org.osgi.service.remoteserviceadmin; version="[1.1,2.0)"}
+ </p><p>
+ Example import for providers implementing the API in this package:
+ </p><p>
+ {@code  Import-Package: org.osgi.service.remoteserviceadmin; version="[1.1,1.2)"}</p>
+   </description>
+<author>@author $Id: b6ee0c187e6a38f6dcf8af9e13ca91f17f82b205 $</author>
+  <class name='EndpointDescription' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription' qn='EndpointDescription' package='org.osgi.service.remoteserviceadmin' typeParam='' modifiers='public class' kind='CLASS'>
+   <lead>
+A description of an endpoint that provides sufficient information for a
+ compatible distribution provider to create a connection to this endpoint
+ 
+ An Endpoint Description is easy to transfer between different systems because
+ it is property based where the property keys are strings and the values are
+ simple types.
+   </lead>
+   <description>
+A description of an endpoint that provides sufficient information for a
+ compatible distribution provider to create a connection to this endpoint
+ 
+ An Endpoint Description is easy to transfer between different systems because
+ it is property based where the property keys are strings and the values are
+ simple types. This allows it to be used as a communications device to convey
+ available endpoint information to nodes in a network.
+ 
+ An Endpoint Description reflects the perspective of an <i>importer</i>. That
+ is, the property keys have been chosen to match filters that are created by
+ client bundles that need a service. Therefore the map must not contain any
+ {@code service.exported.*} property and must contain the corresponding
+ {@code service.imported.*} ones.
+ 
+ The {@code service.intents} property must contain the intents provided by the
+ service itself combined with the intents added by the exporting distribution
+ provider. Qualified intents appear fully expanded on this property.
+   </description>
+<Immutable></Immutable><author>@author $Id: cac5bea5da97dee08b9cdcd2bd6448b95b9656ba $</author>
+    <method name='EndpointDescription' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription.EndpointDescription' qn='EndpointDescription.EndpointDescription(Map)' package='org.osgi.service.remoteserviceadmin' typeArgs='' modifiers='public' signature='(java.util.Map&lt;java.lang.String,?&gt;)' flatSignature='(Map)' isConstructor='true'>
+   <lead>
+Create an Endpoint Description from a Map.
+   </lead>
+   <description>
+Create an Endpoint Description from a Map.
+ 
+ <p>
+ The {@link RemoteConstants#ENDPOINT_ID endpoint.id},
+ {@link RemoteConstants#SERVICE_IMPORTED_CONFIGS service.imported.configs}
+ and {@code objectClass} properties must be set.</p>
+   </description>
+
+<param name='properties'>The map from which to create the Endpoint Description.
+        The keys in the map must be type {@code String} and, since the
+        keys are case insensitive, there must be no duplicates with case
+        variation.</param>
+
+
+<throws name='IllegalArgumentException'>When the properties are not proper for
+         an Endpoint Description.</throws>
+
+
+    <parameter name='properties' dimension='' typeName='Map&lt;String, ?&gt;' fqn='java.util.Map' varargs='false'/>
+     </method>
+    <method name='EndpointDescription' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription.EndpointDescription' qn='EndpointDescription.EndpointDescription(ServiceReference,Map)' package='org.osgi.service.remoteserviceadmin' typeArgs='' modifiers='public' signature='(org.osgi.framework.ServiceReference&lt;?&gt;,java.util.Map&lt;java.lang.String,?&gt;)' flatSignature='(ServiceReference,Map)' isConstructor='true'>
+   <lead>
+Create an Endpoint Description based on a Service Reference and a Map of
+ properties.
+   </lead>
+   <description>
+Create an Endpoint Description based on a Service Reference and a Map of
+ properties. The properties in the map take precedence over the properties
+ in the Service Reference.
+ 
+ <p>
+ This method will automatically set the
+ {@link RemoteConstants#ENDPOINT_FRAMEWORK_UUID endpoint.framework.uuid}
+ and {@link RemoteConstants#ENDPOINT_SERVICE_ID endpoint.service.id}
+ properties based on the specified Service Reference as well as the
+ {@link RemoteConstants#SERVICE_IMPORTED service.imported} property if
+ they are not specified as properties.
+ </p><p>
+ The {@link RemoteConstants#ENDPOINT_ID endpoint.id},
+ {@link RemoteConstants#SERVICE_IMPORTED_CONFIGS service.imported.configs}
+ and {@code objectClass} properties must be set.</p>
+   </description>
+
+<param name='reference'>A service reference that can be exported.</param>
+<param name='properties'>Map of properties. This argument can be {@code null}.
+        The keys in the map must be type {@code String} and, since the
+        keys are case insensitive, there must be no duplicates with case
+        variation.</param>
+
+
+<throws name='IllegalArgumentException'>When the properties are not proper for
+         an Endpoint Description</throws>
+
+
+    <parameter name='reference' dimension='' typeName='ServiceReference&lt;?&gt;' fqn='org.osgi.framework.ServiceReference' varargs='false'/>
+    <parameter name='properties' dimension='' typeName='Map&lt;String, ?&gt;' fqn='java.util.Map' varargs='false'/>
+     </method>
+    <method name='getId' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription.getId' qn='EndpointDescription.getId()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='String' qualifiedTypeName='java.lang.String' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Returns the endpoint's id.
+   </lead>
+   <description>
+Returns the endpoint's id.
+ 
+ The id is an opaque id for an endpoint. No two different endpoints must
+ have the same id. Two Endpoint Descriptions with the same id must
+ represent the same endpoint.
+ 
+ The value of the id is stored in the {@link RemoteConstants#ENDPOINT_ID}
+ property.
+   </description>
+
+
+<return>The id of the endpoint, never {@code null}. The returned value
+         has leading and trailing whitespace removed.</return>
+
+
+
+     </method>
+    <method name='getInterfaces' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription.getInterfaces' qn='EndpointDescription.getInterfaces()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='List&lt;String&gt;' qualifiedTypeName='java.util.List' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Provide the list of interfaces implemented by the exported service.
+   </lead>
+   <description>
+Provide the list of interfaces implemented by the exported service.
+ 
+ The value of the interfaces is derived from the {@code objectClass}
+ property.
+   </description>
+
+
+<return>An unmodifiable list of Java interface names implemented by this
+         endpoint.</return>
+
+
+
+     </method>
+    <method name='getPackageVersion' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription.getPackageVersion' qn='EndpointDescription.getPackageVersion(String)' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='Version' qualifiedTypeName='org.osgi.framework.Version' typeArgs='' dimension='' signature='(java.lang.String)' flatSignature='(String)'>
+   <lead>
+Provide the version of the given package name.
+   </lead>
+   <description>
+Provide the version of the given package name.
+ 
+ The version is encoded by prefixing the given package name with
+ {@link RemoteConstants#ENDPOINT_PACKAGE_VERSION_ endpoint.package.version.}, and then using this as an endpoint property
+ key. For example:
+ 
+ <pre>&#8194;endpoint.package.version.com.acme</pre>
+ 
+ The value of this property is in String format and will be converted to a
+ {@code Version} object by this method.
+   </description>
+
+<param name='packageName'>The name of the package for which a version is
+        requested.</param>
+
+<return>The version of the specified package or
+         {@code Version.emptyVersion} if the package has no version in
+         this Endpoint Description.</return>
+
+<throws name='IllegalArgumentException'>If the version property value is not
+         String.</throws>
+
+
+    <parameter name='packageName' dimension='' typeName='String' fqn='java.lang.String' varargs='false'/>
+     </method>
+    <method name='getServiceId' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription.getServiceId' qn='EndpointDescription.getServiceId()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='long' qualifiedTypeName='long' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Returns the service id for the service exported through this endpoint.
+   </lead>
+   <description>
+Returns the service id for the service exported through this endpoint.
+ 
+ This is the service id under which the framework has registered the
+ service. This field together with the Framework UUID is a globally unique
+ id for a service.
+ 
+ The value of the remote service id is stored in the
+ {@link RemoteConstants#ENDPOINT_SERVICE_ID} endpoint property.
+   </description>
+
+
+<return>Service id of a service or 0 if this Endpoint Description does
+         not relate to an OSGi service.</return>
+
+
+
+     </method>
+    <method name='getConfigurationTypes' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription.getConfigurationTypes' qn='EndpointDescription.getConfigurationTypes()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='List&lt;String&gt;' qualifiedTypeName='java.util.List' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Returns the configuration types.
+   </lead>
+   <description>
+Returns the configuration types.
+ 
+ A distribution provider exports a service with an endpoint. This endpoint
+ uses some kind of communications protocol with a set of configuration
+ parameters. There are many different types but each endpoint is
+ configured by only one configuration type. However, a distribution
+ provider can be aware of different configuration types and provide
+ synonyms to increase the change a receiving distribution provider can
+ create a connection to this endpoint.
+ 
+ This value of the configuration types is stored in the
+ {@link RemoteConstants#SERVICE_IMPORTED_CONFIGS} service property.
+   </description>
+
+
+<return>An unmodifiable list of the configuration types used for the
+         associated endpoint and optionally synonyms.</return>
+
+
+
+     </method>
+    <method name='getIntents' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription.getIntents' qn='EndpointDescription.getIntents()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='List&lt;String&gt;' qualifiedTypeName='java.util.List' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the list of intents implemented by this endpoint.
+   </lead>
+   <description>
+Return the list of intents implemented by this endpoint.
+ 
+ The intents are based on the service.intents on an imported service,
+ except for any intents that are additionally provided by the importing
+ distribution provider. All qualified intents must have been expanded.
+ 
+ This value of the intents is stored in the
+ {@link RemoteConstants#SERVICE_INTENTS} service property.
+   </description>
+
+
+<return>An unmodifiable list of expanded intents that are provided by
+         this endpoint.</return>
+
+
+
+     </method>
+    <method name='getFrameworkUUID' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription.getFrameworkUUID' qn='EndpointDescription.getFrameworkUUID()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='String' qualifiedTypeName='java.lang.String' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the framework UUID for the remote service, if present.
+   </lead>
+   <description>
+Return the framework UUID for the remote service, if present.
+ 
+ The value of the remote framework UUID is stored in the
+ {@link RemoteConstants#ENDPOINT_FRAMEWORK_UUID} endpoint property.
+   </description>
+
+
+<return>Remote Framework UUID, or {@code null} if this endpoint is not
+         associated with an OSGi framework having a framework UUID.</return>
+
+
+
+     </method>
+    <method name='getProperties' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription.getProperties' qn='EndpointDescription.getProperties()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='Map&lt;String, Object&gt;' qualifiedTypeName='java.util.Map' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Returns all endpoint properties.
+   </lead>
+   <description>
+Returns all endpoint properties.
+   </description>
+
+
+<return>An unmodifiable map referring to the properties of this Endpoint
+         Description.</return>
+
+
+
+     </method>
+    <method name='isSameService' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription.isSameService' qn='EndpointDescription.isSameService(EndpointDescription)' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='boolean' qualifiedTypeName='boolean' typeArgs='' dimension='' signature='(org.osgi.service.remoteserviceadmin.EndpointDescription)' flatSignature='(EndpointDescription)'>
+   <lead>
+Answers if this Endpoint Description refers to the same service instance
+ as the given Endpoint Description.
+   </lead>
+   <description>
+Answers if this Endpoint Description refers to the same service instance
+ as the given Endpoint Description.
+ 
+ Two Endpoint Descriptions point to the same service if they have the same
+ id or their framework UUIDs and remote service ids are equal.
+   </description>
+
+<param name='other'>The Endpoint Description to look at</param>
+
+<return>True if this endpoint description points to the same service as
+         the other</return>
+
+
+
+    <parameter name='other' dimension='' typeName='EndpointDescription' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription' varargs='false'/>
+     </method>
+    <method name='hashCode' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription.hashCode' qn='EndpointDescription.hashCode()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='int' qualifiedTypeName='int' typeArgs='' dimension='' signature='()' flatSignature='()'>
+<java.lang.Override></java.lang.Override>
+   <lead>
+Returns a hash code value for the object.
+   </lead>
+   <description>
+Returns a hash code value for the object.
+   </description>
+
+
+<return>An integer which is a hash code value for this object.</return>
+
+
+
+     </method>
+    <method name='equals' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription.equals' qn='EndpointDescription.equals(Object)' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='boolean' qualifiedTypeName='boolean' typeArgs='' dimension='' signature='(java.lang.Object)' flatSignature='(Object)'>
+<java.lang.Override></java.lang.Override>
+   <lead>
+Compares this {@code EndpointDescription} object to another object.
+   </lead>
+   <description>
+Compares this {@code EndpointDescription} object to another object.
+ 
+ <p>
+ An Endpoint Description is considered to be <b>equal to</b> another
+ Endpoint Description if their ids are equal.</p>
+   </description>
+
+<param name='other'>The {@code EndpointDescription} object to be compared.</param>
+
+<return>{@code true} if {@code object} is a {@code EndpointDescription}
+         and is equal to this object; {@code false} otherwise.</return>
+
+
+
+    <parameter name='other' dimension='' typeName='Object' fqn='java.lang.Object' varargs='false'/>
+     </method>
+    <method name='matches' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription.matches' qn='EndpointDescription.matches(String)' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='boolean' qualifiedTypeName='boolean' typeArgs='' dimension='' signature='(java.lang.String)' flatSignature='(String)'>
+   <lead>
+Tests the properties of this {@code EndpointDescription} against the
+ given filter using a case insensitive match.
+   </lead>
+   <description>
+Tests the properties of this {@code EndpointDescription} against the
+ given filter using a case insensitive match.
+   </description>
+
+<param name='filter'>The filter to test.</param>
+
+<return>{@code true} If the properties of this
+         {@code EndpointDescription} match the filter, {@code false}
+         otherwise.</return>
+
+<throws name='IllegalArgumentException'>If {@code filter} contains an invalid
+         filter string that cannot be parsed.</throws>
+
+
+    <parameter name='filter' dimension='' typeName='String' fqn='java.lang.String' varargs='false'/>
+     </method>
+    <method name='toString' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription.toString' qn='EndpointDescription.toString()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='String' qualifiedTypeName='java.lang.String' typeArgs='' dimension='' signature='()' flatSignature='()'>
+<java.lang.Override></java.lang.Override>
+   <lead>
+Returns the string representation of this EndpointDescription.
+   </lead>
+   <description>
+Returns the string representation of this EndpointDescription.
+   </description>
+
+
+<return>String form of this EndpointDescription.</return>
+
+
+
+     </method>
+  </class>
+  <class name='EndpointEvent' fqn='org.osgi.service.remoteserviceadmin.EndpointEvent' qn='EndpointEvent' package='org.osgi.service.remoteserviceadmin' typeParam='' modifiers='public class' kind='CLASS'>
+   <lead>
+An Endpoint Event.
+   </lead>
+   <description>
+An Endpoint Event.
+ <p/>
+ 
+ {@code EndpointEvent} objects are delivered to all registered
+ {@link EndpointEventListener} services where the {@link EndpointDescription}
+ properties match one of the filters specified in the
+ {@link EndpointEventListener#ENDPOINT_LISTENER_SCOPE} registration properties
+ of the Endpoint Event Listener.
+ <p/>
+ 
+ A type code is used to identify the type of event. The following event types
+ are defined:
+ <ul>
+ <li>{@link #ADDED}</li>
+ <li>{@link #REMOVED}</li>
+ <li>{@link #MODIFIED}</li>
+ <li>{@link #MODIFIED_ENDMATCH}</li>
+ </ul>
+ Additional event types may be defined in the future.
+ <p/>
+   </description>
+<a href='#EndpointEventListener'>EndpointEventListener</a><Immutable></Immutable><since>@since 1.1</since>
+    <method name='EndpointEvent' fqn='org.osgi.service.remoteserviceadmin.EndpointEvent.EndpointEvent' qn='EndpointEvent.EndpointEvent(int,EndpointDescription)' package='org.osgi.service.remoteserviceadmin' typeArgs='' modifiers='public' signature='(int,org.osgi.service.remoteserviceadmin.EndpointDescription)' flatSignature='(int,EndpointDescription)' isConstructor='true'>
+   <lead>
+Constructs a {@code EndpointEvent} object from the given arguments.
+   </lead>
+   <description>
+Constructs a {@code EndpointEvent} object from the given arguments.
+   </description>
+
+<param name='type'>The event type. See {@link #getType()}.</param>
+<param name='endpoint'>The endpoint associated with the event.</param>
+
+
+
+
+    <parameter name='type' dimension='' typeName='int' fqn='int' varargs='false'/>
+    <parameter name='endpoint' dimension='' typeName='EndpointDescription' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription' varargs='false'/>
+     </method>
+    <method name='getEndpoint' fqn='org.osgi.service.remoteserviceadmin.EndpointEvent.getEndpoint' qn='EndpointEvent.getEndpoint()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='EndpointDescription' qualifiedTypeName='org.osgi.service.remoteserviceadmin.EndpointDescription' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the endpoint associated with this event.
+   </lead>
+   <description>
+Return the endpoint associated with this event.
+   </description>
+
+
+<return>The endpoint associated with the event.</return>
+
+
+
+     </method>
+    <method name='getType' fqn='org.osgi.service.remoteserviceadmin.EndpointEvent.getType' qn='EndpointEvent.getType()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='int' qualifiedTypeName='int' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the type of this event.
+   </lead>
+   <description>
+Return the type of this event.
+ <p/>
+ The type values are:
+ <ul>
+ <li>{@link #ADDED}</li>
+ <li>{@link #REMOVED}</li>
+ <li>{@link #MODIFIED}</li>
+ <li>{@link #MODIFIED_ENDMATCH}</li>
+ </ul>
+   </description>
+
+
+<return>The type of this event.</return>
+
+
+
+     </method>
+    <field name='ADDED' fqn='org.osgi.service.remoteserviceadmin.EndpointEvent.ADDED' qn='EndpointEvent.ADDED' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='int' qualifiedTypeName='int' dimension='' constantValue='1'>
+   <lead>
+An endpoint has been added.
+   </lead>
+   <description>
+An endpoint has been added.
+ <p/>
+ 
+ This {@code EndpointEvent} type indicates that a new endpoint has been
+ added. The endpoint is represented by the associated
+ {@link EndpointDescription} object.
+   </description>
+
+     </field>
+    <field name='REMOVED' fqn='org.osgi.service.remoteserviceadmin.EndpointEvent.REMOVED' qn='EndpointEvent.REMOVED' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='int' qualifiedTypeName='int' dimension='' constantValue='2'>
+   <lead>
+An endpoint has been removed.
+   </lead>
+   <description>
+An endpoint has been removed.
+ <p/>
+ 
+ This {@code EndpointEvent} type indicates that an endpoint has been
+ removed. The endpoint is represented by the associated
+ {@link EndpointDescription} object.
+   </description>
+
+     </field>
+    <field name='MODIFIED' fqn='org.osgi.service.remoteserviceadmin.EndpointEvent.MODIFIED' qn='EndpointEvent.MODIFIED' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='int' qualifiedTypeName='int' dimension='' constantValue='4'>
+   <lead>
+The properties of an endpoint have been modified.
+   </lead>
+   <description>
+The properties of an endpoint have been modified.
+ <p/>
+ 
+ This {@code EndpointEvent} type indicates that the properties of an
+ existing endpoint have been modified. The endpoint is represented by the
+ associated {@link EndpointDescription} object and its properties can be
+ obtained via {@link EndpointDescription#getProperties()}. The endpoint
+ properties still match the filters as specified in the
+ {@link EndpointEventListener#ENDPOINT_LISTENER_SCOPE} filter.
+   </description>
+
+     </field>
+    <field name='MODIFIED_ENDMATCH' fqn='org.osgi.service.remoteserviceadmin.EndpointEvent.MODIFIED_ENDMATCH' qn='EndpointEvent.MODIFIED_ENDMATCH' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='int' qualifiedTypeName='int' dimension='' constantValue='8'>
+   <lead>
+The properties of an endpoint have been modified and the new properties
+ no longer match the listener's filter.
+   </lead>
+   <description>
+The properties of an endpoint have been modified and the new properties
+ no longer match the listener's filter.
+ <p/>
+ 
+ This {@code EndpointEvent} type indicates that the properties of an
+ existing endpoint have been modified and no longer match the filter. The
+ endpoint is represented by the associated {@link EndpointDescription}
+ object and its properties can be obtained via
+ {@link EndpointDescription#getProperties()}. As a consequence of the
+ modification the filters as specified in the
+ {@link EndpointEventListener#ENDPOINT_LISTENER_SCOPE} do not match any
+ more.
+   </description>
+
+     </field>
+  </class>
+  <class name='EndpointEventListener' fqn='org.osgi.service.remoteserviceadmin.EndpointEventListener' qn='EndpointEventListener' package='org.osgi.service.remoteserviceadmin' typeParam='' modifiers='public abstract' interface='yes' kind='INTERFACE'>
+<org.osgi.annotation.versioning.ConsumerType></org.osgi.annotation.versioning.ConsumerType>
+   <lead>
+A white board service that represents a listener for endpoints.
+   </lead>
+   <description>
+A white board service that represents a listener for endpoints.
+ 
+ An Endpoint Event Listener represents a participant in the distributed model
+ that is interested in Endpoint Descriptions.
+ 
+ This white board service can be used in many different scenarios. However,
+ the primary use case is to allow a remote manager to be informed of Endpoint
+ Descriptions available in the network and inform the network about available
+ Endpoint Descriptions.
+ 
+ Both the network bundle and the manager bundle register an Endpoint Event
+ Listener service. The manager informs the network bundle about Endpoints that
+ it creates. The network bundles then uses a protocol like SLP to announce
+ these local end-points to the network.
+ 
+ If the network bundle discovers a new Endpoint through its discovery
+ protocol, then it sends an Endpoint Description to all the Endpoint Listener
+ services that are registered (except its own) that have specified an interest
+ in that endpoint.
+ 
+ Endpoint Event Listener services can express their <i>scope</i> with the
+ service property {@link #ENDPOINT_LISTENER_SCOPE}. This service property is a
+ list of filters. An Endpoint Description should only be given to a Endpoint
+ Event Listener when there is at least one filter that matches the Endpoint
+ Description properties.
+ 
+ This filter model is quite flexible. For example, a discovery bundle is only
+ interested in locally originating Endpoint Descriptions. The following filter
+ ensures that it only sees local endpoints.
+ 
+ <pre>&#8194;&#8194;&#8194;(org.osgi.framework.uuid=72dc5fd9-5f8f-4f8f-9821-9ebb433a5b72)</pre>
+ 
+ In the same vein, a manager that is only interested in remote Endpoint
+ Descriptions can use a filter like:
+ 
+ <pre>&#8194;&#8194;&#8194;(!(org.osgi.framework.uuid=72dc5fd9-5f8f-4f8f-9821-9ebb433a5b72))</pre>
+ 
+ Where in both cases, the given UUID is the UUID of the local framework that
+ can be found in the Framework properties.
+ 
+ The Endpoint Event Listener's scope maps very well to the service hooks. A
+ manager can just register all filters found from the Listener Hook as its
+ scope. This will automatically provide it with all known endpoints that match
+ the given scope, without having to inspect the filter string.
+ 
+ In general, when an Endpoint Description is discovered, it should be
+ dispatched to all registered Endpoint Event Listener services. If a new
+ Endpoint Event Listener is registered, it should be informed about all
+ currently known Endpoints that match its scope. If a getter of the Endpoint
+ Listener service is unregistered, then all its registered Endpoint
+ Description objects must be removed.
+ 
+ The Endpoint Event Listener models a <i>best effort</i> approach.
+ Participating bundles should do their utmost to keep the listeners up to
+ date, but implementers should realize that many endpoints come through
+ unreliable discovery processes.
+ 
+ The Endpoint Event Listener supersedes the {@link EndpointListener} interface
+ as it also supports notifications around modifications of endpoints.
+   </description>
+<ThreadSafe></ThreadSafe><since>@since 1.1</since>
+    <method name='endpointChanged' fqn='org.osgi.service.remoteserviceadmin.EndpointEventListener.endpointChanged' qn='EndpointEventListener.endpointChanged(EndpointEvent,String)' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='void' qualifiedTypeName='void' typeArgs='' dimension='' signature='(org.osgi.service.remoteserviceadmin.EndpointEvent,java.lang.String)' flatSignature='(EndpointEvent,String)'>
+   <lead>
+Notification that an endpoint has changed.
+   </lead>
+   <description>
+Notification that an endpoint has changed.
+ 
+ Details of the change is captured in the Endpoint Event provided. This
+ could be that an endpoint was added, removed or modified.
+   </description>
+
+<param name='event'>The event containing the details about the change.</param>
+<param name='filter'>The filter from the {@link #ENDPOINT_LISTENER_SCOPE} that
+        matches (or for {@link EndpointEvent#MODIFIED_ENDMATCH} and
+        {@link EndpointEvent#REMOVED} used to match) the endpoint, must
+        not be {@code null}.</param>
+
+
+
+
+    <parameter name='event' dimension='' typeName='EndpointEvent' fqn='org.osgi.service.remoteserviceadmin.EndpointEvent' varargs='false'/>
+    <parameter name='filter' dimension='' typeName='String' fqn='java.lang.String' varargs='false'/>
+     </method>
+    <field name='ENDPOINT_LISTENER_SCOPE' fqn='org.osgi.service.remoteserviceadmin.EndpointEventListener.ENDPOINT_LISTENER_SCOPE' qn='EndpointEventListener.ENDPOINT_LISTENER_SCOPE' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"endpoint.listener.scope"'>
+   <lead>
+Specifies the interest of this listener with filters.
+   </lead>
+   <description>
+Specifies the interest of this listener with filters. This listener is
+ only interested in Endpoint Descriptions where its properties match the
+ given filter. The type of this property must be {@code String+}.
+   </description>
+
+     </field>
+  </class>
+  <class name='EndpointListener' fqn='org.osgi.service.remoteserviceadmin.EndpointListener' qn='EndpointListener' package='org.osgi.service.remoteserviceadmin' typeParam='' modifiers='public abstract' interface='yes' kind='INTERFACE'>
+<org.osgi.annotation.versioning.ConsumerType></org.osgi.annotation.versioning.ConsumerType>
+   <lead>
+Deprecated white board service that represents a listener for endpoints.
+   </lead>
+   <description>
+Deprecated white board service that represents a listener for endpoints.
+ 
+ An Endpoint Listener represents a participant in the distributed model that
+ is interested in Endpoint Descriptions.
+ 
+ The Endpoint Listener is called back when matching endpoints are added or
+ removed. Consumers interested in the modification of endpoints, when
+ associated service properties are changed, should use an
+ {@link EndpointEventListener} instead.
+ 
+ This white board service can be used in many different scenarios. However,
+ the primary use case is to allow a remote manager to be informed of Endpoint
+ Descriptions available in the network and inform the network about available
+ Endpoint Descriptions.
+ 
+ Both the network bundle and the manager bundle register an Endpoint Listener
+ service. The manager informs the network bundle about Endpoints that it
+ creates. The network bundles then uses a protocol like SLP to announce these
+ local end-points to the network.
+ 
+ If the network bundle discovers a new Endpoint through its discovery
+ protocol, then it sends an Endpoint Description to all the Endpoint Listener
+ services that are registered (except its own) that have specified an interest
+ in that endpoint.
+ 
+ Endpoint Listener services can express their <i>scope</i> with the service
+ property {@link #ENDPOINT_LISTENER_SCOPE}. This service property is a list of
+ filters. An Endpoint Description should only be given to a Endpoint Listener
+ when there is at least one filter that matches the Endpoint Description
+ properties.
+ 
+ This filter model is quite flexible. For example, a discovery bundle is only
+ interested in locally originating Endpoint Descriptions. The following filter
+ ensure that it only sees local endpoints.
+ 
+ <pre>&#8194;&#8194;&#8194;(org.osgi.framework.uuid=72dc5fd9-5f8f-4f8f-9821-9ebb433a5b72)</pre>
+ 
+ In the same vein, a manager that is only interested in remote Endpoint
+ Descriptions can use a filter like:
+ 
+ <pre>&#8194;&#8194;&#8194;(!(org.osgi.framework.uuid=72dc5fd9-5f8f-4f8f-9821-9ebb433a5b72))</pre>
+ 
+ Where in both cases, the given UUID is the UUID of the local framework that
+ can be found in the Framework properties.
+ 
+ The Endpoint Listener's scope maps very well to the service hooks. A manager
+ can just register all filters found from the Listener Hook as its scope. This
+ will automatically provide it with all known endpoints that match the given
+ scope, without having to inspect the filter string.
+ 
+ In general, when an Endpoint Description is discovered, it should be
+ dispatched to all registered Endpoint Listener services. If a new Endpoint
+ Listener is registered, it should be informed about all currently known
+ Endpoints that match its scope. If a getter of the Endpoint Listener service
+ is unregistered, then all its registered Endpoint Description objects must be
+ removed.
+ 
+ The Endpoint Listener models a <i>best effort</i> approach. Participating
+ bundles should do their utmost to keep the listeners up to date, but
+ implementers should realize that many endpoints come through unreliable
+ discovery processes.
+   </description>
+<ThreadSafe></ThreadSafe><deprecated>@deprecated As of 1.1. Replaced by EndpointEventListener.</deprecated><author>@author $Id: 391db85af2c57252d7a5f3aac586cee2a8966e44 $</author>
+    <method name='endpointAdded' fqn='org.osgi.service.remoteserviceadmin.EndpointListener.endpointAdded' qn='EndpointListener.endpointAdded(EndpointDescription,String)' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='void' qualifiedTypeName='void' typeArgs='' dimension='' signature='(org.osgi.service.remoteserviceadmin.EndpointDescription,java.lang.String)' flatSignature='(EndpointDescription,String)'>
+   <lead>
+Register an endpoint with this listener.
+   </lead>
+   <description>
+Register an endpoint with this listener.
+ 
+ If the endpoint matches one of the filters registered with the
+ {@link #ENDPOINT_LISTENER_SCOPE} service property then this filter should
+ be given as the {@code matchedFilter} parameter.
+ 
+ When this service is first registered or it is modified, it should
+ receive all known endpoints matching the filter.
+   </description>
+
+<param name='endpoint'>The Endpoint Description to be published</param>
+<param name='matchedFilter'>The filter from the {@link #ENDPOINT_LISTENER_SCOPE}
+        that matched the endpoint, must not be {@code null}.</param>
+
+
+
+
+    <parameter name='endpoint' dimension='' typeName='EndpointDescription' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription' varargs='false'/>
+    <parameter name='matchedFilter' dimension='' typeName='String' fqn='java.lang.String' varargs='false'/>
+     </method>
+    <method name='endpointRemoved' fqn='org.osgi.service.remoteserviceadmin.EndpointListener.endpointRemoved' qn='EndpointListener.endpointRemoved(EndpointDescription,String)' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='void' qualifiedTypeName='void' typeArgs='' dimension='' signature='(org.osgi.service.remoteserviceadmin.EndpointDescription,java.lang.String)' flatSignature='(EndpointDescription,String)'>
+   <lead>
+Remove the registration of an endpoint.
+   </lead>
+   <description>
+Remove the registration of an endpoint.
+ 
+ If an endpoint that was registered with the
+ {@link #endpointAdded(EndpointDescription, String)} method is no longer
+ available then this method should be called. This will remove the
+ endpoint from the listener.
+ 
+ It is not necessary to remove endpoints when the service is unregistered
+ or modified in such a way that not all endpoints match the interest
+ filter anymore.
+   </description>
+
+<param name='endpoint'>The Endpoint Description that is no longer valid.</param>
+<param name='matchedFilter'>The filter from the {@link #ENDPOINT_LISTENER_SCOPE}
+        that matched the endpoint, must not be {@code null}.</param>
+
+
+
+
+    <parameter name='endpoint' dimension='' typeName='EndpointDescription' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription' varargs='false'/>
+    <parameter name='matchedFilter' dimension='' typeName='String' fqn='java.lang.String' varargs='false'/>
+     </method>
+    <field name='ENDPOINT_LISTENER_SCOPE' fqn='org.osgi.service.remoteserviceadmin.EndpointListener.ENDPOINT_LISTENER_SCOPE' qn='EndpointListener.ENDPOINT_LISTENER_SCOPE' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"endpoint.listener.scope"'>
+   <lead>
+Specifies the interest of this listener with filters.
+   </lead>
+   <description>
+Specifies the interest of this listener with filters. This listener is
+ only interested in Endpoint Descriptions where its properties match the
+ given filter. The type of this property must be {@code String+}.
+   </description>
+
+     </field>
+  </class>
+  <class name='EndpointPermission' fqn='org.osgi.service.remoteserviceadmin.EndpointPermission' qn='EndpointPermission' package='org.osgi.service.remoteserviceadmin' typeParam='' modifiers='public final class' superclass='Permission' kind='CLASS'>
+   <lead>
+A bundle's authority to export, import or read an Endpoint.
+   </lead>
+   <description>
+A bundle's authority to export, import or read an Endpoint.
+ <ul>
+ <li>The {@code export} action allows a bundle to export a service as an
+ Endpoint.</li>
+ <li>The {@code import} action allows a bundle to import a service from an
+ Endpoint.</li>
+ <li>The {@code read} action allows a bundle to read references to an
+ Endpoint.</li>
+ </ul>
+ Permission to read an Endpoint is required in order to detect events
+ regarding an Endpoint. Untrusted bundles should not be able to detect the
+ presence of certain Endpoints unless they have the appropriate
+ {@code EndpointPermission} to read the specific service.
+   </description>
+<ThreadSafe></ThreadSafe><author>@author $Id: fff731121e2a412ae181485e66c5b9e56a7dd63b $</author>
+    <method name='EndpointPermission' fqn='org.osgi.service.remoteserviceadmin.EndpointPermission.EndpointPermission' qn='EndpointPermission.EndpointPermission(String,String)' package='org.osgi.service.remoteserviceadmin' typeArgs='' modifiers='public' signature='(java.lang.String,java.lang.String)' flatSignature='(String,String)' isConstructor='true'>
+   <lead>
+Create a new EndpointPermission with the specified filter.
+   </lead>
+   <description>
+Create a new EndpointPermission with the specified filter.
+ 
+ <p>
+ The filter will be evaluated against the endpoint properties of a
+ requested EndpointPermission.
+ 
+ </p><p>
+ There are three possible actions: {@code read}, {@code import} and
+ {@code export}. The {@code read} action allows the owner of this
+ permission to see the presence of distributed services. The
+ {@code import} action allows the owner of this permission to import an
+ endpoint. The {@code export} action allows the owner of this permission
+ to export a service.</p>
+   </description>
+
+<param name='filterString'>The filter string or &quot;*&quot; to match all
+        endpoints.</param>
+<param name='actions'>The actions {@code read}, {@code import}, or
+        {@code export}.</param>
+
+
+<throws name='IllegalArgumentException'>If the filter has an invalid syntax or
+         the actions are not valid.</throws>
+
+
+    <parameter name='filterString' dimension='' typeName='String' fqn='java.lang.String' varargs='false'/>
+    <parameter name='actions' dimension='' typeName='String' fqn='java.lang.String' varargs='false'/>
+     </method>
+    <method name='EndpointPermission' fqn='org.osgi.service.remoteserviceadmin.EndpointPermission.EndpointPermission' qn='EndpointPermission.EndpointPermission(EndpointDescription,String,String)' package='org.osgi.service.remoteserviceadmin' typeArgs='' modifiers='public' signature='(org.osgi.service.remoteserviceadmin.EndpointDescription,java.lang.String,java.lang.String)' flatSignature='(EndpointDescription,String,String)' isConstructor='true'>
+   <lead>
+Creates a new requested {@code EndpointPermission} object to be used by
+ code that must perform {@code checkPermission}.
+   </lead>
+   <description>
+Creates a new requested {@code EndpointPermission} object to be used by
+ code that must perform {@code checkPermission}.
+ {@code EndpointPermission} objects created with this constructor cannot
+ be added to an {@code EndpointPermission} permission collection.
+   </description>
+
+<param name='endpoint'>The requested endpoint.</param>
+<param name='localFrameworkUUID'>The UUID of the local framework. This is used
+        to support matching the
+        {@link RemoteConstants#ENDPOINT_FRAMEWORK_UUID endpoint.framework.uuid} endpoint property to the
+        {@code &lt;&lt;LOCAL&gt;&gt;} value in the filter expression.</param>
+<param name='actions'>The actions {@code read}, {@code import}, or
+        {@code export}.</param>
+
+
+<throws name='IllegalArgumentException'>If the endpoint is {@code null} or the
+         actions are not valid.</throws>
+
+
+    <parameter name='endpoint' dimension='' typeName='EndpointDescription' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription' varargs='false'/>
+    <parameter name='localFrameworkUUID' dimension='' typeName='String' fqn='java.lang.String' varargs='false'/>
+    <parameter name='actions' dimension='' typeName='String' fqn='java.lang.String' varargs='false'/>
+     </method>
+    <method name='implies' fqn='org.osgi.service.remoteserviceadmin.EndpointPermission.implies' qn='EndpointPermission.implies(Permission)' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='boolean' qualifiedTypeName='boolean' typeArgs='' dimension='' signature='(java.security.Permission)' flatSignature='(Permission)'>
+<java.lang.Override></java.lang.Override>
+   <lead>
+Determines if a {@code EndpointPermission} object "implies" the specified
+ permission.
+   </lead>
+   <description>
+Determines if a {@code EndpointPermission} object "implies" the specified
+ permission.
+   </description>
+
+<param name='p'>The target permission to check.</param>
+
+<return>{@code true} if the specified permission is implied by this
+         object; {@code false} otherwise.</return>
+
+
+
+    <parameter name='p' dimension='' typeName='Permission' fqn='java.security.Permission' varargs='false'/>
+     </method>
+    <method name='getActions' fqn='org.osgi.service.remoteserviceadmin.EndpointPermission.getActions' qn='EndpointPermission.getActions()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='String' qualifiedTypeName='java.lang.String' typeArgs='' dimension='' signature='()' flatSignature='()'>
+<java.lang.Override></java.lang.Override>
+   <lead>
+Returns the canonical string representation of the actions.
+   </lead>
+   <description>
+Returns the canonical string representation of the actions. Always
+ returns present actions in the following canonical order: {@code read},
+ {@code import}, {@code export}.
+   </description>
+
+
+<return>The canonical string representation of the actions.</return>
+
+
+
+     </method>
+    <method name='newPermissionCollection' fqn='org.osgi.service.remoteserviceadmin.EndpointPermission.newPermissionCollection' qn='EndpointPermission.newPermissionCollection()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='PermissionCollection' qualifiedTypeName='java.security.PermissionCollection' typeArgs='' dimension='' signature='()' flatSignature='()'>
+<java.lang.Override></java.lang.Override>
+   <lead>
+Returns a new {@code PermissionCollection} object for storing
+ {@code EndpointPermission} objects.
+   </lead>
+   <description>
+Returns a new {@code PermissionCollection} object for storing
+ {@code EndpointPermission} objects.
+   </description>
+
+
+<return>A new {@code PermissionCollection} object suitable for storing
+         {@code EndpointPermission} objects.</return>
+
+
+
+     </method>
+    <method name='equals' fqn='org.osgi.service.remoteserviceadmin.EndpointPermission.equals' qn='EndpointPermission.equals(Object)' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='boolean' qualifiedTypeName='boolean' typeArgs='' dimension='' signature='(java.lang.Object)' flatSignature='(Object)'>
+<java.lang.Override></java.lang.Override>
+   <lead>
+Determines the equality of two EndpointPermission objects.
+   </lead>
+   <description>
+Determines the equality of two EndpointPermission objects.
+ 
+ Checks that specified object has the same name, actions and endpoint as
+ this {@code EndpointPermission}.
+   </description>
+
+<param name='obj'>The object to test for equality.</param>
+
+<return>true If obj is a {@code EndpointPermission}, and has the same
+         name, actions and endpoint as this {@code EndpointPermission}
+         object; {@code false} otherwise.</return>
+
+
+
+    <parameter name='obj' dimension='' typeName='Object' fqn='java.lang.Object' varargs='false'/>
+     </method>
+    <method name='hashCode' fqn='org.osgi.service.remoteserviceadmin.EndpointPermission.hashCode' qn='EndpointPermission.hashCode()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='int' qualifiedTypeName='int' typeArgs='' dimension='' signature='()' flatSignature='()'>
+<java.lang.Override></java.lang.Override>
+   <lead>
+Returns the hash code value for this object.
+   </lead>
+   <description>
+Returns the hash code value for this object.
+   </description>
+
+
+<return>Hash code value for this object.</return>
+
+
+
+     </method>
+    <field name='READ' fqn='org.osgi.service.remoteserviceadmin.EndpointPermission.READ' qn='EndpointPermission.READ' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"read"'>
+   <lead>
+The action string {@code read}.
+   </lead>
+   <description>
+The action string {@code read}.
+   </description>
+
+     </field>
+    <field name='IMPORT' fqn='org.osgi.service.remoteserviceadmin.EndpointPermission.IMPORT' qn='EndpointPermission.IMPORT' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"import"'>
+   <lead>
+The action string {@code import}.
+   </lead>
+   <description>
+The action string {@code import}. The {@code import} action implies the
+ {@code read} action.
+   </description>
+
+     </field>
+    <field name='EXPORT' fqn='org.osgi.service.remoteserviceadmin.EndpointPermission.EXPORT' qn='EndpointPermission.EXPORT' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"export"'>
+   <lead>
+The action string {@code export}.
+   </lead>
+   <description>
+The action string {@code export}. The {@code export} action implies the
+ {@code read} action.
+   </description>
+
+     </field>
+  </class>
+  <class name='ExportReference' fqn='org.osgi.service.remoteserviceadmin.ExportReference' qn='ExportReference' package='org.osgi.service.remoteserviceadmin' typeParam='' modifiers='public abstract' interface='yes' kind='INTERFACE'>
+<org.osgi.annotation.versioning.ProviderType></org.osgi.annotation.versioning.ProviderType>
+   <lead>
+An Export Reference associates a service with a local endpoint.
+   </lead>
+   <description>
+An Export Reference associates a service with a local endpoint.
+ 
+ The Export Reference can be used to reference an exported service. When the
+ service is no longer exported, all methods must return {@code null}.
+   </description>
+<ThreadSafe></ThreadSafe><author>@author $Id: d2f01cd1983a51b39a64dd3e1fd2fca6a1dd589c $</author>
+    <method name='getExportedService' fqn='org.osgi.service.remoteserviceadmin.ExportReference.getExportedService' qn='ExportReference.getExportedService()' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='ServiceReference&lt;?&gt;' qualifiedTypeName='org.osgi.framework.ServiceReference' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the service being exported.
+   </lead>
+   <description>
+Return the service being exported.
+   </description>
+
+
+<return>The service being exported. Must be {@code null} when the service
+         is no longer exported.</return>
+
+
+
+     </method>
+    <method name='getExportedEndpoint' fqn='org.osgi.service.remoteserviceadmin.ExportReference.getExportedEndpoint' qn='ExportReference.getExportedEndpoint()' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='EndpointDescription' qualifiedTypeName='org.osgi.service.remoteserviceadmin.EndpointDescription' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the Endpoint Description for the local endpoint.
+   </lead>
+   <description>
+Return the Endpoint Description for the local endpoint.
+   </description>
+
+
+<return>The Endpoint Description for the local endpoint. Must be
+         {@code null} when the service is no longer exported.</return>
+
+
+
+     </method>
+  </class>
+  <class name='ExportRegistration' fqn='org.osgi.service.remoteserviceadmin.ExportRegistration' qn='ExportRegistration' package='org.osgi.service.remoteserviceadmin' typeParam='' modifiers='public abstract' interface='yes' kind='INTERFACE'>
+<org.osgi.annotation.versioning.ProviderType></org.osgi.annotation.versioning.ProviderType>
+   <lead>
+An Export Registration associates a service to a local endpoint.
+   </lead>
+   <description>
+An Export Registration associates a service to a local endpoint.
+ 
+ The Export Registration can be used to delete the endpoint associated with an
+ this registration. It is created with the
+ {@link RemoteServiceAdmin#exportService(ServiceReference,Map)} method.
+ 
+ When this Export Registration has been closed, all methods must return
+ {@code null}.
+   </description>
+<ThreadSafe></ThreadSafe><author>@author $Id: 833b6a20c4c773d3963baac74b3e2c5063f95bcb $</author>
+    <method name='getExportReference' fqn='org.osgi.service.remoteserviceadmin.ExportRegistration.getExportReference' qn='ExportRegistration.getExportReference()' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='ExportReference' qualifiedTypeName='org.osgi.service.remoteserviceadmin.ExportReference' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the Export Reference for the exported service.
+   </lead>
+   <description>
+Return the Export Reference for the exported service.
+   </description>
+
+
+<return>The Export Reference for this registration, or <code>null</code>
+         if this Import Registration is closed.</return>
+
+<throws name='IllegalStateException'>When this registration was not properly
+         initialized. See {@link #getException()}.</throws>
+
+
+     </method>
+    <method name='update' fqn='org.osgi.service.remoteserviceadmin.ExportRegistration.update' qn='ExportRegistration.update(Map)' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='EndpointDescription' qualifiedTypeName='org.osgi.service.remoteserviceadmin.EndpointDescription' typeArgs='' dimension='' signature='(java.util.Map&lt;java.lang.String,?&gt;)' flatSignature='(Map)'>
+   <lead>
+Update the endpoint represented by this {@link ExportRegistration} and
+ return an updated {@link EndpointDescription}.
+   </lead>
+   <description>
+Update the endpoint represented by this {@link ExportRegistration} and
+ return an updated {@link EndpointDescription}. If this method returns an
+ updated {@link EndpointDescription}, then the object returned via
+ {@link #getExportReference()} must also have been updated to return this
+ new object. If this method does not return an updated
+ {@link EndpointDescription} then the object returned via
+ {@link #getExportReference()} should remain unchanged.
+ 
+ When creating the updated {@link EndpointDescription} the
+ {@link ServiceReference} originally passed to
+ {@link RemoteServiceAdmin#exportService(ServiceReference, Map)} must be
+ queried to pick up any changes to its service properties.
+ 
+ If this argument is null then the original properties passed when
+ creating this ExportRegistration should be used when constructing the
+ updated {@link EndpointDescription}. Otherwise the new properties should
+ be used, and replace the original properties for subsequent calls to the
+ update method.
+   </description>
+
+<param name='properties'>properties to be merged with the current service
+        properties for the {@link ServiceReference} represented by this
+        {@link ExportRegistration}. If null is passed then the original
+        properties passed to
+        {@link RemoteServiceAdmin#exportService(ServiceReference, Map)}
+        will be used.</param>
+
+<return>The updated {@link EndpointDescription} for this registration or
+         null if there was a failure updating the endpoint. If a failure
+         occurs then it can be accessed using {@link #getException()}.</return>
+
+<throws name='IllegalStateException'>If this registration is closed, or when
+         this registration was not properly initialized. See
+         {@link #getException()}.</throws>
+
+<since>@since 1.1</since>
+    <parameter name='properties' dimension='' typeName='Map&lt;String, ?&gt;' fqn='java.util.Map' varargs='false'/>
+     </method>
+    <method name='close' fqn='org.osgi.service.remoteserviceadmin.ExportRegistration.close' qn='ExportRegistration.close()' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='void' qualifiedTypeName='void' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Delete the local endpoint and disconnect any remote distribution
+ providers.
+   </lead>
+   <description>
+Delete the local endpoint and disconnect any remote distribution
+ providers. After this method returns, all methods must return
+ {@code null}.
+ 
+ This method has no effect when this registration has already been closed
+ or is being closed.
+   </description>
+
+
+
+
+
+     </method>
+    <method name='getException' fqn='org.osgi.service.remoteserviceadmin.ExportRegistration.getException' qn='ExportRegistration.getException()' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='Throwable' qualifiedTypeName='java.lang.Throwable' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the exception for any error during the export process.
+   </lead>
+   <description>
+Return the exception for any error during the export process.
+ 
+ If the Remote Service Admin for some reasons is unable to properly
+ initialize this registration, then it must return an exception from this
+ method. If no error occurred, this method must return {@code null}.
+ 
+ The error must be set before this Export Registration is returned.
+ Asynchronously occurring errors must be reported to the log.
+   </description>
+
+
+<return>The exception that occurred during the initialization of this
+         registration or {@code null} if no exception occurred.</return>
+
+
+
+     </method>
+  </class>
+  <class name='ImportReference' fqn='org.osgi.service.remoteserviceadmin.ImportReference' qn='ImportReference' package='org.osgi.service.remoteserviceadmin' typeParam='' modifiers='public abstract' interface='yes' kind='INTERFACE'>
+<org.osgi.annotation.versioning.ProviderType></org.osgi.annotation.versioning.ProviderType>
+   <lead>
+An Import Reference associates an active proxy service to a remote endpoint.
+   </lead>
+   <description>
+An Import Reference associates an active proxy service to a remote endpoint.
+ 
+ The Import Reference can be used to reference an imported service. When the
+ service is no longer imported, all methods must return {@code null}.
+   </description>
+<ThreadSafe></ThreadSafe><author>@author $Id: fa0e7e5fa470a09a298e298abea2a503963dcec9 $</author>
+    <method name='getImportedService' fqn='org.osgi.service.remoteserviceadmin.ImportReference.getImportedService' qn='ImportReference.getImportedService()' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='ServiceReference&lt;?&gt;' qualifiedTypeName='org.osgi.framework.ServiceReference' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the Service Reference for the proxy for the endpoint.
+   </lead>
+   <description>
+Return the Service Reference for the proxy for the endpoint.
+   </description>
+
+
+<return>The Service Reference to the proxy for the endpoint. Must be
+         {@code null} when the service is no longer imported.</return>
+
+
+
+     </method>
+    <method name='getImportedEndpoint' fqn='org.osgi.service.remoteserviceadmin.ImportReference.getImportedEndpoint' qn='ImportReference.getImportedEndpoint()' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='EndpointDescription' qualifiedTypeName='org.osgi.service.remoteserviceadmin.EndpointDescription' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the Endpoint Description for the remote endpoint.
+   </lead>
+   <description>
+Return the Endpoint Description for the remote endpoint.
+   </description>
+
+
+<return>The Endpoint Description for the remote endpoint. Must be
+         {@code null} when the service is no longer imported.</return>
+
+
+
+     </method>
+  </class>
+  <class name='ImportRegistration' fqn='org.osgi.service.remoteserviceadmin.ImportRegistration' qn='ImportRegistration' package='org.osgi.service.remoteserviceadmin' typeParam='' modifiers='public abstract' interface='yes' kind='INTERFACE'>
+<org.osgi.annotation.versioning.ProviderType></org.osgi.annotation.versioning.ProviderType>
+   <lead>
+An Import Registration associates an active proxy service to a remote
+ endpoint.
+   </lead>
+   <description>
+An Import Registration associates an active proxy service to a remote
+ endpoint.
+ 
+ The Import Registration can be used to delete the proxy associated with an
+ endpoint. It is created with the
+ {@link RemoteServiceAdmin#importService(EndpointDescription)} method.
+ 
+ When this Import Registration has been closed, all methods must return
+ {@code null}.
+   </description>
+<ThreadSafe></ThreadSafe><author>@author $Id: c201762c4d6a22af806b023b09af75fd6c76c1a1 $</author>
+    <method name='getImportReference' fqn='org.osgi.service.remoteserviceadmin.ImportRegistration.getImportReference' qn='ImportRegistration.getImportReference()' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='ImportReference' qualifiedTypeName='org.osgi.service.remoteserviceadmin.ImportReference' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the Import Reference for the imported service.
+   </lead>
+   <description>
+Return the Import Reference for the imported service.
+   </description>
+
+
+<return>The Import Reference for this registration, or <code>null</code>
+         if this Import Registration is closed.</return>
+
+<throws name='IllegalStateException'>When this registration was not properly
+         initialized. See {@link #getException()}.</throws>
+
+
+     </method>
+    <method name='update' fqn='org.osgi.service.remoteserviceadmin.ImportRegistration.update' qn='ImportRegistration.update(EndpointDescription)' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='boolean' qualifiedTypeName='boolean' typeArgs='' dimension='' signature='(org.osgi.service.remoteserviceadmin.EndpointDescription)' flatSignature='(EndpointDescription)'>
+   <lead>
+Update the local service represented by this {@link ImportRegistration}.
+   </lead>
+   <description>
+Update the local service represented by this {@link ImportRegistration}.
+ After this method returns the {@link EndpointDescription} returned via
+ {@link #getImportReference()} must have been updated.
+   </description>
+
+<param name='endpoint'>The updated endpoint</param>
+
+<return><code>true</code> if the endpoint was successfully updated,
+         <code>false</code> otherwise. If the update fails then the
+         failure can be retrieved from {@link #getException()}.</return>
+
+<throws name='IllegalStateException'>When this registration is closed, or if it
+         was not properly initialized. See {@link #getException()}.</throws>
+<throws name='IllegalArgumentException'>When the supplied
+         {@link EndpointDescription} does not represent the same endpoint
+         as this {@link ImportRegistration}.</throws>
+
+<since>@since 1.1</since>
+    <parameter name='endpoint' dimension='' typeName='EndpointDescription' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription' varargs='false'/>
+     </method>
+    <method name='close' fqn='org.osgi.service.remoteserviceadmin.ImportRegistration.close' qn='ImportRegistration.close()' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='void' qualifiedTypeName='void' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Close this Import Registration.
+   </lead>
+   <description>
+Close this Import Registration. This must close the connection to the
+ endpoint and unregister the proxy. After this method returns, all other
+ methods must return {@code null}.
+ 
+ This method has no effect when this registration has already been closed
+ or is being closed.
+   </description>
+
+
+
+
+
+     </method>
+    <method name='getException' fqn='org.osgi.service.remoteserviceadmin.ImportRegistration.getException' qn='ImportRegistration.getException()' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='Throwable' qualifiedTypeName='java.lang.Throwable' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the exception for any error during the import process.
+   </lead>
+   <description>
+Return the exception for any error during the import process.
+ 
+ If the Remote Service Admin for some reasons is unable to properly
+ initialize this registration, then it must return an exception from this
+ method. If no error occurred, this method must return {@code null}.
+ 
+ The error must be set before this Import Registration is returned.
+ Asynchronously occurring errors must be reported to the log.
+   </description>
+
+
+<return>The exception that occurred during the initialization of this
+         registration or {@code null} if no exception occurred.</return>
+
+
+
+     </method>
+  </class>
+  <class name='RemoteConstants' fqn='org.osgi.service.remoteserviceadmin.RemoteConstants' qn='RemoteConstants' package='org.osgi.service.remoteserviceadmin' typeParam='' modifiers='public class' kind='CLASS'>
+   <lead>
+Provide the definition of the constants used in the Remote Service Admin
+ specification.
+   </lead>
+   <description>
+Provide the definition of the constants used in the Remote Service Admin
+ specification.
+   </description>
+<Immutable></Immutable><author>@author $Id: 6a43b2bb0342a732b576e4d8de0e25465b835bbb $</author>
+    <field name='REMOTE_CONFIGS_SUPPORTED' fqn='org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_CONFIGS_SUPPORTED' qn='RemoteConstants.REMOTE_CONFIGS_SUPPORTED' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"remote.configs.supported"'>
+   <lead>
+Service property identifying the configuration types supported by a
+ distribution provider.
+   </lead>
+   <description>
+Service property identifying the configuration types supported by a
+ distribution provider. Registered by the distribution provider on one of
+ its services to indicate the supported configuration types.
+ 
+ <p>
+ The value of this property must be of type {@code String},
+ {@code String[]}, or {@code Collection} of {@code String}.</p>
+   </description>
+<a>Remote Services Specification</a>
+     </field>
+    <field name='REMOTE_INTENTS_SUPPORTED' fqn='org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_INTENTS_SUPPORTED' qn='RemoteConstants.REMOTE_INTENTS_SUPPORTED' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"remote.intents.supported"'>
+   <lead>
+Service property identifying the intents supported by a distribution
+ provider.
+   </lead>
+   <description>
+Service property identifying the intents supported by a distribution
+ provider. Registered by the distribution provider on one of its services
+ to indicate the vocabulary of implemented intents.
+ 
+ <p>
+ The value of this property must be of type {@code String},
+ {@code String[]}, or {@code Collection} of {@code String}.</p>
+   </description>
+<a>Remote Services Specification</a>
+     </field>
+    <field name='SERVICE_EXPORTED_CONFIGS' fqn='org.osgi.service.remoteserviceadmin.RemoteConstants.SERVICE_EXPORTED_CONFIGS' qn='RemoteConstants.SERVICE_EXPORTED_CONFIGS' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"service.exported.configs"'>
+   <lead>
+Service property identifying the configuration types that should be used
+ to export the service.
+   </lead>
+   <description>
+Service property identifying the configuration types that should be used
+ to export the service. Each configuration type represents the
+ configuration parameters for an endpoint. A distribution provider should
+ create an endpoint for each configuration type that it supports.
+ 
+ <p>
+ This property may be supplied in the {@code properties}
+ {@code Dictionary} object passed to the
+ {@code BundleContext.registerService} method. The value of this property
+ must be of type {@code String}, {@code String[]}, or {@code Collection}
+ of {@code String}.</p>
+   </description>
+<a>Remote Services Specification</a>
+     </field>
+    <field name='SERVICE_EXPORTED_INTENTS' fqn='org.osgi.service.remoteserviceadmin.RemoteConstants.SERVICE_EXPORTED_INTENTS' qn='RemoteConstants.SERVICE_EXPORTED_INTENTS' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"service.exported.intents"'>
+   <lead>
+Service property identifying the intents that the distribution provider
+ must implement to distribute the service.
+   </lead>
+   <description>
+Service property identifying the intents that the distribution provider
+ must implement to distribute the service. Intents listed in this property
+ are reserved for intents that are critical for the code to function
+ correctly, for example, ordering of messages. These intents should not be
+ configurable.
+ 
+ <p>
+ This property may be supplied in the {@code properties}
+ {@code Dictionary} object passed to the
+ {@code BundleContext.registerService} method. The value of this property
+ must be of type {@code String}, {@code String[]}, or {@code Collection}
+ of {@code String}.</p>
+   </description>
+<a>Remote Services Specification</a>
+     </field>
+    <field name='SERVICE_EXPORTED_INTENTS_EXTRA' fqn='org.osgi.service.remoteserviceadmin.RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA' qn='RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"service.exported.intents.extra"'>
+   <lead>
+Service property identifying the extra intents that the distribution
+ provider must implement to distribute the service.
+   </lead>
+   <description>
+Service property identifying the extra intents that the distribution
+ provider must implement to distribute the service. This property is
+ merged with the {@code service.exported.intents} property before the
+ distribution provider interprets the listed intents; it has therefore the
+ same semantics but the property should be configurable so the
+ administrator can choose the intents based on the topology. Bundles
+ should therefore make this property configurable, for example through the
+ Configuration Admin service.
+ 
+ <p>
+ This property may be supplied in the {@code properties}
+ {@code Dictionary} object passed to the
+ {@code BundleContext.registerService} method. The value of this property
+ must be of type {@code String}, {@code String[]}, or {@code Collection}
+ of {@code String}.</p>
+   </description>
+<a>Remote Services Specification</a>
+     </field>
+    <field name='SERVICE_EXPORTED_INTERFACES' fqn='org.osgi.service.remoteserviceadmin.RemoteConstants.SERVICE_EXPORTED_INTERFACES' qn='RemoteConstants.SERVICE_EXPORTED_INTERFACES' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"service.exported.interfaces"'>
+   <lead>
+Service property marking the service for export.
+   </lead>
+   <description>
+Service property marking the service for export. It defines the
+ interfaces under which this service can be exported. This list must be a
+ subset of the types under which the service was registered. The single
+ value of an asterisk ({@code &apos;*&apos;} &#92;u002A) indicates all the interface
+ types under which the service was registered excluding the non-interface
+ types. It is strongly recommended to only export interface types and not
+ concrete classes due to the complexity of creating proxies for some type
+ of concrete classes.
+ 
+ <p>
+ This property may be supplied in the {@code properties}
+ {@code Dictionary} object passed to the
+ {@code BundleContext.registerService} method. The value of this property
+ must be of type {@code String}, {@code String[]}, or {@code Collection}
+ of {@code String}.</p>
+   </description>
+<a>Remote Services Specification</a>
+     </field>
+    <field name='SERVICE_IMPORTED' fqn='org.osgi.service.remoteserviceadmin.RemoteConstants.SERVICE_IMPORTED' qn='RemoteConstants.SERVICE_IMPORTED' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"service.imported"'>
+   <lead>
+Service property identifying the service as imported.
+   </lead>
+   <description>
+Service property identifying the service as imported. This service
+ property must be set by a distribution provider to any value when it
+ registers the endpoint proxy as an imported service. A bundle can use
+ this property to filter out imported services.
+ 
+ <p>
+ The value of this property may be of any type.</p>
+   </description>
+<a>Remote Services Specification</a>
+     </field>
+    <field name='SERVICE_IMPORTED_CONFIGS' fqn='org.osgi.service.remoteserviceadmin.RemoteConstants.SERVICE_IMPORTED_CONFIGS' qn='RemoteConstants.SERVICE_IMPORTED_CONFIGS' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"service.imported.configs"'>
+   <lead>
+Service property identifying the configuration types used to import the
+ service.
+   </lead>
+   <description>
+Service property identifying the configuration types used to import the
+ service. Any associated properties for this configuration types must be
+ properly mapped to the importing system. For example, a URL in these
+ properties must point to a valid resource when used in the importing
+ framework. If multiple configuration types are listed in this property,
+ then they must be synonyms for exactly the same remote endpoint that is
+ used to export this service.
+ 
+ <p>
+ The value of this property must be of type {@code String},
+ {@code String[]}, or {@code Collection} of {@code String}.</p>
+   </description>
+<a>Remote Services Specification</a><a href='#SERVICE_EXPORTED_CONFIGS'>SERVICE_EXPORTED_CONFIGS</a>
+     </field>
+    <field name='SERVICE_INTENTS' fqn='org.osgi.service.remoteserviceadmin.RemoteConstants.SERVICE_INTENTS' qn='RemoteConstants.SERVICE_INTENTS' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"service.intents"'>
+   <lead>
+Service property identifying the intents that this service implement.
+   </lead>
+   <description>
+Service property identifying the intents that this service implement.
+ This property has a dual purpose:
+ <ul>
+ <li>A bundle can use this service property to notify the distribution
+ provider that these intents are already implemented by the exported
+ service object.</li>
+ <li>A distribution provider must use this property to convey the combined
+ intents of: The exporting service, and the intents that the exporting
+ distribution provider adds, and the intents that the importing
+ distribution provider adds.</li>
+ </ul>
+ 
+ To export a service, a distribution provider must expand any qualified
+ intents. Both the exporting and importing distribution providers must
+ recognize all intents before a service can be distributed.
+ 
+ The value of this property must be of type {@code String},
+ {@code String[]}, or {@code Collection} of {@code String}.
+   </description>
+<a>Remote Services Specification</a>
+     </field>
+    <field name='ENDPOINT_ID' fqn='org.osgi.service.remoteserviceadmin.RemoteConstants.ENDPOINT_ID' qn='RemoteConstants.ENDPOINT_ID' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"endpoint.id"'>
+   <lead>
+Endpoint property identifying the id for this endpoint.
+   </lead>
+   <description>
+Endpoint property identifying the id for this endpoint. This service
+ property must always be set.
+ 
+ <p>
+ The value of this property must be of type {@code String}.</p>
+   </description>
+
+     </field>
+    <field name='ENDPOINT_SERVICE_ID' fqn='org.osgi.service.remoteserviceadmin.RemoteConstants.ENDPOINT_SERVICE_ID' qn='RemoteConstants.ENDPOINT_SERVICE_ID' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"endpoint.service.id"'>
+   <lead>
+Endpoint property identifying the service id of the exported service.
+   </lead>
+   <description>
+Endpoint property identifying the service id of the exported service. Can
+ be absent or 0 if the corresponding endpoint is not for an OSGi service.
+ 
+ <p>
+ The value of this property must be of type {@code Long}.</p>
+   </description>
+
+     </field>
+    <field name='ENDPOINT_FRAMEWORK_UUID' fqn='org.osgi.service.remoteserviceadmin.RemoteConstants.ENDPOINT_FRAMEWORK_UUID' qn='RemoteConstants.ENDPOINT_FRAMEWORK_UUID' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"endpoint.framework.uuid"'>
+   <lead>
+Endpoint property identifying the universally unique id of the exporting
+ framework.
+   </lead>
+   <description>
+Endpoint property identifying the universally unique id of the exporting
+ framework. Can be absent if the corresponding endpoint is not for an OSGi
+ service.
+ 
+ <p>
+ The value of this property must be of type {@code String}.</p>
+   </description>
+
+     </field>
+    <field name='ENDPOINT_PACKAGE_VERSION_' fqn='org.osgi.service.remoteserviceadmin.RemoteConstants.ENDPOINT_PACKAGE_VERSION_' qn='RemoteConstants.ENDPOINT_PACKAGE_VERSION_' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"endpoint.package.version."'>
+   <lead>
+Prefix for an endpoint property identifying the interface Java package
+ version for an interface.
+   </lead>
+   <description>
+Prefix for an endpoint property identifying the interface Java package
+ version for an interface. For example, the property
+ {@code endpoint.package.version.com.acme=1.3} describes the version of
+ the package for the {@code com.acme.Foo} interface. This endpoint
+ property for an interface package does not have to be set. If not set,
+ the value must be assumed to be 0.
+ 
+ <p>
+ Since endpoint properties are stored in a case insensitive map, case
+ variants of a package name are folded together.
+ 
+ </p><p>
+ The value of properties having this prefix must be of type {@code String}.</p>
+   </description>
+
+     </field>
+  </class>
+  <class name='RemoteServiceAdmin' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdmin' qn='RemoteServiceAdmin' package='org.osgi.service.remoteserviceadmin' typeParam='' modifiers='public abstract' interface='yes' kind='INTERFACE'>
+<org.osgi.annotation.versioning.ProviderType></org.osgi.annotation.versioning.ProviderType>
+   <lead>
+A Remote Service Admin manages the import and export of services.
+   </lead>
+   <description>
+A Remote Service Admin manages the import and export of services.
+ 
+ A Distribution Provider can expose a control interface. This interface allows
+ a Topology Manager to control the export and import of services.
+ 
+ The API allows a Topology Manager to export a service, to import a service,
+ and find out about the current imports and exports.
+   </description>
+<ThreadSafe></ThreadSafe><author>@author $Id: 98482d8ebc634ae24429a6df2623ba7abf2e46d8 $</author>
+    <method name='exportService' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdmin.exportService' qn='RemoteServiceAdmin.exportService(ServiceReference,Map)' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='Collection&lt;ExportRegistration&gt;' qualifiedTypeName='java.util.Collection' typeArgs='' dimension='' signature='(org.osgi.framework.ServiceReference&lt;?&gt;,java.util.Map&lt;java.lang.String,?&gt;)' flatSignature='(ServiceReference,Map)'>
+   <lead>
+Export a service to a given Endpoint.
+   </lead>
+   <description>
+Export a service to a given Endpoint. The Remote Service Admin must
+ create an Endpoint from the given description that can be used by other
+ Distribution Providers to connect to this Remote Service Admin and use
+ the exported service.
+ 
+ The property keys of a Service Reference are case insensitive while the
+ property keys of the specified {@code properties} map are case sensitive.
+ A property key in the specified {@code properties} map must therefore
+ override any case variant property key in the properties of the specified
+ Service Reference.
+ 
+ <p>
+ If the caller does not have the appropriate
+ {@code EndpointPermission[endpoint,EXPORT]} for an Endpoint, and the Java
+ Runtime Environment supports permissions, then the
+ {@link ExportRegistration#getException() getException} method on the
+ corresponding returned {@link ExportRegistration} will return a
+ {@code SecurityException}.</p>
+   </description>
+
+<param name='reference'>The Service Reference to export.</param>
+<param name='properties'>The properties to create a local Endpoint that can be
+        implemented by this Remote Service Admin. If this is {@code null},
+        the Endpoint will be determined by the properties on the service.
+        The properties are the same as given for an exported service. They
+        override any properties in the specified Service Reference (case
+        insensitive). The properties {@code objectClass} and
+        {@code service.id}, in any case variant, are ignored. Those
+        properties in the Service Reference cannot be overridden. This
+        parameter can be {@code null}, this should be treated as an empty
+        map.</param>
+
+<return>A {@code Collection} of {@link ExportRegistration}s for the
+         specified Service Reference and properties. Multiple Export
+         Registrations may be returned because a single service can be
+         exported to multiple Endpoints depending on the available
+         configuration type properties and the intents that they support.
+         The result is never {@code null} but may be empty if this Remove
+         Service Admin does not recognize any of the configuration types,
+         or if the Remote Service Admin cannot support the relevant
+         intents.</return>
+
+<throws name='IllegalArgumentException'>If any of the properties for this
+         configuration type has a value that is not syntactically correct,
+         or if the service properties and the overlaid properties do not
+         contain a {@link RemoteConstants#SERVICE_EXPORTED_INTERFACES}
+         entry. This means that implementations must not ignore invalid
+         values for property names that they recognize.</throws>
+
+
+    <parameter name='reference' dimension='' typeName='ServiceReference&lt;?&gt;' fqn='org.osgi.framework.ServiceReference' varargs='false'/>
+    <parameter name='properties' dimension='' typeName='Map&lt;String, ?&gt;' fqn='java.util.Map' varargs='false'/>
+     </method>
+    <method name='importService' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdmin.importService' qn='RemoteServiceAdmin.importService(EndpointDescription)' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='ImportRegistration' qualifiedTypeName='org.osgi.service.remoteserviceadmin.ImportRegistration' typeArgs='' dimension='' signature='(org.osgi.service.remoteserviceadmin.EndpointDescription)' flatSignature='(EndpointDescription)'>
+   <lead>
+Import a service from an Endpoint.
+   </lead>
+   <description>
+Import a service from an Endpoint. The Remote Service Admin must use the
+ given Endpoint to create a proxy. This method can return {@code null} if
+ the service could not be imported.
+   </description>
+
+<param name='endpoint'>The Endpoint Description to be used for import.</param>
+
+<return>An Import Registration that combines the Endpoint Description and
+         the Service Reference or {@code null} if the Endpoint could not
+         be imported.</return>
+
+<throws name='SecurityException'>If the caller does not have the appropriate
+         {@code EndpointPermission[endpoint,IMPORT]} for the Endpoint, and
+         the Java Runtime Environment supports permissions.</throws>
+
+
+    <parameter name='endpoint' dimension='' typeName='EndpointDescription' fqn='org.osgi.service.remoteserviceadmin.EndpointDescription' varargs='false'/>
+     </method>
+    <method name='getExportedServices' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdmin.getExportedServices' qn='RemoteServiceAdmin.getExportedServices()' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='Collection&lt;ExportReference&gt;' qualifiedTypeName='java.util.Collection' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the currently active Export References.
+   </lead>
+   <description>
+Return the currently active Export References.
+ 
+ <p>
+ If the caller does not have the appropriate
+ {@code EndpointPermission[endpoint,READ]} for an Endpoint, and the Java
+ Runtime Environment supports permissions, then returned collection will
+ not contain a reference to the exported Endpoint.</p>
+   </description>
+
+
+<return>A {@code Collection} of {@link ExportReference}s that are
+         currently active.</return>
+
+
+
+     </method>
+    <method name='getImportedEndpoints' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdmin.getImportedEndpoints' qn='RemoteServiceAdmin.getImportedEndpoints()' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='Collection&lt;ImportReference&gt;' qualifiedTypeName='java.util.Collection' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the currently active Import References.
+   </lead>
+   <description>
+Return the currently active Import References.
+ 
+ <p>
+ If the caller does not have the appropriate
+ {@code EndpointPermission[endpoint,READ]} for an Endpoint, and the Java
+ Runtime Environment supports permissions, then returned collection will
+ not contain a reference to the imported Endpoint.</p>
+   </description>
+
+
+<return>A {@code Collection} of {@link ImportReference}s that are
+         currently active.</return>
+
+
+
+     </method>
+  </class>
+  <class name='RemoteServiceAdminEvent' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent' qn='RemoteServiceAdminEvent' package='org.osgi.service.remoteserviceadmin' typeParam='' modifiers='public class' kind='CLASS'>
+   <lead>
+Provides the event information for a Remote Service Admin event.
+   </lead>
+   <description>
+Provides the event information for a Remote Service Admin event.
+   </description>
+<Immutable></Immutable><author>@author $Id: fcdb2f3a8f8dd9d37cdf178164c16785a554f679 $</author>
+    <method name='RemoteServiceAdminEvent' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.RemoteServiceAdminEvent' qn='RemoteServiceAdminEvent.RemoteServiceAdminEvent(int,Bundle,ExportReference,Throwable)' package='org.osgi.service.remoteserviceadmin' typeArgs='' modifiers='public' signature='(int,org.osgi.framework.Bundle,org.osgi.service.remoteserviceadmin.ExportReference,java.lang.Throwable)' flatSignature='(int,Bundle,ExportReference,Throwable)' isConstructor='true'>
+   <lead>
+Create a Remote Service Admin Event for an export notification.
+   </lead>
+   <description>
+Create a Remote Service Admin Event for an export notification.
+   </description>
+
+<param name='type'>The event type.</param>
+<param name='source'>The source bundle, must not be {@code null}.</param>
+<param name='exportReference'>The exportReference, can not be {@code null}.</param>
+<param name='exception'>Any exceptions encountered, can be {@code null}.</param>
+
+
+
+
+    <parameter name='type' dimension='' typeName='int' fqn='int' varargs='false'/>
+    <parameter name='source' dimension='' typeName='Bundle' fqn='org.osgi.framework.Bundle' varargs='false'/>
+    <parameter name='exportReference' dimension='' typeName='ExportReference' fqn='org.osgi.service.remoteserviceadmin.ExportReference' varargs='false'/>
+    <parameter name='exception' dimension='' typeName='Throwable' fqn='java.lang.Throwable' varargs='false'/>
+     </method>
+    <method name='RemoteServiceAdminEvent' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.RemoteServiceAdminEvent' qn='RemoteServiceAdminEvent.RemoteServiceAdminEvent(int,Bundle,ImportReference,Throwable)' package='org.osgi.service.remoteserviceadmin' typeArgs='' modifiers='public' signature='(int,org.osgi.framework.Bundle,org.osgi.service.remoteserviceadmin.ImportReference,java.lang.Throwable)' flatSignature='(int,Bundle,ImportReference,Throwable)' isConstructor='true'>
+   <lead>
+Create a Remote Service Admin Event for an import notification.
+   </lead>
+   <description>
+Create a Remote Service Admin Event for an import notification.
+   </description>
+
+<param name='type'>The event type.</param>
+<param name='source'>The source bundle, must not be {@code null}.</param>
+<param name='importReference'>The importReference, can not be {@code null}.</param>
+<param name='exception'>Any exceptions encountered, can be {@code null}.</param>
+
+
+
+
+    <parameter name='type' dimension='' typeName='int' fqn='int' varargs='false'/>
+    <parameter name='source' dimension='' typeName='Bundle' fqn='org.osgi.framework.Bundle' varargs='false'/>
+    <parameter name='importReference' dimension='' typeName='ImportReference' fqn='org.osgi.service.remoteserviceadmin.ImportReference' varargs='false'/>
+    <parameter name='exception' dimension='' typeName='Throwable' fqn='java.lang.Throwable' varargs='false'/>
+     </method>
+    <method name='getImportReference' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.getImportReference' qn='RemoteServiceAdminEvent.getImportReference()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='ImportReference' qualifiedTypeName='org.osgi.service.remoteserviceadmin.ImportReference' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the Import Reference for this event.
+   </lead>
+   <description>
+Return the Import Reference for this event.
+   </description>
+
+
+<return>The Import Reference or {@code null}.</return>
+
+
+
+     </method>
+    <method name='getExportReference' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.getExportReference' qn='RemoteServiceAdminEvent.getExportReference()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='ExportReference' qualifiedTypeName='org.osgi.service.remoteserviceadmin.ExportReference' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the Export Reference for this event.
+   </lead>
+   <description>
+Return the Export Reference for this event.
+   </description>
+
+
+<return>The Export Reference or {@code null}.</return>
+
+
+
+     </method>
+    <method name='getException' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.getException' qn='RemoteServiceAdminEvent.getException()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='Throwable' qualifiedTypeName='java.lang.Throwable' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the exception for this event.
+   </lead>
+   <description>
+Return the exception for this event.
+   </description>
+
+
+<return>The exception or {@code null}.</return>
+
+
+
+     </method>
+    <method name='getType' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.getType' qn='RemoteServiceAdminEvent.getType()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='int' qualifiedTypeName='int' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the type of this event.
+   </lead>
+   <description>
+Return the type of this event.
+   </description>
+
+
+<return>The type of this event.</return>
+
+
+
+     </method>
+    <method name='getSource' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.getSource' qn='RemoteServiceAdminEvent.getSource()' package='org.osgi.service.remoteserviceadmin' modifiers='public' typeName='Bundle' qualifiedTypeName='org.osgi.framework.Bundle' typeArgs='' dimension='' signature='()' flatSignature='()'>
+   <lead>
+Return the bundle source of this event.
+   </lead>
+   <description>
+Return the bundle source of this event.
+   </description>
+
+
+<return>The bundle source of this event.</return>
+
+
+
+     </method>
+    <field name='IMPORT_REGISTRATION' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.IMPORT_REGISTRATION' qn='RemoteServiceAdminEvent.IMPORT_REGISTRATION' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='int' qualifiedTypeName='int' dimension='' constantValue='1'>
+   <lead>
+Add an import registration.
+   </lead>
+   <description>
+Add an import registration. The Remote Service Admin will send this event
+ when it imports a service. When the {@link RemoteServiceAdminListener}
+ service is registered, the Remote Service Admin must notify the listener
+ of all existing Import Registrations.
+   </description>
+
+     </field>
+    <field name='EXPORT_REGISTRATION' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.EXPORT_REGISTRATION' qn='RemoteServiceAdminEvent.EXPORT_REGISTRATION' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='int' qualifiedTypeName='int' dimension='' constantValue='2'>
+   <lead>
+Add an export registration.
+   </lead>
+   <description>
+Add an export registration. The Remote Service Admin will send this event
+ when it exports a service. When the {@link RemoteServiceAdminListener}
+ service is registered, the Remote Service Admin must notify the listener
+ of all existing Export Registrations.
+   </description>
+
+     </field>
+    <field name='EXPORT_UNREGISTRATION' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.EXPORT_UNREGISTRATION' qn='RemoteServiceAdminEvent.EXPORT_UNREGISTRATION' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='int' qualifiedTypeName='int' dimension='' constantValue='3'>
+   <lead>
+Remove an export registration.
+   </lead>
+   <description>
+Remove an export registration. The Remote Service Admin will send this
+ event when it removes the export of a service.
+   </description>
+
+     </field>
+    <field name='IMPORT_UNREGISTRATION' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.IMPORT_UNREGISTRATION' qn='RemoteServiceAdminEvent.IMPORT_UNREGISTRATION' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='int' qualifiedTypeName='int' dimension='' constantValue='4'>
+   <lead>
+Remove an import registration.
+   </lead>
+   <description>
+Remove an import registration. The Remote Service Admin will send this
+ event when it removes the import of a service.
+   </description>
+
+     </field>
+    <field name='IMPORT_ERROR' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.IMPORT_ERROR' qn='RemoteServiceAdminEvent.IMPORT_ERROR' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='int' qualifiedTypeName='int' dimension='' constantValue='5'>
+   <lead>
+A fatal importing error occurred.
+   </lead>
+   <description>
+A fatal importing error occurred. The Import Registration has been
+ closed.
+   </description>
+
+     </field>
+    <field name='EXPORT_ERROR' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.EXPORT_ERROR' qn='RemoteServiceAdminEvent.EXPORT_ERROR' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='int' qualifiedTypeName='int' dimension='' constantValue='6'>
+   <lead>
+A fatal exporting error occurred.
+   </lead>
+   <description>
+A fatal exporting error occurred. The Export Registration has been
+ closed.
+   </description>
+
+     </field>
+    <field name='EXPORT_WARNING' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.EXPORT_WARNING' qn='RemoteServiceAdminEvent.EXPORT_WARNING' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='int' qualifiedTypeName='int' dimension='' constantValue='7'>
+   <lead>
+A problematic situation occurred, the export is still active.
+   </lead>
+   <description>
+A problematic situation occurred, the export is still active.
+   </description>
+
+     </field>
+    <field name='IMPORT_WARNING' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.IMPORT_WARNING' qn='RemoteServiceAdminEvent.IMPORT_WARNING' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='int' qualifiedTypeName='int' dimension='' constantValue='8'>
+   <lead>
+A problematic situation occurred, the import is still active.
+   </lead>
+   <description>
+A problematic situation occurred, the import is still active.
+   </description>
+
+     </field>
+    <field name='IMPORT_UPDATE' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.IMPORT_UPDATE' qn='RemoteServiceAdminEvent.IMPORT_UPDATE' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='int' qualifiedTypeName='int' dimension='' constantValue='9'>
+   <lead>
+Update an import registration.
+   </lead>
+   <description>
+Update an import registration. The Remote Service Admin will send this
+ event when it updates a service.
+   </description>
+<since>@since 1.1</since>
+     </field>
+    <field name='EXPORT_UPDATE' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.EXPORT_UPDATE' qn='RemoteServiceAdminEvent.EXPORT_UPDATE' package='org.osgi.service.remoteserviceadmin' modifiers='public static final' typeName='int' qualifiedTypeName='int' dimension='' constantValue='10'>
+   <lead>
+Update an export registration.
+   </lead>
+   <description>
+Update an export registration. The Remote Service Admin will send this
+ event when it exports a service.
+   </description>
+<since>@since 1.1</since>
+     </field>
+  </class>
+  <class name='RemoteServiceAdminListener' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminListener' qn='RemoteServiceAdminListener' package='org.osgi.service.remoteserviceadmin' typeParam='' modifiers='public abstract' interface='yes' kind='INTERFACE'>
+<org.osgi.annotation.versioning.ConsumerType></org.osgi.annotation.versioning.ConsumerType>
+   <lead>
+A {@link RemoteServiceAdminEvent} listener is notified synchronously of any
+ export or import registrations and unregistrations.
+   </lead>
+   <description>
+A {@link RemoteServiceAdminEvent} listener is notified synchronously of any
+ export or import registrations and unregistrations.
+ 
+ <p>
+ If the Java Runtime Environment supports permissions, then filtering is done.
+ {@code RemoteServiceAdminEvent} objects are only delivered to the listener if
+ the bundle which defines the listener object's class has the appropriate
+ {@code EndpointPermission[endpoint,READ]} for the endpoint referenced by the
+ event.</p>
+   </description>
+<a href='#RemoteServiceAdminEvent'>RemoteServiceAdminEvent</a><ThreadSafe></ThreadSafe><author>@author $Id: 1ce7282806d9c5e073f2ff7fc9baa8e04e9c1cc0 $</author>
+    <method name='remoteAdminEvent' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminListener.remoteAdminEvent' qn='RemoteServiceAdminListener.remoteAdminEvent(RemoteServiceAdminEvent)' package='org.osgi.service.remoteserviceadmin' modifiers='public abstract' typeName='void' qualifiedTypeName='void' typeArgs='' dimension='' signature='(org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent)' flatSignature='(RemoteServiceAdminEvent)'>
+   <lead>
+Receive notification of any export or import registrations and
+ unregistrations as well as errors and warnings.
+   </lead>
+   <description>
+Receive notification of any export or import registrations and
+ unregistrations as well as errors and warnings.
+   </description>
+
+<param name='event'>The {@link RemoteServiceAdminEvent} object.</param>
+
+
+
+
+    <parameter name='event' dimension='' typeName='RemoteServiceAdminEvent' fqn='org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent' varargs='false'/>
+     </method>
+  </class>
+  </package>
+  <package name='org.osgi.service.remoteserviceadmin.namespace' fqn='org.osgi.service.remoteserviceadmin.namespace' qn='org.osgi.service.remoteserviceadmin.namespace'>
+<org.osgi.annotation.versioning.Version><value>1.0</value>
+</org.osgi.annotation.versioning.Version>
+   <lead>
+Remote Service Admin Namespaces Version 1.0.
+   </lead>
+   <description>
+Remote Service Admin Namespaces Version 1.0.
+ 
+ <p>
+ Bundles should not need to import this package at runtime since all
+ the types in this package just contain constants for capability and 
+ requirement namespaces specified by the OSGi Working Group.</p>
+   </description>
+<author>@author $Id: d9d033d68d4a811eb4beffc0739078f723a9c9c5 $</author>
+  <class name='DiscoveryNamespace' fqn='org.osgi.service.remoteserviceadmin.namespace.DiscoveryNamespace' qn='DiscoveryNamespace' package='org.osgi.service.remoteserviceadmin.namespace' typeParam='' modifiers='public final class' superclass='Namespace' kind='CLASS'>
+   <lead>
+Remote Services Discovery Provider Capability and Requirement Namespace.
+   </lead>
+   <description>
+Remote Services Discovery Provider Capability and Requirement Namespace.
+ 
+ <p>
+ This class defines the names for the attributes and directives for this
+ namespace.</p>
+   </description>
+<Immutable></Immutable><author>@author $Id: 471f0d6c214c6cd6d149d81560091dd4a027063c $</author>
+    <field name='DISCOVERY_NAMESPACE' fqn='org.osgi.service.remoteserviceadmin.namespace.DiscoveryNamespace.DISCOVERY_NAMESPACE' qn='DiscoveryNamespace.DISCOVERY_NAMESPACE' package='org.osgi.service.remoteserviceadmin.namespace' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"osgi.remoteserviceadmin.discovery"'>
+   <lead>
+Namespace name for Remote Services discovery provider capabilities and
+ requirements.
+   </lead>
+   <description>
+Namespace name for Remote Services discovery provider capabilities and
+ requirements.
+   </description>
+
+     </field>
+    <field name='CAPABILITY_PROTOCOLS_ATTRIBUTE' fqn='org.osgi.service.remoteserviceadmin.namespace.DiscoveryNamespace.CAPABILITY_PROTOCOLS_ATTRIBUTE' qn='DiscoveryNamespace.CAPABILITY_PROTOCOLS_ATTRIBUTE' package='org.osgi.service.remoteserviceadmin.namespace' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"protocols"'>
+   <lead>
+The capability attribute used to specify the discovery protocols
+ supported by this discovery provider.
+   </lead>
+   <description>
+The capability attribute used to specify the discovery protocols
+ supported by this discovery provider. The value of this attribute must be
+ of type {@code String} or {@code List&lt;String&gt;}.
+   </description>
+
+     </field>
+  </class>
+  <class name='DistributionNamespace' fqn='org.osgi.service.remoteserviceadmin.namespace.DistributionNamespace' qn='DistributionNamespace' package='org.osgi.service.remoteserviceadmin.namespace' typeParam='' modifiers='public final class' superclass='Namespace' kind='CLASS'>
+   <lead>
+Remote Services Distribution Provider Capability and Requirement Namespace.
+   </lead>
+   <description>
+Remote Services Distribution Provider Capability and Requirement Namespace.
+ 
+ <p>
+ This class defines the names for the attributes and directives for this
+ namespace.</p>
+   </description>
+<Immutable></Immutable><author>@author $Id: af646f7026c259b9fb313f7dc0e676efc08c1982 $</author>
+    <field name='DISTRIBUTION_NAMESPACE' fqn='org.osgi.service.remoteserviceadmin.namespace.DistributionNamespace.DISTRIBUTION_NAMESPACE' qn='DistributionNamespace.DISTRIBUTION_NAMESPACE' package='org.osgi.service.remoteserviceadmin.namespace' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"osgi.remoteserviceadmin.distribution"'>
+   <lead>
+Namespace name for Remote Services distribution provider capabilities and
+ requirements.
+   </lead>
+   <description>
+Namespace name for Remote Services distribution provider capabilities and
+ requirements.
+   </description>
+
+     </field>
+    <field name='CAPABILITY_CONFIGS_ATTRIBUTE' fqn='org.osgi.service.remoteserviceadmin.namespace.DistributionNamespace.CAPABILITY_CONFIGS_ATTRIBUTE' qn='DistributionNamespace.CAPABILITY_CONFIGS_ATTRIBUTE' package='org.osgi.service.remoteserviceadmin.namespace' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"configs"'>
+   <lead>
+The capability attribute used to specify the config types supported by
+ this distribution provider.
+   </lead>
+   <description>
+The capability attribute used to specify the config types supported by
+ this distribution provider. The value of this attribute must be of type
+ {@code String} or {@code List&lt;String&gt;}.
+   </description>
+
+     </field>
+  </class>
+  <class name='TopologyNamespace' fqn='org.osgi.service.remoteserviceadmin.namespace.TopologyNamespace' qn='TopologyNamespace' package='org.osgi.service.remoteserviceadmin.namespace' typeParam='' modifiers='public final class' superclass='Namespace' kind='CLASS'>
+   <lead>
+Remote Services Topology Manager Capability and Requirement Namespace.
+   </lead>
+   <description>
+Remote Services Topology Manager Capability and Requirement Namespace.
+ 
+ <p>
+ This class defines the names for the attributes and directives for this
+ namespace.</p>
+   </description>
+<Immutable></Immutable><author>@author $Id: 553f781757aeb7dfc1acb0f685a780b946be0462 $</author>
+    <field name='TOPOLOGY_NAMESPACE' fqn='org.osgi.service.remoteserviceadmin.namespace.TopologyNamespace.TOPOLOGY_NAMESPACE' qn='TopologyNamespace.TOPOLOGY_NAMESPACE' package='org.osgi.service.remoteserviceadmin.namespace' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"osgi.remoteserviceadmin.topology"'>
+   <lead>
+Namespace name for Remote Services topology manager capabilities and
+ requirements.
+   </lead>
+   <description>
+Namespace name for Remote Services topology manager capabilities and
+ requirements.
+   </description>
+
+     </field>
+    <field name='CAPABILITY_POLICY_ATTRIBUTE' fqn='org.osgi.service.remoteserviceadmin.namespace.TopologyNamespace.CAPABILITY_POLICY_ATTRIBUTE' qn='TopologyNamespace.CAPABILITY_POLICY_ATTRIBUTE' package='org.osgi.service.remoteserviceadmin.namespace' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"policy"'>
+   <lead>
+The capability attribute used to specify the policy or policies supported
+ by this topology manager.
+   </lead>
+   <description>
+The capability attribute used to specify the policy or policies supported
+ by this topology manager. The value of this attribute must be of type
+ {@code String} or {@code List&lt;String&gt;}. Policy names are typically
+ implementation specific, however the Remote Services Specification
+ defines the <em>promiscuous</em> and <em>fail-over</em> policies for
+ common use cases.
+   </description>
+
+     </field>
+    <field name='PROMISCUOUS_POLICY' fqn='org.osgi.service.remoteserviceadmin.namespace.TopologyNamespace.PROMISCUOUS_POLICY' qn='TopologyNamespace.PROMISCUOUS_POLICY' package='org.osgi.service.remoteserviceadmin.namespace' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"promiscuous"'>
+   <lead>
+The attribute value for Topology managers with a promiscuous policy
+   </lead>
+   <description>
+The attribute value for Topology managers with a promiscuous policy
+   </description>
+<a href='#TopologyNamespace.CAPABILITY_POLICY_ATTRIBUTE'>TopologyNamespace.CAPABILITY_POLICY_ATTRIBUTE</a>
+     </field>
+    <field name='FAIL_OVER_POLICY' fqn='org.osgi.service.remoteserviceadmin.namespace.TopologyNamespace.FAIL_OVER_POLICY' qn='TopologyNamespace.FAIL_OVER_POLICY' package='org.osgi.service.remoteserviceadmin.namespace' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"fail-over"'>
+   <lead>
+The attribute value for Topology managers with a fail-over policy
+   </lead>
+   <description>
+The attribute value for Topology managers with a fail-over policy
+   </description>
+<a href='#TopologyNamespace.CAPABILITY_POLICY_ATTRIBUTE'>TopologyNamespace.CAPABILITY_POLICY_ATTRIBUTE</a>
+     </field>
+  </class>
+  </package>
+</top>

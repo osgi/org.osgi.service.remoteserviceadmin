@@ -1,0 +1,17 @@
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/common/A.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/common/AsyncJava8Types.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/common/AsyncTypes.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/common/B.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/common/BasicTypes.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/common/C.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/common/DTOType.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/common/SlowService.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/impl/AsyncJava8TypesImpl.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/impl/AsyncTypesImpl.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/impl/BasicTypesTestServiceImpl.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/impl/SlowServiceImpl.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/impl/TestServiceImpl.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/junit/DistributionProviderConstants.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/junit/MultiFrameworkTestCase.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/junit/RemoteServiceConstants.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/tck/org.osgi.test.cases.remoteservices/src/main/java/org/osgi/test/cases/remoteservices/junit/SimpleTest.java
