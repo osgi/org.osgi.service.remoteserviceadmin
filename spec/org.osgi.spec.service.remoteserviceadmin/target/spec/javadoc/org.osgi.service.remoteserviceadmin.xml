@@ -1,0 +1,2176 @@
+<section xmlns="http://docbook.org/ns/docbook"
+         xreflabel="org.osgi.service.remoteserviceadmin"
+         version="5"
+         role="package"
+         xml:id="org.osgi.service.remoteserviceadmin">
+   <title>org.osgi.service.remoteserviceadmin</title>
+   <info>
+      <releaseinfo xml:id="org.osgi.service.remoteserviceadmin-version">Version 1.1</releaseinfo>
+      <edition xml:id="org.osgi.service.remoteserviceadmin-version.number">1.1</edition>
+   </info>
+   <para>
+Remote Service Admin Package Version 1.1.
+ 
+ </para>
+   <para>
+ Bundles wishing to use this package must list the package in the
+ Import-Package header of the bundle's manifest. This package has two types of
+ users: the consumers that use the API in this package and the providers that
+ implement the API in this package.
+ 
+ </para>
+   <para>
+ Example import for consumers using the API in this package:
+ </para>
+   <para>
+ {@code  Import-Package: org.osgi.service.remoteserviceadmin; version="[1.1,2.0)"}
+ </para>
+   <para>
+ Example import for providers implementing the API in this package:
+ </para>
+   <para>
+ {@code  Import-Package: org.osgi.service.remoteserviceadmin; version="[1.1,1.2)"}</para>
+   <section role="summary">
+      <title>Summary</title>
+      <itemizedlist>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.EndpointDescription">
+                  <code>EndpointDescription</code>
+               </link> - 
+A description of an endpoint that provides sufficient information for a
+ compatible distribution provider to create a connection to this endpoint
+ 
+ An Endpoint Description is easy to transfer between different systems because
+ it is property based where the property keys are strings and the values are
+ simple types.
+   </para>
+         </listitem>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.EndpointEvent">
+                  <code>EndpointEvent</code>
+               </link> - 
+An Endpoint Event.
+   </para>
+         </listitem>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.EndpointEventListener">
+                  <code>EndpointEventListener</code>
+               </link> - 
+A white board service that represents a listener for endpoints.
+   </para>
+         </listitem>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.EndpointListener">
+                  <code>EndpointListener</code>
+               </link> - 
+Deprecated white board service that represents a listener for endpoints.
+   </para>
+         </listitem>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.EndpointPermission">
+                  <code>EndpointPermission</code>
+               </link> - 
+A bundle's authority to export, import or read an Endpoint.
+   </para>
+         </listitem>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.ExportReference">
+                  <code>ExportReference</code>
+               </link> - 
+An Export Reference associates a service with a local endpoint.
+   </para>
+         </listitem>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.ExportRegistration">
+                  <code>ExportRegistration</code>
+               </link> - 
+An Export Registration associates a service to a local endpoint.
+   </para>
+         </listitem>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.ImportReference">
+                  <code>ImportReference</code>
+               </link> - 
+An Import Reference associates an active proxy service to a remote endpoint.
+   </para>
+         </listitem>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.ImportRegistration">
+                  <code>ImportRegistration</code>
+               </link> - 
+An Import Registration associates an active proxy service to a remote
+ endpoint.
+   </para>
+         </listitem>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.RemoteConstants">
+                  <code>RemoteConstants</code>
+               </link> - 
+Provide the definition of the constants used in the Remote Service Admin
+ specification.
+   </para>
+         </listitem>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.RemoteServiceAdmin">
+                  <code>RemoteServiceAdmin</code>
+               </link> - 
+A Remote Service Admin manages the import and export of services.
+   </para>
+         </listitem>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent">
+                  <code>RemoteServiceAdminEvent</code>
+               </link> - 
+Provides the event information for a Remote Service Admin event.
+   </para>
+         </listitem>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.RemoteServiceAdminListener">
+                  <code>RemoteServiceAdminListener</code>
+               </link> - 
+A {@link RemoteServiceAdminEvent} listener is notified synchronously of any
+ export or import registrations and unregistrations.
+   </para>
+         </listitem>
+      </itemizedlist>
+   </section>
+   <section xreflabel="EndpointDescription"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription">
+      <title>public class EndpointDescription</title>
+      <para>
+A description of an endpoint that provides sufficient information for a
+ compatible distribution provider to create a connection to this endpoint
+ 
+ An Endpoint Description is easy to transfer between different systems because
+ it is property based where the property keys are strings and the values are
+ simple types. This allows it to be used as a communications device to convey
+ available endpoint information to nodes in a network.
+ 
+ An Endpoint Description reflects the perspective of an <emphasis>importer</emphasis>. That
+ is, the property keys have been chosen to match filters that are created by
+ client bundles that need a service. Therefore the map must not contain any
+ {@code service.exported.*} property and must contain the corresponding
+ {@code service.imported.*} ones.
+ 
+ The {@code service.intents} property must contain the intents provided by the
+ service itself combined with the intents added by the exporting distribution
+ provider. Qualified intents appear fully expanded on this property.
+   </para>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Immutable </para>
+      </formalpara>
+      <section xreflabel="EndpointDescription(Map)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription.EndpointDescription-Map-">
+         <title>public  EndpointDescription(Map&lt;String, ?&gt; properties)</title>
+         <formalpara role="parameter">
+            <title>properties</title>
+            <para>The map from which to create the Endpoint Description.
+        The keys in the map must be type {@code String} and, since the
+        keys are case insensitive, there must be no duplicates with case
+        variation.</para>
+         </formalpara>
+         <para role="description">
+Create an Endpoint Description from a Map.
+ 
+ </para>
+         <para>
+ The {@link RemoteConstants#ENDPOINT_ID endpoint.id},
+ {@link RemoteConstants#SERVICE_IMPORTED_CONFIGS service.imported.configs}
+ and {@code objectClass} properties must be set.</para>
+         <formalpara role="parameter">
+            <title>Throws</title>
+            <para>
+               <code>IllegalArgumentException</code>– When the properties are not proper for
+         an Endpoint Description.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="EndpointDescription(ServiceReference,Map)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription.EndpointDescription-ServiceReference-Map-">
+         <title>public  EndpointDescription(ServiceReference&lt;?&gt; reference, Map&lt;String, ?&gt; properties)</title>
+         <formalpara role="parameter">
+            <title>reference</title>
+            <para>A service reference that can be exported.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>properties</title>
+            <para>Map of properties. This argument can be {@code null}.
+        The keys in the map must be type {@code String} and, since the
+        keys are case insensitive, there must be no duplicates with case
+        variation.</para>
+         </formalpara>
+         <para role="description">
+Create an Endpoint Description based on a Service Reference and a Map of
+ properties. The properties in the map take precedence over the properties
+ in the Service Reference.
+ 
+ </para>
+         <para>
+ This method will automatically set the
+ {@link RemoteConstants#ENDPOINT_FRAMEWORK_UUID endpoint.framework.uuid}
+ and {@link RemoteConstants#ENDPOINT_SERVICE_ID endpoint.service.id}
+ properties based on the specified Service Reference as well as the
+ {@link RemoteConstants#SERVICE_IMPORTED service.imported} property if
+ they are not specified as properties.
+ </para>
+         <para>
+ The {@link RemoteConstants#ENDPOINT_ID endpoint.id},
+ {@link RemoteConstants#SERVICE_IMPORTED_CONFIGS service.imported.configs}
+ and {@code objectClass} properties must be set.</para>
+         <formalpara role="parameter">
+            <title>Throws</title>
+            <para>
+               <code>IllegalArgumentException</code>– When the properties are not proper for
+         an Endpoint Description</para>
+         </formalpara>
+      </section>
+      <section xreflabel="equals(Object)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription.equals-Object-">
+         <title>public boolean equals(Object other)</title>
+         <formalpara role="parameter">
+            <title>other</title>
+            <para>The {@code EndpointDescription} object to be compared.</para>
+         </formalpara>
+         <para role="description">
+Compares this {@code EndpointDescription} object to another object.
+ 
+ </para>
+         <para>
+ An Endpoint Description is considered to be <emphasis role="strong">equal to</emphasis> another
+ Endpoint Description if their ids are equal.</para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>{@code true} if {@code object} is a {@code EndpointDescription}
+         and is equal to this object; {@code false} otherwise.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getConfigurationTypes()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription.getConfigurationTypes--">
+         <title>public List&lt;String&gt; getConfigurationTypes()</title>
+         <para role="description">
+Returns the configuration types.
+ 
+ A distribution provider exports a service with an endpoint. This endpoint
+ uses some kind of communications protocol with a set of configuration
+ parameters. There are many different types but each endpoint is
+ configured by only one configuration type. However, a distribution
+ provider can be aware of different configuration types and provide
+ synonyms to increase the change a receiving distribution provider can
+ create a connection to this endpoint.
+ 
+ This value of the configuration types is stored in the
+ {@link RemoteConstants#SERVICE_IMPORTED_CONFIGS} service property.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>An unmodifiable list of the configuration types used for the
+         associated endpoint and optionally synonyms.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getFrameworkUUID()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription.getFrameworkUUID--">
+         <title>public String getFrameworkUUID()</title>
+         <para role="description">
+Return the framework UUID for the remote service, if present.
+ 
+ The value of the remote framework UUID is stored in the
+ {@link RemoteConstants#ENDPOINT_FRAMEWORK_UUID} endpoint property.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>Remote Framework UUID, or {@code null} if this endpoint is not
+         associated with an OSGi framework having a framework UUID.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getId()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription.getId--">
+         <title>public String getId()</title>
+         <para role="description">
+Returns the endpoint's id.
+ 
+ The id is an opaque id for an endpoint. No two different endpoints must
+ have the same id. Two Endpoint Descriptions with the same id must
+ represent the same endpoint.
+ 
+ The value of the id is stored in the {@link RemoteConstants#ENDPOINT_ID}
+ property.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The id of the endpoint, never {@code null}. The returned value
+         has leading and trailing whitespace removed.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getIntents()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription.getIntents--">
+         <title>public List&lt;String&gt; getIntents()</title>
+         <para role="description">
+Return the list of intents implemented by this endpoint.
+ 
+ The intents are based on the service.intents on an imported service,
+ except for any intents that are additionally provided by the importing
+ distribution provider. All qualified intents must have been expanded.
+ 
+ This value of the intents is stored in the
+ {@link RemoteConstants#SERVICE_INTENTS} service property.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>An unmodifiable list of expanded intents that are provided by
+         this endpoint.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getInterfaces()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription.getInterfaces--">
+         <title>public List&lt;String&gt; getInterfaces()</title>
+         <para role="description">
+Provide the list of interfaces implemented by the exported service.
+ 
+ The value of the interfaces is derived from the {@code objectClass}
+ property.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>An unmodifiable list of Java interface names implemented by this
+         endpoint.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getPackageVersion(String)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription.getPackageVersion-String-">
+         <title>public Version getPackageVersion(String packageName)</title>
+         <formalpara role="parameter">
+            <title>packageName</title>
+            <para>The name of the package for which a version is
+        requested.</para>
+         </formalpara>
+         <para role="description">
+Provide the version of the given package name.
+ 
+ The version is encoded by prefixing the given package name with
+ {@link RemoteConstants#ENDPOINT_PACKAGE_VERSION_ endpoint.package.version.}, and then using this as an endpoint property
+ key. For example:
+ 
+ </para>
+         <programlisting> endpoint.package.version.com.acme</programlisting>
+         <para>
+ 
+ The value of this property is in String format and will be converted to a
+ {@code Version} object by this method.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The version of the specified package or
+         {@code Version.emptyVersion} if the package has no version in
+         this Endpoint Description.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>Throws</title>
+            <para>
+               <code>IllegalArgumentException</code>– If the version property value is not
+         String.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getProperties()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription.getProperties--">
+         <title>public Map&lt;String, Object&gt; getProperties()</title>
+         <para role="description">
+Returns all endpoint properties.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>An unmodifiable map referring to the properties of this Endpoint
+         Description.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getServiceId()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription.getServiceId--">
+         <title>public long getServiceId()</title>
+         <para role="description">
+Returns the service id for the service exported through this endpoint.
+ 
+ This is the service id under which the framework has registered the
+ service. This field together with the Framework UUID is a globally unique
+ id for a service.
+ 
+ The value of the remote service id is stored in the
+ {@link RemoteConstants#ENDPOINT_SERVICE_ID} endpoint property.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>Service id of a service or 0 if this Endpoint Description does
+         not relate to an OSGi service.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="hashCode()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription.hashCode--">
+         <title>public int hashCode()</title>
+         <para role="description">
+Returns a hash code value for the object.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>An integer which is a hash code value for this object.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="isSameService(EndpointDescription)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription.isSameService-EndpointDescription-">
+         <title>public boolean isSameService(EndpointDescription other)</title>
+         <formalpara role="parameter">
+            <title>other</title>
+            <para>The Endpoint Description to look at</para>
+         </formalpara>
+         <para role="description">
+Answers if this Endpoint Description refers to the same service instance
+ as the given Endpoint Description.
+ 
+ Two Endpoint Descriptions point to the same service if they have the same
+ id or their framework UUIDs and remote service ids are equal.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>True if this endpoint description points to the same service as
+         the other</para>
+         </formalpara>
+      </section>
+      <section xreflabel="matches(String)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription.matches-String-">
+         <title>public boolean matches(String filter)</title>
+         <formalpara role="parameter">
+            <title>filter</title>
+            <para>The filter to test.</para>
+         </formalpara>
+         <para role="description">
+Tests the properties of this {@code EndpointDescription} against the
+ given filter using a case insensitive match.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>{@code true} If the properties of this
+         {@code EndpointDescription} match the filter, {@code false}
+         otherwise.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>Throws</title>
+            <para>
+               <code>IllegalArgumentException</code>– If {@code filter} contains an invalid
+         filter string that cannot be parsed.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="toString()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointDescription.toString--">
+         <title>public String toString()</title>
+         <para role="description">
+Returns the string representation of this EndpointDescription.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>String form of this EndpointDescription.</para>
+         </formalpara>
+      </section>
+   </section>
+   <section xreflabel="EndpointEvent"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.EndpointEvent">
+      <title>public class EndpointEvent</title>
+      <para>
+An Endpoint Event.
+ </para>
+      <para/>
+      <para>
+ 
+ {@code EndpointEvent} objects are delivered to all registered
+ {@link EndpointEventListener} services where the {@link EndpointDescription}
+ properties match one of the filters specified in the
+ {@link EndpointEventListener#ENDPOINT_LISTENER_SCOPE} registration properties
+ of the Endpoint Event Listener.
+ </para>
+      <para/>
+      <para>
+ 
+ A type code is used to identify the type of event. The following event types
+ are defined:
+ </para>
+      <itemizedlist>
+         <listitem>
+            <para>{@link #ADDED}</para>
+         </listitem>
+         <listitem>
+            <para>{@link #REMOVED}</para>
+         </listitem>
+         <listitem>
+            <para>{@link #MODIFIED}</para>
+         </listitem>
+         <listitem>
+            <para>{@link #MODIFIED_ENDMATCH}</para>
+         </listitem>
+      </itemizedlist>
+      <para>
+ Additional event types may be defined in the future.
+ </para>
+      <para/>
+      <formalpara role="parameter">
+         <title>See Also</title>
+         <para>
+            <link linkend="org.osgi.service.remoteserviceadmin.EndpointEventListener">EndpointEventListener</link>
+         </para>
+      </formalpara>
+      <formalpara role="parameter">
+         <title>Since</title>
+         <para>@since 1.1</para>
+      </formalpara>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Immutable </para>
+      </formalpara>
+      <section xreflabel="ADDED"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointEvent.ADDED">
+         <title>public static final int ADDED = 1</title>
+         <para>
+An endpoint has been added.
+ </para>
+         <para/>
+         <para>
+ 
+ This {@code EndpointEvent} type indicates that a new endpoint has been
+ added. The endpoint is represented by the associated
+ {@link EndpointDescription} object.
+   </para>
+      </section>
+      <section xreflabel="MODIFIED"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointEvent.MODIFIED">
+         <title>public static final int MODIFIED = 4</title>
+         <para>
+The properties of an endpoint have been modified.
+ </para>
+         <para/>
+         <para>
+ 
+ This {@code EndpointEvent} type indicates that the properties of an
+ existing endpoint have been modified. The endpoint is represented by the
+ associated {@link EndpointDescription} object and its properties can be
+ obtained via {@link EndpointDescription#getProperties()}. The endpoint
+ properties still match the filters as specified in the
+ {@link EndpointEventListener#ENDPOINT_LISTENER_SCOPE} filter.
+   </para>
+      </section>
+      <section xreflabel="MODIFIED_ENDMATCH"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointEvent.MODIFIED_ENDMATCH">
+         <title>public static final int MODIFIED_ENDMATCH = 8</title>
+         <para>
+The properties of an endpoint have been modified and the new properties
+ no longer match the listener's filter.
+ </para>
+         <para/>
+         <para>
+ 
+ This {@code EndpointEvent} type indicates that the properties of an
+ existing endpoint have been modified and no longer match the filter. The
+ endpoint is represented by the associated {@link EndpointDescription}
+ object and its properties can be obtained via
+ {@link EndpointDescription#getProperties()}. As a consequence of the
+ modification the filters as specified in the
+ {@link EndpointEventListener#ENDPOINT_LISTENER_SCOPE} do not match any
+ more.
+   </para>
+      </section>
+      <section xreflabel="REMOVED"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointEvent.REMOVED">
+         <title>public static final int REMOVED = 2</title>
+         <para>
+An endpoint has been removed.
+ </para>
+         <para/>
+         <para>
+ 
+ This {@code EndpointEvent} type indicates that an endpoint has been
+ removed. The endpoint is represented by the associated
+ {@link EndpointDescription} object.
+   </para>
+      </section>
+      <section xreflabel="EndpointEvent(int,EndpointDescription)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointEvent.EndpointEvent-int-EndpointDescription-">
+         <title>public  EndpointEvent(int type, EndpointDescription endpoint)</title>
+         <formalpara role="parameter">
+            <title>type</title>
+            <para>The event type. See {@link #getType()}.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>endpoint</title>
+            <para>The endpoint associated with the event.</para>
+         </formalpara>
+         <para role="description">
+Constructs a {@code EndpointEvent} object from the given arguments.
+   </para>
+      </section>
+      <section xreflabel="getEndpoint()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointEvent.getEndpoint--">
+         <title>public EndpointDescription getEndpoint()</title>
+         <para role="description">
+Return the endpoint associated with this event.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The endpoint associated with the event.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getType()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointEvent.getType--">
+         <title>public int getType()</title>
+         <para role="description">
+Return the type of this event.
+ </para>
+         <para/>
+         <para>
+ The type values are:
+ </para>
+         <itemizedlist>
+            <listitem>
+               <para>{@link #ADDED}</para>
+            </listitem>
+            <listitem>
+               <para>{@link #REMOVED}</para>
+            </listitem>
+            <listitem>
+               <para>{@link #MODIFIED}</para>
+            </listitem>
+            <listitem>
+               <para>{@link #MODIFIED_ENDMATCH}</para>
+            </listitem>
+         </itemizedlist>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The type of this event.</para>
+         </formalpara>
+      </section>
+   </section>
+   <section xreflabel="EndpointEventListener"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.EndpointEventListener">
+      <title>public abstract EndpointEventListener</title>
+      <para>
+A white board service that represents a listener for endpoints.
+ 
+ An Endpoint Event Listener represents a participant in the distributed model
+ that is interested in Endpoint Descriptions.
+ 
+ This white board service can be used in many different scenarios. However,
+ the primary use case is to allow a remote manager to be informed of Endpoint
+ Descriptions available in the network and inform the network about available
+ Endpoint Descriptions.
+ 
+ Both the network bundle and the manager bundle register an Endpoint Event
+ Listener service. The manager informs the network bundle about Endpoints that
+ it creates. The network bundles then uses a protocol like SLP to announce
+ these local end-points to the network.
+ 
+ If the network bundle discovers a new Endpoint through its discovery
+ protocol, then it sends an Endpoint Description to all the Endpoint Listener
+ services that are registered (except its own) that have specified an interest
+ in that endpoint.
+ 
+ Endpoint Event Listener services can express their <emphasis>scope</emphasis> with the
+ service property {@link #ENDPOINT_LISTENER_SCOPE}. This service property is a
+ list of filters. An Endpoint Description should only be given to a Endpoint
+ Event Listener when there is at least one filter that matches the Endpoint
+ Description properties.
+ 
+ This filter model is quite flexible. For example, a discovery bundle is only
+ interested in locally originating Endpoint Descriptions. The following filter
+ ensures that it only sees local endpoints.
+ 
+ </para>
+      <programlisting>   (org.osgi.framework.uuid=72dc5fd9-5f8f-4f8f-9821-9ebb433a5b72)</programlisting>
+      <para>
+ 
+ In the same vein, a manager that is only interested in remote Endpoint
+ Descriptions can use a filter like:
+ 
+ </para>
+      <programlisting>   (!(org.osgi.framework.uuid=72dc5fd9-5f8f-4f8f-9821-9ebb433a5b72))</programlisting>
+      <para>
+ 
+ Where in both cases, the given UUID is the UUID of the local framework that
+ can be found in the Framework properties.
+ 
+ The Endpoint Event Listener's scope maps very well to the service hooks. A
+ manager can just register all filters found from the Listener Hook as its
+ scope. This will automatically provide it with all known endpoints that match
+ the given scope, without having to inspect the filter string.
+ 
+ In general, when an Endpoint Description is discovered, it should be
+ dispatched to all registered Endpoint Event Listener services. If a new
+ Endpoint Event Listener is registered, it should be informed about all
+ currently known Endpoints that match its scope. If a getter of the Endpoint
+ Listener service is unregistered, then all its registered Endpoint
+ Description objects must be removed.
+ 
+ The Endpoint Event Listener models a <emphasis>best effort</emphasis> approach.
+ Participating bundles should do their utmost to keep the listeners up to
+ date, but implementers should realize that many endpoints come through
+ unreliable discovery processes.
+ 
+ The Endpoint Event Listener supersedes the {@link EndpointListener} interface
+ as it also supports notifications around modifications of endpoints.
+   </para>
+      <formalpara role="parameter">
+         <title>Since</title>
+         <para>@since 1.1</para>
+      </formalpara>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Thread-safe </para>
+      </formalpara>
+      <section xreflabel="ENDPOINT_LISTENER_SCOPE"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointEventListener.ENDPOINT_LISTENER_SCOPE">
+         <title>public static final String ENDPOINT_LISTENER_SCOPE = "endpoint.listener.scope"</title>
+         <para>
+Specifies the interest of this listener with filters. This listener is
+ only interested in Endpoint Descriptions where its properties match the
+ given filter. The type of this property must be {@code String+}.
+   </para>
+      </section>
+      <section xreflabel="endpointChanged(EndpointEvent,String)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointEventListener.endpointChanged-EndpointEvent-String-">
+         <title>public abstract void endpointChanged(EndpointEvent event, String filter)</title>
+         <formalpara role="parameter">
+            <title>event</title>
+            <para>The event containing the details about the change.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>filter</title>
+            <para>The filter from the {@link #ENDPOINT_LISTENER_SCOPE} that
+        matches (or for {@link EndpointEvent#MODIFIED_ENDMATCH} and
+        {@link EndpointEvent#REMOVED} used to match) the endpoint, must
+        not be {@code null}.</para>
+         </formalpara>
+         <para role="description">
+Notification that an endpoint has changed.
+ 
+ Details of the change is captured in the Endpoint Event provided. This
+ could be that an endpoint was added, removed or modified.
+   </para>
+      </section>
+   </section>
+   <section xreflabel="EndpointListener"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.EndpointListener">
+      <title>public abstract EndpointListener</title>
+      <para>
+Deprecated white board service that represents a listener for endpoints.
+ 
+ An Endpoint Listener represents a participant in the distributed model that
+ is interested in Endpoint Descriptions.
+ 
+ The Endpoint Listener is called back when matching endpoints are added or
+ removed. Consumers interested in the modification of endpoints, when
+ associated service properties are changed, should use an
+ {@link EndpointEventListener} instead.
+ 
+ This white board service can be used in many different scenarios. However,
+ the primary use case is to allow a remote manager to be informed of Endpoint
+ Descriptions available in the network and inform the network about available
+ Endpoint Descriptions.
+ 
+ Both the network bundle and the manager bundle register an Endpoint Listener
+ service. The manager informs the network bundle about Endpoints that it
+ creates. The network bundles then uses a protocol like SLP to announce these
+ local end-points to the network.
+ 
+ If the network bundle discovers a new Endpoint through its discovery
+ protocol, then it sends an Endpoint Description to all the Endpoint Listener
+ services that are registered (except its own) that have specified an interest
+ in that endpoint.
+ 
+ Endpoint Listener services can express their <emphasis>scope</emphasis> with the service
+ property {@link #ENDPOINT_LISTENER_SCOPE}. This service property is a list of
+ filters. An Endpoint Description should only be given to a Endpoint Listener
+ when there is at least one filter that matches the Endpoint Description
+ properties.
+ 
+ This filter model is quite flexible. For example, a discovery bundle is only
+ interested in locally originating Endpoint Descriptions. The following filter
+ ensure that it only sees local endpoints.
+ 
+ </para>
+      <programlisting>   (org.osgi.framework.uuid=72dc5fd9-5f8f-4f8f-9821-9ebb433a5b72)</programlisting>
+      <para>
+ 
+ In the same vein, a manager that is only interested in remote Endpoint
+ Descriptions can use a filter like:
+ 
+ </para>
+      <programlisting>   (!(org.osgi.framework.uuid=72dc5fd9-5f8f-4f8f-9821-9ebb433a5b72))</programlisting>
+      <para>
+ 
+ Where in both cases, the given UUID is the UUID of the local framework that
+ can be found in the Framework properties.
+ 
+ The Endpoint Listener's scope maps very well to the service hooks. A manager
+ can just register all filters found from the Listener Hook as its scope. This
+ will automatically provide it with all known endpoints that match the given
+ scope, without having to inspect the filter string.
+ 
+ In general, when an Endpoint Description is discovered, it should be
+ dispatched to all registered Endpoint Listener services. If a new Endpoint
+ Listener is registered, it should be informed about all currently known
+ Endpoints that match its scope. If a getter of the Endpoint Listener service
+ is unregistered, then all its registered Endpoint Description objects must be
+ removed.
+ 
+ The Endpoint Listener models a <emphasis>best effort</emphasis> approach. Participating
+ bundles should do their utmost to keep the listeners up to date, but
+ implementers should realize that many endpoints come through unreliable
+ discovery processes.
+   </para>
+      <formalpara role="parameter">
+         <title>Deprecated</title>
+         <para>@deprecated As of 1.1. Replaced by EndpointEventListener.</para>
+      </formalpara>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Thread-safe </para>
+      </formalpara>
+      <section xreflabel="ENDPOINT_LISTENER_SCOPE"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointListener.ENDPOINT_LISTENER_SCOPE">
+         <title>public static final String ENDPOINT_LISTENER_SCOPE = "endpoint.listener.scope"</title>
+         <para>
+Specifies the interest of this listener with filters. This listener is
+ only interested in Endpoint Descriptions where its properties match the
+ given filter. The type of this property must be {@code String+}.
+   </para>
+      </section>
+      <section xreflabel="endpointAdded(EndpointDescription,String)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointListener.endpointAdded-EndpointDescription-String-">
+         <title>public abstract void endpointAdded(EndpointDescription endpoint, String matchedFilter)</title>
+         <formalpara role="parameter">
+            <title>endpoint</title>
+            <para>The Endpoint Description to be published</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>matchedFilter</title>
+            <para>The filter from the {@link #ENDPOINT_LISTENER_SCOPE}
+        that matched the endpoint, must not be {@code null}.</para>
+         </formalpara>
+         <para role="description">
+Register an endpoint with this listener.
+ 
+ If the endpoint matches one of the filters registered with the
+ {@link #ENDPOINT_LISTENER_SCOPE} service property then this filter should
+ be given as the {@code matchedFilter} parameter.
+ 
+ When this service is first registered or it is modified, it should
+ receive all known endpoints matching the filter.
+   </para>
+      </section>
+      <section xreflabel="endpointRemoved(EndpointDescription,String)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointListener.endpointRemoved-EndpointDescription-String-">
+         <title>public abstract void endpointRemoved(EndpointDescription endpoint, String matchedFilter)</title>
+         <formalpara role="parameter">
+            <title>endpoint</title>
+            <para>The Endpoint Description that is no longer valid.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>matchedFilter</title>
+            <para>The filter from the {@link #ENDPOINT_LISTENER_SCOPE}
+        that matched the endpoint, must not be {@code null}.</para>
+         </formalpara>
+         <para role="description">
+Remove the registration of an endpoint.
+ 
+ If an endpoint that was registered with the
+ {@link #endpointAdded(EndpointDescription, String)} method is no longer
+ available then this method should be called. This will remove the
+ endpoint from the listener.
+ 
+ It is not necessary to remove endpoints when the service is unregistered
+ or modified in such a way that not all endpoints match the interest
+ filter anymore.
+   </para>
+      </section>
+   </section>
+   <section xreflabel="EndpointPermission"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.EndpointPermission">
+      <title>public final class EndpointPermission<?line-break?> extends Permission</title>
+      <para>
+A bundle's authority to export, import or read an Endpoint.
+ </para>
+      <itemizedlist>
+         <listitem>
+            <para>The {@code export} action allows a bundle to export a service as an
+ Endpoint.</para>
+         </listitem>
+         <listitem>
+            <para>The {@code import} action allows a bundle to import a service from an
+ Endpoint.</para>
+         </listitem>
+         <listitem>
+            <para>The {@code read} action allows a bundle to read references to an
+ Endpoint.</para>
+         </listitem>
+      </itemizedlist>
+      <para>
+ Permission to read an Endpoint is required in order to detect events
+ regarding an Endpoint. Untrusted bundles should not be able to detect the
+ presence of certain Endpoints unless they have the appropriate
+ {@code EndpointPermission} to read the specific service.
+   </para>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Thread-safe </para>
+      </formalpara>
+      <section xreflabel="EXPORT"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointPermission.EXPORT">
+         <title>public static final String EXPORT = "export"</title>
+         <para>
+The action string {@code export}. The {@code export} action implies the
+ {@code read} action.
+   </para>
+      </section>
+      <section xreflabel="IMPORT"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointPermission.IMPORT">
+         <title>public static final String IMPORT = "import"</title>
+         <para>
+The action string {@code import}. The {@code import} action implies the
+ {@code read} action.
+   </para>
+      </section>
+      <section xreflabel="READ"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointPermission.READ">
+         <title>public static final String READ = "read"</title>
+         <para>
+The action string {@code read}.
+   </para>
+      </section>
+      <section xreflabel="EndpointPermission(String,String)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointPermission.EndpointPermission-String-String-">
+         <title>public  EndpointPermission(String filterString, String actions)</title>
+         <formalpara role="parameter">
+            <title>filterString</title>
+            <para>The filter string or "*" to match all
+        endpoints.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>actions</title>
+            <para>The actions {@code read}, {@code import}, or
+        {@code export}.</para>
+         </formalpara>
+         <para role="description">
+Create a new EndpointPermission with the specified filter.
+ 
+ </para>
+         <para>
+ The filter will be evaluated against the endpoint properties of a
+ requested EndpointPermission.
+ 
+ </para>
+         <para>
+ There are three possible actions: {@code read}, {@code import} and
+ {@code export}. The {@code read} action allows the owner of this
+ permission to see the presence of distributed services. The
+ {@code import} action allows the owner of this permission to import an
+ endpoint. The {@code export} action allows the owner of this permission
+ to export a service.</para>
+         <formalpara role="parameter">
+            <title>Throws</title>
+            <para>
+               <code>IllegalArgumentException</code>– If the filter has an invalid syntax or
+         the actions are not valid.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="EndpointPermission(EndpointDescription,String,String)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointPermission.EndpointPermission-EndpointDescription-String-String-">
+         <title>public  EndpointPermission(EndpointDescription endpoint, String localFrameworkUUID, String actions)</title>
+         <formalpara role="parameter">
+            <title>endpoint</title>
+            <para>The requested endpoint.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>localFrameworkUUID</title>
+            <para>The UUID of the local framework. This is used
+        to support matching the
+        {@link RemoteConstants#ENDPOINT_FRAMEWORK_UUID endpoint.framework.uuid} endpoint property to the
+        {@code &lt;&lt;LOCAL&gt;&gt;} value in the filter expression.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>actions</title>
+            <para>The actions {@code read}, {@code import}, or
+        {@code export}.</para>
+         </formalpara>
+         <para role="description">
+Creates a new requested {@code EndpointPermission} object to be used by
+ code that must perform {@code checkPermission}.
+ {@code EndpointPermission} objects created with this constructor cannot
+ be added to an {@code EndpointPermission} permission collection.
+   </para>
+         <formalpara role="parameter">
+            <title>Throws</title>
+            <para>
+               <code>IllegalArgumentException</code>– If the endpoint is {@code null} or the
+         actions are not valid.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="equals(Object)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointPermission.equals-Object-">
+         <title>public boolean equals(Object obj)</title>
+         <formalpara role="parameter">
+            <title>obj</title>
+            <para>The object to test for equality.</para>
+         </formalpara>
+         <para role="description">
+Determines the equality of two EndpointPermission objects.
+ 
+ Checks that specified object has the same name, actions and endpoint as
+ this {@code EndpointPermission}.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>true If obj is a {@code EndpointPermission}, and has the same
+         name, actions and endpoint as this {@code EndpointPermission}
+         object; {@code false} otherwise.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getActions()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointPermission.getActions--">
+         <title>public String getActions()</title>
+         <para role="description">
+Returns the canonical string representation of the actions. Always
+ returns present actions in the following canonical order: {@code read},
+ {@code import}, {@code export}.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The canonical string representation of the actions.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="hashCode()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointPermission.hashCode--">
+         <title>public int hashCode()</title>
+         <para role="description">
+Returns the hash code value for this object.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>Hash code value for this object.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="implies(Permission)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointPermission.implies-Permission-">
+         <title>public boolean implies(Permission p)</title>
+         <formalpara role="parameter">
+            <title>p</title>
+            <para>The target permission to check.</para>
+         </formalpara>
+         <para role="description">
+Determines if a {@code EndpointPermission} object "implies" the specified
+ permission.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>{@code true} if the specified permission is implied by this
+         object; {@code false} otherwise.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="newPermissionCollection()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.EndpointPermission.newPermissionCollection--">
+         <title>public PermissionCollection newPermissionCollection()</title>
+         <para role="description">
+Returns a new {@code PermissionCollection} object for storing
+ {@code EndpointPermission} objects.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>A new {@code PermissionCollection} object suitable for storing
+         {@code EndpointPermission} objects.</para>
+         </formalpara>
+      </section>
+   </section>
+   <section xreflabel="ExportReference"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.ExportReference">
+      <title>public abstract ExportReference</title>
+      <para>
+An Export Reference associates a service with a local endpoint.
+ 
+ The Export Reference can be used to reference an exported service. When the
+ service is no longer exported, all methods must return {@code null}.
+   </para>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Thread-safe </para>
+      </formalpara>
+      <formalpara role="parameter">
+         <title>Provider Type</title>
+         <para>Consumers of this API must not implement this type</para>
+      </formalpara>
+      <section xreflabel="getExportedEndpoint()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.ExportReference.getExportedEndpoint--">
+         <title>public abstract EndpointDescription getExportedEndpoint()</title>
+         <para role="description">
+Return the Endpoint Description for the local endpoint.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The Endpoint Description for the local endpoint. Must be
+         {@code null} when the service is no longer exported.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getExportedService()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.ExportReference.getExportedService--">
+         <title>public abstract ServiceReference&lt;?&gt; getExportedService()</title>
+         <para role="description">
+Return the service being exported.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The service being exported. Must be {@code null} when the service
+         is no longer exported.</para>
+         </formalpara>
+      </section>
+   </section>
+   <section xreflabel="ExportRegistration"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.ExportRegistration">
+      <title>public abstract ExportRegistration</title>
+      <para>
+An Export Registration associates a service to a local endpoint.
+ 
+ The Export Registration can be used to delete the endpoint associated with an
+ this registration. It is created with the
+ {@link RemoteServiceAdmin#exportService(ServiceReference,Map)} method.
+ 
+ When this Export Registration has been closed, all methods must return
+ {@code null}.
+   </para>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Thread-safe </para>
+      </formalpara>
+      <formalpara role="parameter">
+         <title>Provider Type</title>
+         <para>Consumers of this API must not implement this type</para>
+      </formalpara>
+      <section xreflabel="close()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.ExportRegistration.close--">
+         <title>public abstract void close()</title>
+         <para role="description">
+Delete the local endpoint and disconnect any remote distribution
+ providers. After this method returns, all methods must return
+ {@code null}.
+ 
+ This method has no effect when this registration has already been closed
+ or is being closed.
+   </para>
+      </section>
+      <section xreflabel="getException()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.ExportRegistration.getException--">
+         <title>public abstract Throwable getException()</title>
+         <para role="description">
+Return the exception for any error during the export process.
+ 
+ If the Remote Service Admin for some reasons is unable to properly
+ initialize this registration, then it must return an exception from this
+ method. If no error occurred, this method must return {@code null}.
+ 
+ The error must be set before this Export Registration is returned.
+ Asynchronously occurring errors must be reported to the log.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The exception that occurred during the initialization of this
+         registration or {@code null} if no exception occurred.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getExportReference()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.ExportRegistration.getExportReference--">
+         <title>public abstract ExportReference getExportReference()</title>
+         <para role="description">
+Return the Export Reference for the exported service.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The Export Reference for this registration, or <code>null</code>
+         if this Import Registration is closed.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>Throws</title>
+            <para>
+               <code>IllegalStateException</code>– When this registration was not properly
+         initialized. See {@link #getException()}.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="update(Map)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.ExportRegistration.update-Map-">
+         <title>public abstract EndpointDescription update(Map&lt;String, ?&gt; properties)</title>
+         <formalpara role="parameter">
+            <title>properties</title>
+            <para>properties to be merged with the current service
+        properties for the {@link ServiceReference} represented by this
+        {@link ExportRegistration}. If null is passed then the original
+        properties passed to
+        {@link RemoteServiceAdmin#exportService(ServiceReference, Map)}
+        will be used.</para>
+         </formalpara>
+         <para role="description">
+Update the endpoint represented by this {@link ExportRegistration} and
+ return an updated {@link EndpointDescription}. If this method returns an
+ updated {@link EndpointDescription}, then the object returned via
+ {@link #getExportReference()} must also have been updated to return this
+ new object. If this method does not return an updated
+ {@link EndpointDescription} then the object returned via
+ {@link #getExportReference()} should remain unchanged.
+ 
+ When creating the updated {@link EndpointDescription} the
+ {@link ServiceReference} originally passed to
+ {@link RemoteServiceAdmin#exportService(ServiceReference, Map)} must be
+ queried to pick up any changes to its service properties.
+ 
+ If this argument is null then the original properties passed when
+ creating this ExportRegistration should be used when constructing the
+ updated {@link EndpointDescription}. Otherwise the new properties should
+ be used, and replace the original properties for subsequent calls to the
+ update method.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The updated {@link EndpointDescription} for this registration or
+         null if there was a failure updating the endpoint. If a failure
+         occurs then it can be accessed using {@link #getException()}.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>Throws</title>
+            <para>
+               <code>IllegalStateException</code>– If this registration is closed, or when
+         this registration was not properly initialized. See
+         {@link #getException()}.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>Since</title>
+            <para>@since 1.1</para>
+         </formalpara>
+      </section>
+   </section>
+   <section xreflabel="ImportReference"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.ImportReference">
+      <title>public abstract ImportReference</title>
+      <para>
+An Import Reference associates an active proxy service to a remote endpoint.
+ 
+ The Import Reference can be used to reference an imported service. When the
+ service is no longer imported, all methods must return {@code null}.
+   </para>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Thread-safe </para>
+      </formalpara>
+      <formalpara role="parameter">
+         <title>Provider Type</title>
+         <para>Consumers of this API must not implement this type</para>
+      </formalpara>
+      <section xreflabel="getImportedEndpoint()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.ImportReference.getImportedEndpoint--">
+         <title>public abstract EndpointDescription getImportedEndpoint()</title>
+         <para role="description">
+Return the Endpoint Description for the remote endpoint.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The Endpoint Description for the remote endpoint. Must be
+         {@code null} when the service is no longer imported.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getImportedService()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.ImportReference.getImportedService--">
+         <title>public abstract ServiceReference&lt;?&gt; getImportedService()</title>
+         <para role="description">
+Return the Service Reference for the proxy for the endpoint.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The Service Reference to the proxy for the endpoint. Must be
+         {@code null} when the service is no longer imported.</para>
+         </formalpara>
+      </section>
+   </section>
+   <section xreflabel="ImportRegistration"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.ImportRegistration">
+      <title>public abstract ImportRegistration</title>
+      <para>
+An Import Registration associates an active proxy service to a remote
+ endpoint.
+ 
+ The Import Registration can be used to delete the proxy associated with an
+ endpoint. It is created with the
+ {@link RemoteServiceAdmin#importService(EndpointDescription)} method.
+ 
+ When this Import Registration has been closed, all methods must return
+ {@code null}.
+   </para>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Thread-safe </para>
+      </formalpara>
+      <formalpara role="parameter">
+         <title>Provider Type</title>
+         <para>Consumers of this API must not implement this type</para>
+      </formalpara>
+      <section xreflabel="close()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.ImportRegistration.close--">
+         <title>public abstract void close()</title>
+         <para role="description">
+Close this Import Registration. This must close the connection to the
+ endpoint and unregister the proxy. After this method returns, all other
+ methods must return {@code null}.
+ 
+ This method has no effect when this registration has already been closed
+ or is being closed.
+   </para>
+      </section>
+      <section xreflabel="getException()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.ImportRegistration.getException--">
+         <title>public abstract Throwable getException()</title>
+         <para role="description">
+Return the exception for any error during the import process.
+ 
+ If the Remote Service Admin for some reasons is unable to properly
+ initialize this registration, then it must return an exception from this
+ method. If no error occurred, this method must return {@code null}.
+ 
+ The error must be set before this Import Registration is returned.
+ Asynchronously occurring errors must be reported to the log.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The exception that occurred during the initialization of this
+         registration or {@code null} if no exception occurred.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getImportReference()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.ImportRegistration.getImportReference--">
+         <title>public abstract ImportReference getImportReference()</title>
+         <para role="description">
+Return the Import Reference for the imported service.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The Import Reference for this registration, or <code>null</code>
+         if this Import Registration is closed.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>Throws</title>
+            <para>
+               <code>IllegalStateException</code>– When this registration was not properly
+         initialized. See {@link #getException()}.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="update(EndpointDescription)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.ImportRegistration.update-EndpointDescription-">
+         <title>public abstract boolean update(EndpointDescription endpoint)</title>
+         <formalpara role="parameter">
+            <title>endpoint</title>
+            <para>The updated endpoint</para>
+         </formalpara>
+         <para role="description">
+Update the local service represented by this {@link ImportRegistration}.
+ After this method returns the {@link EndpointDescription} returned via
+ {@link #getImportReference()} must have been updated.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>
+               <code>true</code> if the endpoint was successfully updated,
+         <code>false</code> otherwise. If the update fails then the
+         failure can be retrieved from {@link #getException()}.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>Throws</title>
+            <para>
+               <code>IllegalStateException</code>– When this registration is closed, or if it
+         was not properly initialized. See {@link #getException()}.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>Throws</title>
+            <para>
+               <code>IllegalArgumentException</code>– When the supplied
+         {@link EndpointDescription} does not represent the same endpoint
+         as this {@link ImportRegistration}.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>Since</title>
+            <para>@since 1.1</para>
+         </formalpara>
+      </section>
+   </section>
+   <section xreflabel="RemoteConstants"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.RemoteConstants">
+      <title>public class RemoteConstants</title>
+      <para>
+Provide the definition of the constants used in the Remote Service Admin
+ specification.
+   </para>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Immutable </para>
+      </formalpara>
+      <section xreflabel="ENDPOINT_FRAMEWORK_UUID"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteConstants.ENDPOINT_FRAMEWORK_UUID">
+         <title>public static final String ENDPOINT_FRAMEWORK_UUID = "endpoint.framework.uuid"</title>
+         <para>
+Endpoint property identifying the universally unique id of the exporting
+ framework. Can be absent if the corresponding endpoint is not for an OSGi
+ service.
+ 
+ </para>
+         <para>
+ The value of this property must be of type {@code String}.</para>
+      </section>
+      <section xreflabel="ENDPOINT_ID"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteConstants.ENDPOINT_ID">
+         <title>public static final String ENDPOINT_ID = "endpoint.id"</title>
+         <para>
+Endpoint property identifying the id for this endpoint. This service
+ property must always be set.
+ 
+ </para>
+         <para>
+ The value of this property must be of type {@code String}.</para>
+      </section>
+      <section xreflabel="ENDPOINT_PACKAGE_VERSION_"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteConstants.ENDPOINT_PACKAGE_VERSION_">
+         <title>public static final String ENDPOINT_PACKAGE_VERSION_ = "endpoint.package.version."</title>
+         <para>
+Prefix for an endpoint property identifying the interface Java package
+ version for an interface. For example, the property
+ {@code endpoint.package.version.com.acme=1.3} describes the version of
+ the package for the {@code com.acme.Foo} interface. This endpoint
+ property for an interface package does not have to be set. If not set,
+ the value must be assumed to be 0.
+ 
+ </para>
+         <para>
+ Since endpoint properties are stored in a case insensitive map, case
+ variants of a package name are folded together.
+ 
+ </para>
+         <para>
+ The value of properties having this prefix must be of type {@code String}.</para>
+      </section>
+      <section xreflabel="ENDPOINT_SERVICE_ID"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteConstants.ENDPOINT_SERVICE_ID">
+         <title>public static final String ENDPOINT_SERVICE_ID = "endpoint.service.id"</title>
+         <para>
+Endpoint property identifying the service id of the exported service. Can
+ be absent or 0 if the corresponding endpoint is not for an OSGi service.
+ 
+ </para>
+         <para>
+ The value of this property must be of type {@code Long}.</para>
+      </section>
+      <section xreflabel="REMOTE_CONFIGS_SUPPORTED"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_CONFIGS_SUPPORTED">
+         <title>public static final String REMOTE_CONFIGS_SUPPORTED = "remote.configs.supported"</title>
+         <para>
+Service property identifying the configuration types supported by a
+ distribution provider. Registered by the distribution provider on one of
+ its services to indicate the supported configuration types.
+ 
+ </para>
+         <para>
+ The value of this property must be of type {@code String},
+ {@code String[]}, or {@code Collection} of {@code String}.</para>
+         <formalpara role="parameter">
+            <title>See Also</title>
+            <para>
+               <code>Remote Services Specification</code>
+            </para>
+         </formalpara>
+      </section>
+      <section xreflabel="REMOTE_INTENTS_SUPPORTED"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_INTENTS_SUPPORTED">
+         <title>public static final String REMOTE_INTENTS_SUPPORTED = "remote.intents.supported"</title>
+         <para>
+Service property identifying the intents supported by a distribution
+ provider. Registered by the distribution provider on one of its services
+ to indicate the vocabulary of implemented intents.
+ 
+ </para>
+         <para>
+ The value of this property must be of type {@code String},
+ {@code String[]}, or {@code Collection} of {@code String}.</para>
+         <formalpara role="parameter">
+            <title>See Also</title>
+            <para>
+               <code>Remote Services Specification</code>
+            </para>
+         </formalpara>
+      </section>
+      <section xreflabel="SERVICE_EXPORTED_CONFIGS"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteConstants.SERVICE_EXPORTED_CONFIGS">
+         <title>public static final String SERVICE_EXPORTED_CONFIGS = "service.exported.configs"</title>
+         <para>
+Service property identifying the configuration types that should be used
+ to export the service. Each configuration type represents the
+ configuration parameters for an endpoint. A distribution provider should
+ create an endpoint for each configuration type that it supports.
+ 
+ </para>
+         <para>
+ This property may be supplied in the {@code properties}
+ {@code Dictionary} object passed to the
+ {@code BundleContext.registerService} method. The value of this property
+ must be of type {@code String}, {@code String[]}, or {@code Collection}
+ of {@code String}.</para>
+         <formalpara role="parameter">
+            <title>See Also</title>
+            <para>
+               <code>Remote Services Specification</code>
+            </para>
+         </formalpara>
+      </section>
+      <section xreflabel="SERVICE_EXPORTED_INTENTS"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteConstants.SERVICE_EXPORTED_INTENTS">
+         <title>public static final String SERVICE_EXPORTED_INTENTS = "service.exported.intents"</title>
+         <para>
+Service property identifying the intents that the distribution provider
+ must implement to distribute the service. Intents listed in this property
+ are reserved for intents that are critical for the code to function
+ correctly, for example, ordering of messages. These intents should not be
+ configurable.
+ 
+ </para>
+         <para>
+ This property may be supplied in the {@code properties}
+ {@code Dictionary} object passed to the
+ {@code BundleContext.registerService} method. The value of this property
+ must be of type {@code String}, {@code String[]}, or {@code Collection}
+ of {@code String}.</para>
+         <formalpara role="parameter">
+            <title>See Also</title>
+            <para>
+               <code>Remote Services Specification</code>
+            </para>
+         </formalpara>
+      </section>
+      <section xreflabel="SERVICE_EXPORTED_INTENTS_EXTRA"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA">
+         <title>public static final String SERVICE_EXPORTED_INTENTS_EXTRA = "service.exported.intents.extra"</title>
+         <para>
+Service property identifying the extra intents that the distribution
+ provider must implement to distribute the service. This property is
+ merged with the {@code service.exported.intents} property before the
+ distribution provider interprets the listed intents; it has therefore the
+ same semantics but the property should be configurable so the
+ administrator can choose the intents based on the topology. Bundles
+ should therefore make this property configurable, for example through the
+ Configuration Admin service.
+ 
+ </para>
+         <para>
+ This property may be supplied in the {@code properties}
+ {@code Dictionary} object passed to the
+ {@code BundleContext.registerService} method. The value of this property
+ must be of type {@code String}, {@code String[]}, or {@code Collection}
+ of {@code String}.</para>
+         <formalpara role="parameter">
+            <title>See Also</title>
+            <para>
+               <code>Remote Services Specification</code>
+            </para>
+         </formalpara>
+      </section>
+      <section xreflabel="SERVICE_EXPORTED_INTERFACES"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteConstants.SERVICE_EXPORTED_INTERFACES">
+         <title>public static final String SERVICE_EXPORTED_INTERFACES = "service.exported.interfaces"</title>
+         <para>
+Service property marking the service for export. It defines the
+ interfaces under which this service can be exported. This list must be a
+ subset of the types under which the service was registered. The single
+ value of an asterisk ({@code '*'} \u002A) indicates all the interface
+ types under which the service was registered excluding the non-interface
+ types. It is strongly recommended to only export interface types and not
+ concrete classes due to the complexity of creating proxies for some type
+ of concrete classes.
+ 
+ </para>
+         <para>
+ This property may be supplied in the {@code properties}
+ {@code Dictionary} object passed to the
+ {@code BundleContext.registerService} method. The value of this property
+ must be of type {@code String}, {@code String[]}, or {@code Collection}
+ of {@code String}.</para>
+         <formalpara role="parameter">
+            <title>See Also</title>
+            <para>
+               <code>Remote Services Specification</code>
+            </para>
+         </formalpara>
+      </section>
+      <section xreflabel="SERVICE_IMPORTED"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteConstants.SERVICE_IMPORTED">
+         <title>public static final String SERVICE_IMPORTED = "service.imported"</title>
+         <para>
+Service property identifying the service as imported. This service
+ property must be set by a distribution provider to any value when it
+ registers the endpoint proxy as an imported service. A bundle can use
+ this property to filter out imported services.
+ 
+ </para>
+         <para>
+ The value of this property may be of any type.</para>
+         <formalpara role="parameter">
+            <title>See Also</title>
+            <para>
+               <code>Remote Services Specification</code>
+            </para>
+         </formalpara>
+      </section>
+      <section xreflabel="SERVICE_IMPORTED_CONFIGS"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteConstants.SERVICE_IMPORTED_CONFIGS">
+         <title>public static final String SERVICE_IMPORTED_CONFIGS = "service.imported.configs"</title>
+         <para>
+Service property identifying the configuration types used to import the
+ service. Any associated properties for this configuration types must be
+ properly mapped to the importing system. For example, a URL in these
+ properties must point to a valid resource when used in the importing
+ framework. If multiple configuration types are listed in this property,
+ then they must be synonyms for exactly the same remote endpoint that is
+ used to export this service.
+ 
+ </para>
+         <para>
+ The value of this property must be of type {@code String},
+ {@code String[]}, or {@code Collection} of {@code String}.</para>
+         <formalpara role="parameter">
+            <title>See Also</title>
+            <para>
+               <code>Remote Services Specification</code>, <link linkend="UNRESOLVED">SERVICE_EXPORTED_CONFIGS</link>
+            </para>
+         </formalpara>
+      </section>
+      <section xreflabel="SERVICE_INTENTS"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteConstants.SERVICE_INTENTS">
+         <title>public static final String SERVICE_INTENTS = "service.intents"</title>
+         <para>
+Service property identifying the intents that this service implement.
+ This property has a dual purpose:
+ </para>
+         <itemizedlist>
+            <listitem>
+               <para>A bundle can use this service property to notify the distribution
+ provider that these intents are already implemented by the exported
+ service object.</para>
+            </listitem>
+            <listitem>
+               <para>A distribution provider must use this property to convey the combined
+ intents of: The exporting service, and the intents that the exporting
+ distribution provider adds, and the intents that the importing
+ distribution provider adds.</para>
+            </listitem>
+         </itemizedlist>
+         <para>
+ 
+ To export a service, a distribution provider must expand any qualified
+ intents. Both the exporting and importing distribution providers must
+ recognize all intents before a service can be distributed.
+ 
+ The value of this property must be of type {@code String},
+ {@code String[]}, or {@code Collection} of {@code String}.
+   </para>
+         <formalpara role="parameter">
+            <title>See Also</title>
+            <para>
+               <code>Remote Services Specification</code>
+            </para>
+         </formalpara>
+      </section>
+   </section>
+   <section xreflabel="RemoteServiceAdmin"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdmin">
+      <title>public abstract RemoteServiceAdmin</title>
+      <para>
+A Remote Service Admin manages the import and export of services.
+ 
+ A Distribution Provider can expose a control interface. This interface allows
+ a Topology Manager to control the export and import of services.
+ 
+ The API allows a Topology Manager to export a service, to import a service,
+ and find out about the current imports and exports.
+   </para>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Thread-safe </para>
+      </formalpara>
+      <formalpara role="parameter">
+         <title>Provider Type</title>
+         <para>Consumers of this API must not implement this type</para>
+      </formalpara>
+      <section xreflabel="exportService(ServiceReference,Map)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdmin.exportService-ServiceReference-Map-">
+         <title>public abstract Collection&lt;ExportRegistration&gt; exportService(ServiceReference&lt;?&gt; reference, Map&lt;String, ?&gt; properties)</title>
+         <formalpara role="parameter">
+            <title>reference</title>
+            <para>The Service Reference to export.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>properties</title>
+            <para>The properties to create a local Endpoint that can be
+        implemented by this Remote Service Admin. If this is {@code null},
+        the Endpoint will be determined by the properties on the service.
+        The properties are the same as given for an exported service. They
+        override any properties in the specified Service Reference (case
+        insensitive). The properties {@code objectClass} and
+        {@code service.id}, in any case variant, are ignored. Those
+        properties in the Service Reference cannot be overridden. This
+        parameter can be {@code null}, this should be treated as an empty
+        map.</para>
+         </formalpara>
+         <para role="description">
+Export a service to a given Endpoint. The Remote Service Admin must
+ create an Endpoint from the given description that can be used by other
+ Distribution Providers to connect to this Remote Service Admin and use
+ the exported service.
+ 
+ The property keys of a Service Reference are case insensitive while the
+ property keys of the specified {@code properties} map are case sensitive.
+ A property key in the specified {@code properties} map must therefore
+ override any case variant property key in the properties of the specified
+ Service Reference.
+ 
+ </para>
+         <para>
+ If the caller does not have the appropriate
+ {@code EndpointPermission[endpoint,EXPORT]} for an Endpoint, and the Java
+ Runtime Environment supports permissions, then the
+ {@link ExportRegistration#getException() getException} method on the
+ corresponding returned {@link ExportRegistration} will return a
+ {@code SecurityException}.</para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>A {@code Collection} of {@link ExportRegistration}s for the
+         specified Service Reference and properties. Multiple Export
+         Registrations may be returned because a single service can be
+         exported to multiple Endpoints depending on the available
+         configuration type properties and the intents that they support.
+         The result is never {@code null} but may be empty if this Remove
+         Service Admin does not recognize any of the configuration types,
+         or if the Remote Service Admin cannot support the relevant
+         intents.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>Throws</title>
+            <para>
+               <code>IllegalArgumentException</code>– If any of the properties for this
+         configuration type has a value that is not syntactically correct,
+         or if the service properties and the overlaid properties do not
+         contain a {@link RemoteConstants#SERVICE_EXPORTED_INTERFACES}
+         entry. This means that implementations must not ignore invalid
+         values for property names that they recognize.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getExportedServices()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdmin.getExportedServices--">
+         <title>public abstract Collection&lt;ExportReference&gt; getExportedServices()</title>
+         <para role="description">
+Return the currently active Export References.
+ 
+ </para>
+         <para>
+ If the caller does not have the appropriate
+ {@code EndpointPermission[endpoint,READ]} for an Endpoint, and the Java
+ Runtime Environment supports permissions, then returned collection will
+ not contain a reference to the exported Endpoint.</para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>A {@code Collection} of {@link ExportReference}s that are
+         currently active.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getImportedEndpoints()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdmin.getImportedEndpoints--">
+         <title>public abstract Collection&lt;ImportReference&gt; getImportedEndpoints()</title>
+         <para role="description">
+Return the currently active Import References.
+ 
+ </para>
+         <para>
+ If the caller does not have the appropriate
+ {@code EndpointPermission[endpoint,READ]} for an Endpoint, and the Java
+ Runtime Environment supports permissions, then returned collection will
+ not contain a reference to the imported Endpoint.</para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>A {@code Collection} of {@link ImportReference}s that are
+         currently active.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="importService(EndpointDescription)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdmin.importService-EndpointDescription-">
+         <title>public abstract ImportRegistration importService(EndpointDescription endpoint)</title>
+         <formalpara role="parameter">
+            <title>endpoint</title>
+            <para>The Endpoint Description to be used for import.</para>
+         </formalpara>
+         <para role="description">
+Import a service from an Endpoint. The Remote Service Admin must use the
+ given Endpoint to create a proxy. This method can return {@code null} if
+ the service could not be imported.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>An Import Registration that combines the Endpoint Description and
+         the Service Reference or {@code null} if the Endpoint could not
+         be imported.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>Throws</title>
+            <para>
+               <code>SecurityException</code>– If the caller does not have the appropriate
+         {@code EndpointPermission[endpoint,IMPORT]} for the Endpoint, and
+         the Java Runtime Environment supports permissions.</para>
+         </formalpara>
+      </section>
+   </section>
+   <section xreflabel="RemoteServiceAdminEvent"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent">
+      <title>public class RemoteServiceAdminEvent</title>
+      <para>
+Provides the event information for a Remote Service Admin event.
+   </para>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Immutable </para>
+      </formalpara>
+      <section xreflabel="EXPORT_ERROR"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.EXPORT_ERROR">
+         <title>public static final int EXPORT_ERROR = 6</title>
+         <para>
+A fatal exporting error occurred. The Export Registration has been
+ closed.
+   </para>
+      </section>
+      <section xreflabel="EXPORT_REGISTRATION"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.EXPORT_REGISTRATION">
+         <title>public static final int EXPORT_REGISTRATION = 2</title>
+         <para>
+Add an export registration. The Remote Service Admin will send this event
+ when it exports a service. When the {@link RemoteServiceAdminListener}
+ service is registered, the Remote Service Admin must notify the listener
+ of all existing Export Registrations.
+   </para>
+      </section>
+      <section xreflabel="EXPORT_UNREGISTRATION"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.EXPORT_UNREGISTRATION">
+         <title>public static final int EXPORT_UNREGISTRATION = 3</title>
+         <para>
+Remove an export registration. The Remote Service Admin will send this
+ event when it removes the export of a service.
+   </para>
+      </section>
+      <section xreflabel="EXPORT_UPDATE"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.EXPORT_UPDATE">
+         <title>public static final int EXPORT_UPDATE = 10</title>
+         <para>
+Update an export registration. The Remote Service Admin will send this
+ event when it exports a service.
+   </para>
+         <formalpara role="parameter">
+            <title>Since</title>
+            <para>@since 1.1</para>
+         </formalpara>
+      </section>
+      <section xreflabel="EXPORT_WARNING"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.EXPORT_WARNING">
+         <title>public static final int EXPORT_WARNING = 7</title>
+         <para>
+A problematic situation occurred, the export is still active.
+   </para>
+      </section>
+      <section xreflabel="IMPORT_ERROR"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.IMPORT_ERROR">
+         <title>public static final int IMPORT_ERROR = 5</title>
+         <para>
+A fatal importing error occurred. The Import Registration has been
+ closed.
+   </para>
+      </section>
+      <section xreflabel="IMPORT_REGISTRATION"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.IMPORT_REGISTRATION">
+         <title>public static final int IMPORT_REGISTRATION = 1</title>
+         <para>
+Add an import registration. The Remote Service Admin will send this event
+ when it imports a service. When the {@link RemoteServiceAdminListener}
+ service is registered, the Remote Service Admin must notify the listener
+ of all existing Import Registrations.
+   </para>
+      </section>
+      <section xreflabel="IMPORT_UNREGISTRATION"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.IMPORT_UNREGISTRATION">
+         <title>public static final int IMPORT_UNREGISTRATION = 4</title>
+         <para>
+Remove an import registration. The Remote Service Admin will send this
+ event when it removes the import of a service.
+   </para>
+      </section>
+      <section xreflabel="IMPORT_UPDATE"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.IMPORT_UPDATE">
+         <title>public static final int IMPORT_UPDATE = 9</title>
+         <para>
+Update an import registration. The Remote Service Admin will send this
+ event when it updates a service.
+   </para>
+         <formalpara role="parameter">
+            <title>Since</title>
+            <para>@since 1.1</para>
+         </formalpara>
+      </section>
+      <section xreflabel="IMPORT_WARNING"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.IMPORT_WARNING">
+         <title>public static final int IMPORT_WARNING = 8</title>
+         <para>
+A problematic situation occurred, the import is still active.
+   </para>
+      </section>
+      <section xreflabel="RemoteServiceAdminEvent(int,Bundle,ExportReference,Throwable)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.RemoteServiceAdminEvent-int-Bundle-ExportReference-Throwable-">
+         <title>public  RemoteServiceAdminEvent(int type, Bundle source, ExportReference exportReference, Throwable exception)</title>
+         <formalpara role="parameter">
+            <title>type</title>
+            <para>The event type.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>source</title>
+            <para>The source bundle, must not be {@code null}.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>exportReference</title>
+            <para>The exportReference, can not be {@code null}.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>exception</title>
+            <para>Any exceptions encountered, can be {@code null}.</para>
+         </formalpara>
+         <para role="description">
+Create a Remote Service Admin Event for an export notification.
+   </para>
+      </section>
+      <section xreflabel="RemoteServiceAdminEvent(int,Bundle,ImportReference,Throwable)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.RemoteServiceAdminEvent-int-Bundle-ImportReference-Throwable-">
+         <title>public  RemoteServiceAdminEvent(int type, Bundle source, ImportReference importReference, Throwable exception)</title>
+         <formalpara role="parameter">
+            <title>type</title>
+            <para>The event type.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>source</title>
+            <para>The source bundle, must not be {@code null}.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>importReference</title>
+            <para>The importReference, can not be {@code null}.</para>
+         </formalpara>
+         <formalpara role="parameter">
+            <title>exception</title>
+            <para>Any exceptions encountered, can be {@code null}.</para>
+         </formalpara>
+         <para role="description">
+Create a Remote Service Admin Event for an import notification.
+   </para>
+      </section>
+      <section xreflabel="getException()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.getException--">
+         <title>public Throwable getException()</title>
+         <para role="description">
+Return the exception for this event.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The exception or {@code null}.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getExportReference()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.getExportReference--">
+         <title>public ExportReference getExportReference()</title>
+         <para role="description">
+Return the Export Reference for this event.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The Export Reference or {@code null}.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getImportReference()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.getImportReference--">
+         <title>public ImportReference getImportReference()</title>
+         <para role="description">
+Return the Import Reference for this event.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The Import Reference or {@code null}.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getSource()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.getSource--">
+         <title>public Bundle getSource()</title>
+         <para role="description">
+Return the bundle source of this event.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The bundle source of this event.</para>
+         </formalpara>
+      </section>
+      <section xreflabel="getType()"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent.getType--">
+         <title>public int getType()</title>
+         <para role="description">
+Return the type of this event.
+   </para>
+         <formalpara role="parameter">
+            <title>Returns</title>
+            <para>The type of this event.</para>
+         </formalpara>
+      </section>
+   </section>
+   <section xreflabel="RemoteServiceAdminListener"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminListener">
+      <title>public abstract RemoteServiceAdminListener</title>
+      <para>
+A {@link RemoteServiceAdminEvent} listener is notified synchronously of any
+ export or import registrations and unregistrations.
+ 
+ </para>
+      <para>
+ If the Java Runtime Environment supports permissions, then filtering is done.
+ {@code RemoteServiceAdminEvent} objects are only delivered to the listener if
+ the bundle which defines the listener object's class has the appropriate
+ {@code EndpointPermission[endpoint,READ]} for the endpoint referenced by the
+ event.</para>
+      <formalpara role="parameter">
+         <title>See Also</title>
+         <para>
+            <link linkend="org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent">RemoteServiceAdminEvent</link>
+         </para>
+      </formalpara>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Thread-safe </para>
+      </formalpara>
+      <section xreflabel="remoteAdminEvent(RemoteServiceAdminEvent)"
+               role="method"
+               xml:id="org.osgi.service.remoteserviceadmin.RemoteServiceAdminListener.remoteAdminEvent-RemoteServiceAdminEvent-">
+         <title>public abstract void remoteAdminEvent(RemoteServiceAdminEvent event)</title>
+         <formalpara role="parameter">
+            <title>event</title>
+            <para>The {@link RemoteServiceAdminEvent} object.</para>
+         </formalpara>
+         <para role="description">
+Receive notification of any export or import registrations and
+ unregistrations as well as errors and warnings.
+   </para>
+      </section>
+   </section>
+</section>

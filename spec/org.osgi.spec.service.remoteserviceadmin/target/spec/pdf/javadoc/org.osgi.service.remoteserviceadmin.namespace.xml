@@ -1,0 +1,184 @@
+<section xmlns="http://docbook.org/ns/docbook"
+         xreflabel="org.osgi.service.remoteserviceadmin.namespace"
+         version="5"
+         role="package"
+         xml:id="org.osgi.service.remoteserviceadmin.namespace">
+   <title>org.osgi.service.remoteserviceadmin.namespace</title>
+   <info>
+      <releaseinfo xml:id="org.osgi.service.remoteserviceadmin.namespace-version">Version 1.0</releaseinfo>
+      <edition xml:id="org.osgi.service.remoteserviceadmin.namespace-version.number">1.0</edition>
+   </info>
+   <para>
+Remote Service Admin Namespaces Version 1.0.
+ 
+ </para>
+   <para>
+ Bundles should not need to import this package at runtime since all
+ the types in this package just contain constants for capability and 
+ requirement namespaces specified by the OSGi Working Group.</para>
+   <section role="summary">
+      <title>Summary</title>
+      <itemizedlist>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.namespace.DiscoveryNamespace">
+                  <code>DiscoveryNamespace</code>
+               </link> - 
+Remote Services Discovery Provider Capability and Requirement Namespace.
+   </para>
+         </listitem>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.namespace.DistributionNamespace">
+                  <code>DistributionNamespace</code>
+               </link> - 
+Remote Services Distribution Provider Capability and Requirement Namespace.
+   </para>
+         </listitem>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.namespace.TopologyNamespace">
+                  <code>TopologyNamespace</code>
+               </link> - 
+Remote Services Topology Manager Capability and Requirement Namespace.
+   </para>
+         </listitem>
+      </itemizedlist>
+   </section>
+   <section xreflabel="DiscoveryNamespace"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.namespace.DiscoveryNamespace">
+      <title>public final class DiscoveryNamespace<?line-break?> extends Namespace</title>
+      <para>
+Remote Services Discovery Provider Capability and Requirement Namespace.
+ 
+ </para>
+      <para>
+ This class defines the names for the attributes and directives for this
+ namespace.</para>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Immutable </para>
+      </formalpara>
+      <section xreflabel="CAPABILITY_PROTOCOLS_ATTRIBUTE"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.namespace.DiscoveryNamespace.CAPABILITY_PROTOCOLS_ATTRIBUTE">
+         <title>public static final String CAPABILITY_PROTOCOLS_ATTRIBUTE = "protocols"</title>
+         <para>
+The capability attribute used to specify the discovery protocols
+ supported by this discovery provider. The value of this attribute must be
+ of type {@code String} or {@code List&lt;String&gt;}.
+   </para>
+      </section>
+      <section xreflabel="DISCOVERY_NAMESPACE"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.namespace.DiscoveryNamespace.DISCOVERY_NAMESPACE">
+         <title>public static final String DISCOVERY_NAMESPACE = "osgi.remoteserviceadmin.discovery"</title>
+         <para>
+Namespace name for Remote Services discovery provider capabilities and
+ requirements.
+   </para>
+      </section>
+   </section>
+   <section xreflabel="DistributionNamespace"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.namespace.DistributionNamespace">
+      <title>public final class DistributionNamespace<?line-break?> extends Namespace</title>
+      <para>
+Remote Services Distribution Provider Capability and Requirement Namespace.
+ 
+ </para>
+      <para>
+ This class defines the names for the attributes and directives for this
+ namespace.</para>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Immutable </para>
+      </formalpara>
+      <section xreflabel="CAPABILITY_CONFIGS_ATTRIBUTE"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.namespace.DistributionNamespace.CAPABILITY_CONFIGS_ATTRIBUTE">
+         <title>public static final String CAPABILITY_CONFIGS_ATTRIBUTE = "configs"</title>
+         <para>
+The capability attribute used to specify the config types supported by
+ this distribution provider. The value of this attribute must be of type
+ {@code String} or {@code List&lt;String&gt;}.
+   </para>
+      </section>
+      <section xreflabel="DISTRIBUTION_NAMESPACE"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.namespace.DistributionNamespace.DISTRIBUTION_NAMESPACE">
+         <title>public static final String DISTRIBUTION_NAMESPACE = "osgi.remoteserviceadmin.distribution"</title>
+         <para>
+Namespace name for Remote Services distribution provider capabilities and
+ requirements.
+   </para>
+      </section>
+   </section>
+   <section xreflabel="TopologyNamespace"
+            role="class"
+            xml:id="org.osgi.service.remoteserviceadmin.namespace.TopologyNamespace">
+      <title>public final class TopologyNamespace<?line-break?> extends Namespace</title>
+      <para>
+Remote Services Topology Manager Capability and Requirement Namespace.
+ 
+ </para>
+      <para>
+ This class defines the names for the attributes and directives for this
+ namespace.</para>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Immutable </para>
+      </formalpara>
+      <section xreflabel="CAPABILITY_POLICY_ATTRIBUTE"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.namespace.TopologyNamespace.CAPABILITY_POLICY_ATTRIBUTE">
+         <title>public static final String CAPABILITY_POLICY_ATTRIBUTE = "policy"</title>
+         <para>
+The capability attribute used to specify the policy or policies supported
+ by this topology manager. The value of this attribute must be of type
+ {@code String} or {@code List&lt;String&gt;}. Policy names are typically
+ implementation specific, however the Remote Services Specification
+ defines the <emphasis>promiscuous</emphasis> and <emphasis>fail-over</emphasis> policies for
+ common use cases.
+   </para>
+      </section>
+      <section xreflabel="FAIL_OVER_POLICY"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.namespace.TopologyNamespace.FAIL_OVER_POLICY">
+         <title>public static final String FAIL_OVER_POLICY = "fail-over"</title>
+         <para>
+The attribute value for Topology managers with a fail-over policy
+   </para>
+         <formalpara role="parameter">
+            <title>See Also</title>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.namespace.TopologyNamespace.CAPABILITY_POLICY_ATTRIBUTE">TopologyNamespace.CAPABILITY_POLICY_ATTRIBUTE</link>
+            </para>
+         </formalpara>
+      </section>
+      <section xreflabel="PROMISCUOUS_POLICY"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.namespace.TopologyNamespace.PROMISCUOUS_POLICY">
+         <title>public static final String PROMISCUOUS_POLICY = "promiscuous"</title>
+         <para>
+The attribute value for Topology managers with a promiscuous policy
+   </para>
+         <formalpara role="parameter">
+            <title>See Also</title>
+            <para>
+               <link linkend="org.osgi.service.remoteserviceadmin.namespace.TopologyNamespace.CAPABILITY_POLICY_ATTRIBUTE">TopologyNamespace.CAPABILITY_POLICY_ATTRIBUTE</link>
+            </para>
+         </formalpara>
+      </section>
+      <section xreflabel="TOPOLOGY_NAMESPACE"
+               role="field"
+               xml:id="org.osgi.service.remoteserviceadmin.namespace.TopologyNamespace.TOPOLOGY_NAMESPACE">
+         <title>public static final String TOPOLOGY_NAMESPACE = "osgi.remoteserviceadmin.topology"</title>
+         <para>
+Namespace name for Remote Services topology manager capabilities and
+ requirements.
+   </para>
+      </section>
+   </section>
+</section>

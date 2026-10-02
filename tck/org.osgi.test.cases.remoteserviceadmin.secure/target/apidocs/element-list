@@ -1,0 +1,6 @@
+org.osgi.test.cases.remoteserviceadmin.secure
+org.osgi.test.cases.remoteserviceadmin.secure.common
+org.osgi.test.cases.remoteserviceadmin.secure.tb.exporter
+org.osgi.test.cases.remoteserviceadmin.secure.tb.importer
+org.osgi.test.cases.remoteserviceadmin.secure.tb.reader
+org.osgi.test.cases.remoteserviceadmin.secure.tb.reader_noperm

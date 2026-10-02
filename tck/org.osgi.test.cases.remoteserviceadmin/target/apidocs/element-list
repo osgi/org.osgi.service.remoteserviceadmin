@@ -1,0 +1,9 @@
+org.osgi.test.cases.remoteserviceadmin.common
+org.osgi.test.cases.remoteserviceadmin.impl
+org.osgi.test.cases.remoteserviceadmin.junit
+org.osgi.test.cases.remoteserviceadmin.tb1
+org.osgi.test.cases.remoteserviceadmin.tb2
+org.osgi.test.cases.remoteserviceadmin.tb3
+org.osgi.test.cases.remoteserviceadmin.tb5
+org.osgi.test.cases.remoteserviceadmin.tb7
+org.osgi.test.cases.remoteserviceadmin.tb8

@@ -1,0 +1,3 @@
+org.osgi.test.cases.remoteservices.common
+org.osgi.test.cases.remoteservices.impl
+org.osgi.test.cases.remoteservices.junit

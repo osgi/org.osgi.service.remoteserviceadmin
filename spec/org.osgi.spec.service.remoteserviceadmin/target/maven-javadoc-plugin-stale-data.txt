@@ -1,0 +1,76 @@
+@options
+@packages
+-classpath
+'/home/stbischof/.m2/repository/org/osgi/org.osgi.annotation.versioning/1.1.2/org.osgi.annotation.versioning-1.1.2.jar:/home/stbischof/.m2/repository/org/osgi/org.osgi.annotation.bundle/2.0.0/org.osgi.annotation.bundle-2.0.0.jar:/home/stbischof/.m2/repository/org/osgi/org.osgi.framework/1.10.0/org.osgi.framework-1.10.0.jar:/home/stbischof/.m2/repository/org/osgi/org.osgi.resource/1.0.1/org.osgi.resource-1.0.1.jar'
+-encoding
+'UTF-8'
+-protected
+--release
+8
+-sourcepath
+'/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/api/src/main/java:/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/generated-sources/annotations'
+-author
+-bottom
+'Copyright &#169; 1980 <a href="https://www.eclipse.org/">Eclipse Foundation</a>. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs'
+-docencoding
+'UTF-8'
+-Xdoclint:none
+-doctitle
+'OSGi Specification repo for org.osgi.service.remoteserviceadmin 1.1.1-SNAPSHOT API'
+-linkoffline
+'https://docs.oracle.com/javase/8/docs/api' '/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/javadoc-bundle-options'
+-notimestamp
+-tag
+"Immutable:t:Immutable"
+-tag
+"ThreadSafe:t:ThreadSafe"
+-tag
+"NotThreadSafe:t:NotThreadSafe"
+-tag
+"GuardedBy:mf:Guarded By:"
+-tag
+"security:m:Required Permissions"
+-tag
+"noimplement:t:Consumers of this API must not implement this interface"
+-tag
+"implNote:a:Implementation Note:"
+-use
+-version
+-windowtitle
+'OSGi Specification repo for org.osgi.service.remoteserviceadmin 1.1.1-SNAPSHOT API'
+org.osgi.service.remoteserviceadmin
+org.osgi.service.remoteserviceadmin.namespace
+/home/stbischof/.m2/repository/org/osgi/org.osgi.annotation.versioning/1.1.2/org.osgi.annotation.versioning-1.1.2.jar = 1634136809000
+/home/stbischof/.m2/repository/org/osgi/org.osgi.annotation.bundle/2.0.0/org.osgi.annotation.bundle-2.0.0.jar = 1644360733000
+/home/stbischof/.m2/repository/org/osgi/org.osgi.framework/1.10.0/org.osgi.framework-1.10.0.jar = 1607377478000
+/home/stbischof/.m2/repository/org/osgi/org.osgi.resource/1.0.1/org.osgi.resource-1.0.1.jar = 1607391117000
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/api/src/main/java = 1790012136761
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/generated-sources/annotations = 1790091341426
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/element-list = 1790093559041
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/constant-values.html = 1790093559148
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/serialized-form.html = 1790093559211
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/overview-tree.html = 1790093559381
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/deprecated-list.html = 1790093559388
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/index.html = 1790093559397
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/allclasses-index.html = 1790093559450
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/allpackages-index.html = 1790093559457
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/module-search-index.js = 1790093559459
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/package-search-index.js = 1790093559461
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/type-search-index.js = 1790093559462
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/member-search-index.js = 1790093559463
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/tag-search-index.js = 1790093559465
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/index-all.html = 1790093559553
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/search.html = 1790093559560
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/overview-summary.html = 1790093559564
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/help-doc.html = 1790093559621
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/stylesheet.css = 1790093559627
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/script.js = 1790093559630
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/copy.svg = 1790093559632
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/link.svg = 1790093559633
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/search.js = 1790093559639
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/search-page.js = 1790093559641
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.remoteserviceadmin/spec/org.osgi.spec.service.remoteserviceadmin/target/apidocs/javadoc.sh = 1790091397700
