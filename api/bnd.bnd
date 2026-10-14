@@ -2,3 +2,4 @@
 # bnd-maven-plugin configuration in org.osgi.maven.pom.parent.
 # Package versions come from the @Version annotations in package-info.java.
 Export-Package: ${project.artifactId}.*; -split-package:=first
+-includeresource.xmlns: xmlns/rsa=${.}/../xmlns/rsa
