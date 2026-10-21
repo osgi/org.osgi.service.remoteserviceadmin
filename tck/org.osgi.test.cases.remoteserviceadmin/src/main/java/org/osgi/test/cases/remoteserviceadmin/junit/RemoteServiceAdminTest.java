@@ -17,6 +17,9 @@
  *******************************************************************************/
 package org.osgi.test.cases.remoteserviceadmin.junit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +35,8 @@ import java.util.StringTokenizer;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -51,6 +56,8 @@ import org.osgi.test.cases.remoteserviceadmin.common.A;
 import org.osgi.test.cases.remoteserviceadmin.common.B;
 import org.osgi.test.cases.remoteserviceadmin.common.TestEventHandler;
 import org.osgi.test.cases.remoteserviceadmin.common.Utils;
+import org.osgi.test.common.annotation.InjectBundleInstaller;
+import org.osgi.test.common.install.BundleInstaller;
 
 /**
  * Use RSA service to register a service in a child framework and then import
@@ -64,12 +71,15 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 	private static final String	SYSTEM_PACKAGES_EXTRA	= "org.osgi.test.cases.remoteserviceadmin.system.packages.extra";
 
 	long						timeout;
+
+	@InjectBundleInstaller
+	BundleInstaller				installer;
 	
 	/**
 	 * @see org.osgi.test.cases.remoteserviceadmin.junit.MultiFrameworkTestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception {
+	@BeforeEach
+	public void setUp() throws Exception {
 		super.setUp();
 		timeout = getLongProperty("rsa.tck.timeout", 300000L);
 	}
@@ -101,6 +111,7 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 	 * framework. This manual step bypasses Discovery, which would normally do the transport
 	 * between the two frameworks.
 	 */
+	@Test
 	public void testExportImportManually() throws Exception {
 		verifyFramework();
 		
@@ -110,7 +121,7 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 		BundleContext childContext = getFramework().getBundleContext();
 		
 		Bundle tb2Bundle = installBundle(childContext, "/tb2.jar");
-		assertNotNull(tb2Bundle);
+		assertThat(tb2Bundle).isNotNull();
 		
 		// start test bundle in child framework
 		// the bundle registers a service with interface A and then uses the RemoteServiceAdmin service
@@ -126,20 +137,20 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 		// find the RSA in the parent framework and import the
 		// service
 		//
-		ServiceReference<RemoteServiceAdmin> rsaRef = getContext()
+		ServiceReference<RemoteServiceAdmin> rsaRef = context
 				.getServiceReference(RemoteServiceAdmin.class);
-		assertNotNull(rsaRef);
-		RemoteServiceAdmin rsa = getContext().getService(rsaRef);
-		assertNotNull(rsa);
+		assertThat(rsaRef).isNotNull();
+		RemoteServiceAdmin rsa = context.getService(rsaRef);
+		assertThat(rsa).isNotNull();
 
 		try {
 			// reconstruct the endpoint description in version 1.0.0
 			EndpointDescription endpoint = Utils.reconstructEndpoint("1.0.0",
-					this);
+					context);
 			// gather all the service and exporting intents
 			List<String> endpointIntents = endpoint.getIntents();
-			assertNotNull(endpointIntents);
-			assertFalse(endpointIntents.isEmpty());
+			assertThat(endpointIntents).isNotNull();
+			assertThat(endpointIntents).isNotEmpty();
 
 			//
 			// 122.4.2: Importing
@@ -148,7 +159,7 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 			Map<String, Object> map = new HashMap<String, Object>(endpoint.getProperties());
 			map.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "guaranteed_unsupported_" + System.currentTimeMillis());
 			EndpointDescription clone = new EndpointDescription(map);
-			assertNull("122.4.2: with no supported config type no service may be imported", rsa.importService(clone));
+			assertThat(rsa.importService(clone)).as("122.4.2: with no supported config type no service may be imported").isNull();
 
 			//
 			// 122.4.8: Events
@@ -178,65 +189,65 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 			// positive test: import the service
 			//
 			ImportRegistration importReg = rsa.importService(endpoint);
-			assertNotNull(importReg);
-			assertNull(importReg.getException());
+			assertThat(importReg).isNotNull();
+			assertThat(importReg.getException()).isNull();
 
 			ImportReference importRef = importReg.getImportReference();
-			assertNotNull(importRef);
+			assertThat(importRef).isNotNull();
 			
 			ServiceReference< ? > sref = importRef.getImportedService();
-			assertNotNull(sref);
-			assertEquals("has been overridden", sref.getProperty("mykey"));
-			assertEquals("myvalue", sref.getProperty("myprop"));
-			assertTrue(((List< ? >) sref.getProperty("mylist")).size() == 2);
-			assertTrue(((Set< ? >) sref.getProperty("myset")).size() == 2);
-			assertEquals(3.1415f, sref.getProperty("myfloat"));
-			assertEquals(-3.1415d, sref.getProperty("mydouble"));
-			assertEquals('t', sref.getProperty("mychar"));
-			assertNull(sref.getProperty(".do_not_forward"));
-			assertEquals("<myxml>test</myxml>", sref.getProperty("myxml"));
+			assertThat(sref).isNotNull();
+			assertThat(sref.getProperty("mykey")).isEqualTo("has been overridden");
+			assertThat(sref.getProperty("myprop")).isEqualTo("myvalue");
+			assertThat(((List<?>) sref.getProperty("mylist")).size()).isEqualTo(2);
+			assertThat(((Set<?>) sref.getProperty("myset")).size()).isEqualTo(2);
+			assertThat(sref.getProperty("myfloat")).isEqualTo(3.1415f);
+			assertThat(sref.getProperty("mydouble")).isEqualTo(-3.1415d);
+			assertThat(sref.getProperty("mychar")).isEqualTo('t');
+			assertThat(sref.getProperty(".do_not_forward")).isNull();
+			assertThat(sref.getProperty("myxml")).isEqualTo("<myxml>test</myxml>");
 
-			assertNotNull("122.4.2: the service.imported property has to be set", sref.getProperty(RemoteConstants.SERVICE_IMPORTED));
-			assertNotNull(sref.getProperty(RemoteConstants.SERVICE_IMPORTED_CONFIGS));
+			assertThat(sref.getProperty(RemoteConstants.SERVICE_IMPORTED)).as("122.4.2: the service.imported property has to be set").isNotNull();
+			assertThat(sref.getProperty(RemoteConstants.SERVICE_IMPORTED_CONFIGS)).isNotNull();
 			List<String> intents = getPropertyAsList(sref.getProperty(RemoteConstants.SERVICE_INTENTS));
-			assertNotNull("122.4.2: service reference has to have service.intents property set", intents);
-			assertTrue("122.4.2: imported service.intents has to include all service.intents of exported service", intents.containsAll(endpointIntents));
+			assertThat(intents).as("122.4.2: service reference has to have service.intents property set").isNotNull();
+			assertThat(intents.containsAll(endpointIntents)).as("122.4.2: imported service.intents has to include all service.intents of exported service").isTrue();
 
 			// validate EndpointDescription
 			EndpointDescription description = importRef.getImportedEndpoint();
-			assertNotNull(description);
-			assertEquals("has been overridden", description.getProperties().get("mykey"));
+			assertThat(description).isNotNull();
+			assertThat(description.getProperties().get("mykey")).isEqualTo("has been overridden");
 			try {
 				new EndpointDescription(sref, description.getProperties()); // this throws an exception if
 			} catch (IllegalArgumentException ie) {
 				fail("invalid endpoint description returned from imported service");
 			}
-			assertNotNull(description.getProperties().get(RemoteConstants.SERVICE_IMPORTED));
-			assertTrue(description.getInterfaces().size() == 1);
-			assertTrue(description.getInterfaces().contains(A.class.getName()));
+			assertThat(description.getProperties().get(RemoteConstants.SERVICE_IMPORTED)).isNotNull();
+			assertThat(description.getInterfaces().size() == 1).isTrue();
+			assertThat(description.getInterfaces().contains(A.class.getName())).isTrue();
 
 			// check for event notifications
 			//
 			// 122.8 verify that import notification was sent to RemoteServiceAdminListeners
 			//
 			RemoteServiceAdminEvent rsaevent = remoteServiceAdminListener.getNextEvent();
-			assertEquals(0, remoteServiceAdminListener.getEventCount());
-			assertNotNull("no RemoteServiceAdminEvent received", rsaevent);
-			assertNotNull("122.10.11: source must not be null", rsaevent.getSource());
+			assertThat(remoteServiceAdminListener.getEventCount()).isZero();
+			assertThat(rsaevent).as("no RemoteServiceAdminEvent received").isNotNull();
+			assertThat(rsaevent.getSource()).as("122.10.11: source must not be null").isNotNull();
 
 			ImportReference importReference = null;
 			EndpointDescription importedED = null;
 
 			//
 			// check received event type whether import was successful or not
-			assertEquals(RemoteServiceAdminEvent.IMPORT_REGISTRATION, rsaevent.getType());
-			assertNull(rsaevent.getException());
+			assertThat(rsaevent.getType()).isEqualTo(RemoteServiceAdminEvent.IMPORT_REGISTRATION);
+			assertThat(rsaevent.getException()).isNull();
 			importReference = rsaevent.getImportReference();
-			assertNotNull("ImportReference expected in event", importReference);
+			assertThat(importReference).as("ImportReference expected in event").isNotNull();
 			importedED = importReference.getImportedEndpoint();
-			assertNotNull(importedED);
+			assertThat(importedED).isNotNull();
 			// compare endpoints
-			assertTrue(endpoint.isSameService(importedED));
+			assertThat(endpoint.isSameService(importedED)).isTrue();
 
 
 			//
@@ -244,24 +255,22 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 			//
 			Event event = eventHandler
 					.getNextEventForTopic("org/osgi/service/remoteserviceadmin/IMPORT_REGISTRATION");
-			assertNotNull("no Event received", event);
-			assertEquals(0, eventHandler.getEventCount());
+			assertThat(event).as("no Event received").isNotNull();
+			assertThat(eventHandler.getEventCount()).isZero();
 
-            assertEquals("122.7: bundle has to refer to RSA bundle", rsaRef.getBundle(), event.getProperty("bundle"));
-            assertEquals("122.7: bundle.symbolicname has to refer to RSA bundle SymbolicName", rsaRef.getBundle().getSymbolicName(),
-                    event.getProperty("bundle.symbolicname"));
-            assertEquals("122.7: bundle.id has to refer to RSA bundle id", rsaRef.getBundle().getBundleId(), event.getProperty("bundle.id"));
-            assertEquals("122.7: bundle.version has to refer to RSA bundle version", rsaRef.getBundle().getVersion(),
-                    event.getProperty("bundle.version"));
+            assertThat(event.getProperty("bundle")).as("122.7: bundle has to refer to RSA bundle").isEqualTo(rsaRef.getBundle());
+            assertThat(event.getProperty("bundle.symbolicname")).as("122.7: bundle.symbolicname has to refer to RSA bundle SymbolicName").isEqualTo(rsaRef.getBundle().getSymbolicName());
+            assertThat(event.getProperty("bundle.id")).as("122.7: bundle.id has to refer to RSA bundle id").isEqualTo(rsaRef.getBundle().getBundleId());
+            assertThat(event.getProperty("bundle.version")).as("122.7: bundle.version has to refer to RSA bundle version").isEqualTo(rsaRef.getBundle().getVersion());
             rsaevent = (RemoteServiceAdminEvent) event.getProperty("event");
-            assertNotNull(rsaevent);
-			assertNotNull(event.getProperty("timestamp"));
+            assertThat(rsaevent).isNotNull();
+			assertThat(event.getProperty("timestamp")).isNotNull();
 
 			// check event type
 			String topic = event.getTopic();
-			assertEquals("org/osgi/service/remoteserviceadmin/IMPORT_REGISTRATION", topic);
-			assertNull("cause in event", event.getProperty("cause"));
-			assertEquals(RemoteServiceAdminEvent.IMPORT_REGISTRATION, rsaevent.getType());
+			assertThat(topic).isEqualTo("org/osgi/service/remoteserviceadmin/IMPORT_REGISTRATION");
+			assertThat(event.getProperty("cause")).as("cause in event").isNull();
+			assertThat(rsaevent.getType()).isEqualTo(RemoteServiceAdminEvent.IMPORT_REGISTRATION);
 
 			//
 			// 122.4.2: Importing
@@ -269,22 +278,22 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 			// ensure that it is pointing to the same EndpointDescrition/proxy combination
 			// but returning a new ImportRegistration instance
 			ImportRegistration importReg2 = rsa.importService(endpoint);
-			assertNotNull(importReg2);
-			assertNull(importReg2.getException());
-			assertNotSame("122.4.2: RSA has to create a new ImportRegistration on importService", importReg, importReg2);
+			assertThat(importReg2).isNotNull();
+			assertThat(importReg2.getException()).isNull();
+			assertThat(importReg2).as("122.4.2: RSA has to create a new ImportRegistration on importService").isNotSameAs(importReg);
 
 			// check for events on second import
 			rsaevent = remoteServiceAdminListener.getNextEvent();
-			assertNotNull("no RemoteServiceAdminEvent received", rsaevent);
-			assertEquals(0, remoteServiceAdminListener.getEventCount());
-			assertNotNull("122.10.11: source must not be null", rsaevent.getSource());
+			assertThat(rsaevent).as("no RemoteServiceAdminEvent received").isNotNull();
+			assertThat(remoteServiceAdminListener.getEventCount()).isZero();
+			assertThat(rsaevent.getSource()).as("122.10.11: source must not be null").isNotNull();
 
-			assertEquals(RemoteServiceAdminEvent.IMPORT_REGISTRATION, rsaevent.getType());
-			assertNull(rsaevent.getException());
+			assertThat(rsaevent.getType()).isEqualTo(RemoteServiceAdminEvent.IMPORT_REGISTRATION);
+			assertThat(rsaevent.getException()).isNull();
 			ImportReference importRef2 = importReg.getImportReference();
-			assertNotNull(importRef2);
+			assertThat(importRef2).isNotNull();
 			ServiceReference< ? > sref2 = importRef.getImportedService();
-			assertNotNull(sref2);
+			assertThat(sref2).isNotNull();
 			// Bug 2642, It is not required anymore that proxy services are
 			// shared among multiple imports
 			// assertSame("122.4.2: ImportRegistration has to point to the same proxy service",
@@ -292,11 +301,11 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 
 			event = eventHandler
 					.getNextEventForTopic("org/osgi/service/remoteserviceadmin/IMPORT_REGISTRATION");
-			assertNotNull("no Event received", event);
-			assertEquals(0, eventHandler.getEventCount());
+			assertThat(event).as("no Event received").isNotNull();
+			assertThat(eventHandler.getEventCount()).isZero();
 			topic = event.getTopic();
-			assertEquals("org/osgi/service/remoteserviceadmin/IMPORT_REGISTRATION", topic);
-			assertNull("cause in event", event.getProperty("cause"));
+			assertThat(topic).isEqualTo("org/osgi/service/remoteserviceadmin/IMPORT_REGISTRATION");
+			assertThat(event.getProperty("cause")).as("cause in event").isNull();
 
 			// invoke service
 			A serviceA = null;
@@ -307,22 +316,22 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 			// no version
 			serviceA = getService(A.class);
 			try {
-				assertNotNull(serviceA);
-				assertEquals("this is A", serviceA.getA());
+				assertThat(serviceA).isNotNull();
+				assertThat(serviceA.getA()).isEqualTo("this is A");
 			} finally {
 				ungetService(serviceA);
 			}
 
 			// not available version
-			Filter filter = getContext().createFilter("(version=3.0.0)");
-			ServiceReference< ? >[] refs = getContext()
+			Filter filter = context.createFilter("(version=3.0.0)");
+			ServiceReference< ? >[] refs = context
 					.getServiceReferences(A.class.getName(), filter.toString());
 			try {
-				assertNull(refs);
+				assertThat(refs).isNull();
 			} finally {
 				if (refs != null) {
 					for (int i = 0; i < refs.length; i++) {
-						getContext().ungetService(refs[i]);
+						context.ungetService(refs[i]);
 					}
 				}
 			}
@@ -336,8 +345,8 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 
 			serviceA = getService(A.class);
 			try {
-				assertNotNull(serviceA);
-				assertEquals("this is A", serviceA.getA());
+				assertThat(serviceA).isNotNull();
+				assertThat(serviceA.getA()).isEqualTo("this is A");
 			} finally {
 				ungetService(serviceA);
 			}
@@ -346,58 +355,58 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 			// 122.4.8 on close of the ImportRegistration expect another event
 			//
 			rsaevent = remoteServiceAdminListener.getNextEvent();
-			assertNotNull("no RemoteServiceAdminEvent received", rsaevent);
-			assertNotNull("122.10.11: source must not be null", rsaevent.getSource());
-			assertNull(rsaevent.getException());
-			assertEquals("122.10.11: event type is wrong", RemoteServiceAdminEvent.IMPORT_UNREGISTRATION, rsaevent.getType());
+			assertThat(rsaevent).as("no RemoteServiceAdminEvent received").isNotNull();
+			assertThat(rsaevent.getSource()).as("122.10.11: source must not be null").isNotNull();
+			assertThat(rsaevent.getException()).isNull();
+			assertThat(rsaevent.getType()).as("122.10.11: event type is wrong").isEqualTo(RemoteServiceAdminEvent.IMPORT_UNREGISTRATION);
 
 			importReference = rsaevent.getImportReference();
-			assertNotNull("ImportReference expected in event", importReference);
+			assertThat(importReference).as("ImportReference expected in event").isNotNull();
 
-			assertNull(importReference.getImportedEndpoint());
+			assertThat(importReference.getImportedEndpoint()).isNull();
 
 			event = eventHandler
 					.getNextEventForTopic("org/osgi/service/remoteserviceadmin/IMPORT_UNREGISTRATION");
-			assertNotNull("no Event received", event);
-			assertEquals(0, eventHandler.getEventCount());
+			assertThat(event).as("no Event received").isNotNull();
+			assertThat(eventHandler.getEventCount()).isZero();
 			topic = event.getTopic();
-			assertEquals("122.4.8: wrong event topic", "org/osgi/service/remoteserviceadmin/IMPORT_UNREGISTRATION", topic);
-			assertNull("cause in event", event.getProperty("cause"));
+			assertThat(topic).as("122.4.8: wrong event topic").isEqualTo("org/osgi/service/remoteserviceadmin/IMPORT_UNREGISTRATION");
+			assertThat(event.getProperty("cause")).as("cause in event").isNull();
 
 			//
 			// now close the last one, this should remove the proxy service
 			importReg.close();
 			importReg.close(); // calling this multiple times must not cause a problem
 
-			serviceA = (A) getContext().getService(sref);
-			assertNull("122.4.2: the last ImportRegistration has been closed, but proxy is still available", serviceA);
-			assertFalse("122.4.2: the last ImportRegistration has been closed, but RSA still lists it", rsa.getImportedEndpoints().contains(importRef));
+			serviceA = (A) context.getService(sref);
+			assertThat(serviceA).as("122.4.2: the last ImportRegistration has been closed, but proxy is still available").isNull();
+			assertThat(rsa.getImportedEndpoints().contains(importRef)).as("122.4.2: the last ImportRegistration has been closed, but RSA still lists it").isFalse();
 
 			//
 			// 122.4.8 on close of the ImportRegistration expect another event
 			//
 			rsaevent = remoteServiceAdminListener.getNextEvent();
-			assertNotNull("no RemoteServiceAdminEvent received", rsaevent);
-			assertNotNull("122.10.11: source must not be null", rsaevent.getSource());
-			assertNull(rsaevent.getException());
-			assertEquals("122.10.11: event type is wrong", RemoteServiceAdminEvent.IMPORT_UNREGISTRATION, rsaevent.getType());
+			assertThat(rsaevent).as("no RemoteServiceAdminEvent received").isNotNull();
+			assertThat(rsaevent.getSource()).as("122.10.11: source must not be null").isNotNull();
+			assertThat(rsaevent.getException()).isNull();
+			assertThat(rsaevent.getType()).as("122.10.11: event type is wrong").isEqualTo(RemoteServiceAdminEvent.IMPORT_UNREGISTRATION);
 
 			importReference = rsaevent.getImportReference();
-			assertNotNull("ImportReference expected in event", importReference);
+			assertThat(importReference).as("ImportReference expected in event").isNotNull();
 
-			assertNull(importReference.getImportedEndpoint());
+			assertThat(importReference.getImportedEndpoint()).isNull();
 
 			event = eventHandler
 					.getNextEventForTopic("org/osgi/service/remoteserviceadmin/IMPORT_UNREGISTRATION");
-			assertNotNull("no Event received", event);
-			assertEquals(0, eventHandler.getEventCount());
+			assertThat(event).as("no Event received").isNotNull();
+			assertThat(eventHandler.getEventCount()).isZero();
 			topic = event.getTopic();
-			assertEquals("122.4.8: wrong event topic", "org/osgi/service/remoteserviceadmin/IMPORT_UNREGISTRATION", topic);
-			assertNull("cause in event", event.getProperty("cause"));
+			assertThat(topic).as("122.4.8: wrong event topic").isEqualTo("org/osgi/service/remoteserviceadmin/IMPORT_UNREGISTRATION");
+			assertThat(event.getProperty("cause")).as("cause in event").isNull();
 
 		} finally {
 			// Make sure the service instance of the RSA can be closed by the RSA Service Factory
-			getContext().ungetService(rsaRef);
+			context.ungetService(rsaRef);
 		}
 	}
 
@@ -410,6 +419,7 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 	 * This test is similar to testExportImportManually, but exports the same interface in
 	 * multiple versions and imports them in multiple versions.
 	 */
+	@Test
 	public void testExportImportManuallyMultipleVersions() throws Exception {
 		verifyFramework();
 		
@@ -419,7 +429,7 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 		BundleContext childContext = getFramework().getBundleContext();
 		
 		Bundle tb2Bundle = installBundle(childContext, "/tb2.jar");
-		assertNotNull(tb2Bundle);
+		assertThat(tb2Bundle).isNotNull();
 		
 		// start test bundle in child framework
 		// the bundle registers a service with interface A and then uses the RemoteServiceAdmin service
@@ -434,45 +444,45 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 		// install another version of tb2, but this time it exports the
 		// interface in version 2.0.0
 		Bundle tb4Bundle = installBundle(childContext, "/tb4.jar");
-		assertNotNull(tb4Bundle);
+		assertThat(tb4Bundle).isNotNull();
 		tb4Bundle.start();
 		
 		// install a consumer bundle that tries to use service A in version 1.0.0
-		Bundle tb5Bundle = install("/tb5.jar");
-		assertNotNull(tb5Bundle);
+		Bundle tb5Bundle = installer.installBundle("/tb5.jar", false);
+		assertThat(tb5Bundle).isNotNull();
 		
 		// and another one that tries to use service A in version 2.0.0
-		Bundle tb6Bundle = install("/tb6.jar");
-		assertNotNull(tb6Bundle);
+		Bundle tb6Bundle = installer.installBundle("/tb6.jar", false);
+		assertThat(tb6Bundle).isNotNull();
 		
 		//
 		// find the RSA in the parent framework and import the
 		// service
 		//
-		ServiceReference<RemoteServiceAdmin> rsaRef = getContext()
+		ServiceReference<RemoteServiceAdmin> rsaRef = context
 				.getServiceReference(RemoteServiceAdmin.class);
-		assertNotNull(rsaRef);
-		RemoteServiceAdmin rsa = getContext().getService(rsaRef);
-		assertNotNull(rsa);
+		assertThat(rsaRef).isNotNull();
+		RemoteServiceAdmin rsa = context.getService(rsaRef);
+		assertThat(rsa).isNotNull();
 
 		try {
 			// reconstruct the endpoint description in version 1.0.0
 			EndpointDescription endpoint = Utils.reconstructEndpoint("1.0.0",
-					this);
-			assertNotNull(endpoint);
+					context);
+			assertThat(endpoint).isNotNull();
 
 			// import version 1.0.0
 			ImportRegistration importReg1 = rsa.importService(endpoint);
-			assertNotNull(importReg1);
-			assertNull(importReg1.getException());
+			assertThat(importReg1).isNotNull();
+			assertThat(importReg1.getException()).isNull();
 
 			// now import version 2.0.0
-			endpoint = Utils.reconstructEndpoint("2.0.0", this);
-			assertNotNull(endpoint);
+			endpoint = Utils.reconstructEndpoint("2.0.0", context);
+			assertThat(endpoint).isNotNull();
 
 			ImportRegistration importReg2 = rsa.importService(endpoint);
-			assertNotNull(importReg2);
-			assertNull(importReg2.getException());
+			assertThat(importReg2).isNotNull();
+			assertThat(importReg2.getException()).isNull();
 
 			// start consumer bundles, will throw exceptions if not working
 			tb5Bundle.start();
@@ -486,7 +496,7 @@ public class RemoteServiceAdminTest extends MultiFrameworkTestCase {
 			tb6Bundle.stop();
 		} finally {
 			// Make sure the service instance of the RSA can be closed by the RSA Service Factory
-			getContext().ungetService(rsaRef);
+			context.ungetService(rsaRef);
 		}
 	}
 

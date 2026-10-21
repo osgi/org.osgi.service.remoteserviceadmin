@@ -18,6 +18,9 @@
 
 package org.osgi.test.cases.remoteserviceadmin.junit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.fail;
 import static org.osgi.framework.Constants.OBJECTCLASS;
 import static org.osgi.framework.Constants.SERVICE_EXPORTED_CONFIGS;
 import static org.osgi.framework.Constants.SERVICE_ID;
@@ -35,17 +38,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
-import org.osgi.test.support.mock.MockFactory;
 
-import junit.framework.TestCase;
 
-public class EndpointDescriptionTests extends TestCase {
+public class EndpointDescriptionTests {
 
+	@Test
 	public void testFromMap() {
 		EndpointDescription ed;
 		Map<String, Object> props;
@@ -81,15 +84,15 @@ public class EndpointDescriptionTests extends TestCase {
 
 		props.put(SERVICE_IMPORTED_CONFIGS, "config");
 		ed = newEndpointDescription(props);
-		assertEquals("wrong remote id", someId, ed.getId());
+		assertThat(ed.getId()).as("wrong remote id").isEqualTo(someId);
 
-		assertEquals("remote service id should be zero", 0l, ed.getServiceId());
-		assertNull("remote framework uuid should be null", ed
-				.getFrameworkUUID());
+		assertThat(ed.getServiceId()).as("remote service id should be zero").isZero();
+		assertThat(ed
+				.getFrameworkUUID()).as("remote framework uuid should be null").isNull();
 
 		props.put(ENDPOINT_FRAMEWORK_UUID, testUUID);
 		ed = newEndpointDescription(props);
-		assertEquals("wrong uuid", testUUID, ed.getFrameworkUUID());
+		assertThat(ed.getFrameworkUUID()).as("wrong uuid").isEqualTo(testUUID);
 
 		props.put(ENDPOINT_SERVICE_ID, "not a valid long");
 		try {
@@ -112,7 +115,7 @@ public class EndpointDescriptionTests extends TestCase {
 		Long someServiceId = Long.valueOf(12l);
 		props.put(ENDPOINT_SERVICE_ID, someServiceId);
 		ed = newEndpointDescription(props);
-		assertEquals("wrong id", someServiceId.longValue(), ed.getServiceId());
+		assertThat(ed.getServiceId()).as("wrong id").isEqualTo(someServiceId.longValue());
 
 		props.put(OBJECTCLASS, "not a String[]");
 		try {
@@ -137,15 +140,15 @@ public class EndpointDescriptionTests extends TestCase {
 		ed = newEndpointDescription(props);
 		testMutability(ed);
 		List<String> interfs = ed.getInterfaces();
-		assertEquals("should have 2 interfaces", 2, interfs.size());
-		assertEquals("first interface wrong", objectClass[0], interfs.get(0));
-		assertEquals("second interface wrong", objectClass[1], interfs.get(1));
-		assertEquals("package version wrong", Version.emptyVersion, ed
-				.getPackageVersion(getPackageName(objectClass[0])));
-		assertEquals("package version wrong", Version.emptyVersion, ed
-				.getPackageVersion(getPackageName(objectClass[1])));
-		assertEquals("package version wrong", Version.emptyVersion, ed
-				.getPackageVersion("xxx"));
+		assertThat(interfs).as("should have 2 interfaces").hasSize(2);
+		assertThat(interfs.get(0)).as("first interface wrong").isEqualTo(objectClass[0]);
+		assertThat(interfs.get(1)).as("second interface wrong").isEqualTo(objectClass[1]);
+		assertThat(ed
+				.getPackageVersion(getPackageName(objectClass[0]))).as("package version wrong").isEqualTo(Version.emptyVersion);
+		assertThat(ed
+				.getPackageVersion(getPackageName(objectClass[1]))).as("package version wrong").isEqualTo(Version.emptyVersion);
+		assertThat(ed
+				.getPackageVersion("xxx")).as("package version wrong").isEqualTo(Version.emptyVersion);
 
 		props.put(ENDPOINT_PACKAGE_VERSION_ + getPackageName(objectClass[0]),
 				"bad version");
@@ -161,8 +164,8 @@ public class EndpointDescriptionTests extends TestCase {
 		props.put(ENDPOINT_PACKAGE_VERSION_ + getPackageName(objectClass[0]),
 				someVersion.toString());
 		ed = newEndpointDescription(props);
-		assertEquals("package version wrong", someVersion, ed
-				.getPackageVersion(getPackageName(objectClass[0])));
+		assertThat(ed
+				.getPackageVersion(getPackageName(objectClass[0]))).as("package version wrong").isEqualTo(someVersion);
 
 		props
 				.remove(ENDPOINT_PACKAGE_VERSION_
@@ -180,11 +183,12 @@ public class EndpointDescriptionTests extends TestCase {
 		props.put(ENDPOINT_PACKAGE_VERSION_ + getPackageName(objectClass[1]),
 				someVersion.toString());
 		ed = newEndpointDescription(props);
-		assertEquals("package version wrong", someVersion, ed
-				.getPackageVersion(getPackageName(objectClass[1])));
+		assertThat(ed
+				.getPackageVersion(getPackageName(objectClass[1]))).as("package version wrong").isEqualTo(someVersion);
 
 	}
 
+	@Test
 	public void testBadMap() {
 		@SuppressWarnings("unused")
 		EndpointDescription ed;
@@ -245,6 +249,7 @@ public class EndpointDescriptionTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testFromReference() {
 		EndpointDescription ed;
 		Map<String, Object> props = new HashMap<String, Object>();
@@ -312,15 +317,15 @@ public class EndpointDescriptionTests extends TestCase {
 
 		serviceProps.put(SERVICE_IMPORTED_CONFIGS, "config");
 		ed = newEndpointDescription(ref, null);
-		assertEquals("wrong remote id", someId, ed.getId());
+		assertThat(ed.getId()).as("wrong remote id").isEqualTo(someId);
 
-		assertEquals("remote service id should be zero", 0l, ed.getServiceId());
-		assertEquals("wrong uuid", testUUID, ed.getFrameworkUUID());
+		assertThat(ed.getServiceId()).as("remote service id should be zero").isZero();
+		assertThat(ed.getFrameworkUUID()).as("wrong uuid").isEqualTo(testUUID);
 
 		props.put(ENDPOINT_FRAMEWORK_UUID, "newUUID");
 		props.put(SERVICE_IMPORTED_CONFIGS, "config");
 		ed = newEndpointDescription(props);
-		assertEquals("wrong uuid", "newUUID", ed.getFrameworkUUID());
+		assertThat(ed.getFrameworkUUID()).as("wrong uuid").isEqualTo("newUUID");
 		props.remove(ENDPOINT_FRAMEWORK_UUID);
 
 		props.put(ENDPOINT_SERVICE_ID, "not a valid long");
@@ -345,7 +350,7 @@ public class EndpointDescriptionTests extends TestCase {
 		props.remove(ENDPOINT_SERVICE_ID);
 		serviceProps.put(SERVICE_ID, someServiceId);
 		ed = newEndpointDescription(ref, props);
-		assertEquals("wrong id", someServiceId.longValue(), ed.getServiceId());
+		assertThat(ed.getServiceId()).as("wrong id").isEqualTo(someServiceId.longValue());
 
 		String[] objectClass = new String[] {"com.acme.Foo", "com.acme.FOO"};
 		props.put(OBJECTCLASS, objectClass);
@@ -366,15 +371,15 @@ public class EndpointDescriptionTests extends TestCase {
 		ed = newEndpointDescription(ref, props);
 		testMutability(ed);
 		List<String> interfs = ed.getInterfaces();
-		assertEquals("should have 2 interfaces", 2, interfs.size());
-		assertEquals("first interface wrong", objectClass[0], interfs.get(0));
-		assertEquals("second interface wrong", objectClass[1], interfs.get(1));
-		assertEquals("package version wrong", Version.emptyVersion, ed
-				.getPackageVersion(getPackageName(objectClass[0])));
-		assertEquals("package version wrong", Version.emptyVersion, ed
-				.getPackageVersion(getPackageName(objectClass[1])));
-		assertEquals("package version wrong", Version.emptyVersion, ed
-				.getPackageVersion("xxx"));
+		assertThat(interfs).as("should have 2 interfaces").hasSize(2);
+		assertThat(interfs.get(0)).as("first interface wrong").isEqualTo(objectClass[0]);
+		assertThat(interfs.get(1)).as("second interface wrong").isEqualTo(objectClass[1]);
+		assertThat(ed
+				.getPackageVersion(getPackageName(objectClass[0]))).as("package version wrong").isEqualTo(Version.emptyVersion);
+		assertThat(ed
+				.getPackageVersion(getPackageName(objectClass[1]))).as("package version wrong").isEqualTo(Version.emptyVersion);
+		assertThat(ed
+				.getPackageVersion("xxx")).as("package version wrong").isEqualTo(Version.emptyVersion);
 
 		serviceProps.put(ENDPOINT_PACKAGE_VERSION_
 				+ getPackageName(objectClass[0]), "bad version");
@@ -390,8 +395,8 @@ public class EndpointDescriptionTests extends TestCase {
 		serviceProps.put(ENDPOINT_PACKAGE_VERSION_
 				+ getPackageName(objectClass[0]), someVersion.toString());
 		ed = newEndpointDescription(ref, props);
-		assertEquals("package version wrong", someVersion, ed
-				.getPackageVersion(getPackageName(objectClass[0])));
+		assertThat(ed
+				.getPackageVersion(getPackageName(objectClass[0]))).as("package version wrong").isEqualTo(someVersion);
 
 		serviceProps.put(ENDPOINT_PACKAGE_VERSION_
 				+ getPackageName(objectClass[1]), "bad version");
@@ -404,6 +409,7 @@ public class EndpointDescriptionTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testIntents() {
 		EndpointDescription ed;
 		Map<String, Object> props = new HashMap<String, Object>();
@@ -426,14 +432,14 @@ public class EndpointDescriptionTests extends TestCase {
 
 		ed = newEndpointDescription(props);
 		intents = ed.getIntents();
-		assertNotNull("intents null", intents);
-		assertTrue("intents not empty", intents.isEmpty());
+		assertThat(intents).as("intents null").isNotNull();
+		assertThat(intents).as("intents not empty").isEmpty();
 		testListMutability(intents);
 
 		ed = newEndpointDescription(ref, null);
 		intents = ed.getIntents();
-		assertNotNull("intents null", intents);
-		assertTrue("intents not empty", intents.isEmpty());
+		assertThat(intents).as("intents null").isNotNull();
+		assertThat(intents).as("intents not empty").isEmpty();
 		testListMutability(intents);
 
 		props.put(SERVICE_INTENTS, this);
@@ -441,14 +447,14 @@ public class EndpointDescriptionTests extends TestCase {
 
 		ed = newEndpointDescription(props);
 		intents = ed.getIntents();
-		assertNotNull("intents null", intents);
-		assertTrue("intents not empty", intents.isEmpty());
+		assertThat(intents).as("intents null").isNotNull();
+		assertThat(intents).as("intents not empty").isEmpty();
 		testListMutability(intents);
 
 		ed = newEndpointDescription(ref, null);
 		intents = ed.getIntents();
-		assertNotNull("intents null", intents);
-		assertTrue("intents not empty", intents.isEmpty());
+		assertThat(intents).as("intents null").isNotNull();
+		assertThat(intents).as("intents not empty").isEmpty();
 		testListMutability(intents);
 
 		String scalarIntent = "some.intent";
@@ -457,18 +463,18 @@ public class EndpointDescriptionTests extends TestCase {
 
 		ed = newEndpointDescription(props);
 		intents = ed.getIntents();
-		assertNotNull("intents null", intents);
-		assertFalse("intents not empty", intents.isEmpty());
-		assertEquals("only one element", 1, intents.size());
-		assertEquals("wrong intent value", scalarIntent, intents.get(0));
+		assertThat(intents).as("intents null").isNotNull();
+		assertThat(intents.isEmpty()).as("intents not empty").isFalse();
+		assertThat(intents.size()).as("only one element").isEqualTo(1);
+		assertThat(intents.get(0)).as("wrong intent value").isEqualTo(scalarIntent);
 		testListMutability(intents);
 
 		ed = newEndpointDescription(ref, null);
 		intents = ed.getIntents();
-		assertNotNull("intents null", intents);
-		assertFalse("intents not empty", intents.isEmpty());
-		assertEquals("only one element", 1, intents.size());
-		assertEquals("wrong intent value", scalarIntent, intents.get(0));
+		assertThat(intents).as("intents null").isNotNull();
+		assertThat(intents.isEmpty()).as("intents not empty").isFalse();
+		assertThat(intents.size()).as("only one element").isEqualTo(1);
+		assertThat(intents.get(0)).as("wrong intent value").isEqualTo(scalarIntent);
 		testListMutability(intents);
 
 		String[] arrayIntents = new String[] {"some.intent1", "some.intent2"};
@@ -477,23 +483,23 @@ public class EndpointDescriptionTests extends TestCase {
 
 		ed = newEndpointDescription(props);
 		intents = ed.getIntents();
-		assertNotNull("intents null", intents);
-		assertFalse("intents not empty", intents.isEmpty());
-		assertEquals("wrong number of elements", arrayIntents.length, intents
-				.size());
+		assertThat(intents).as("intents null").isNotNull();
+		assertThat(intents.isEmpty()).as("intents not empty").isFalse();
+		assertThat(intents
+				.size()).as("wrong number of elements").isEqualTo(arrayIntents.length);
 		for (int i = 0; i < arrayIntents.length; i++) {
-			assertEquals("wrong intent value", arrayIntents[i], intents.get(i));
+			assertThat(intents.get(i)).as("wrong intent value").isEqualTo(arrayIntents[i]);
 		}
 		testListMutability(intents);
 
 		ed = newEndpointDescription(ref, null);
 		intents = ed.getIntents();
-		assertNotNull("intents null", intents);
-		assertFalse("intents not empty", intents.isEmpty());
-		assertEquals("wrong number of elements", arrayIntents.length, intents
-				.size());
+		assertThat(intents).as("intents null").isNotNull();
+		assertThat(intents.isEmpty()).as("intents not empty").isFalse();
+		assertThat(intents
+				.size()).as("wrong number of elements").isEqualTo(arrayIntents.length);
 		for (int i = 0; i < arrayIntents.length; i++) {
-			assertEquals("wrong intent value", arrayIntents[i], intents.get(i));
+			assertThat(intents.get(i)).as("wrong intent value").isEqualTo(arrayIntents[i]);
 		}
 		testListMutability(intents);
 
@@ -504,30 +510,31 @@ public class EndpointDescriptionTests extends TestCase {
 
 		ed = newEndpointDescription(props);
 		intents = ed.getIntents();
-		assertNotNull("intents null", intents);
-		assertFalse("intents not empty", intents.isEmpty());
-		assertEquals("wrong number of elements", listIntents.size(), intents
-				.size());
+		assertThat(intents).as("intents null").isNotNull();
+		assertThat(intents.isEmpty()).as("intents not empty").isFalse();
+		assertThat(intents
+				.size()).as("wrong number of elements").isEqualTo(listIntents.size());
 		for (int i = 0; i < listIntents.size(); i++) {
-			assertEquals("wrong intent value", listIntents.get(i), intents
-					.get(i));
+			assertThat(intents
+					.get(i)).as("wrong intent value").isEqualTo(listIntents.get(i));
 		}
 		testListMutability(intents);
 
 		ed = newEndpointDescription(ref, null);
 		intents = ed.getIntents();
-		assertNotNull("intents null", intents);
-		assertFalse("intents not empty", intents.isEmpty());
-		assertEquals("wrong number of elements", listIntents.size(), intents
-				.size());
+		assertThat(intents).as("intents null").isNotNull();
+		assertThat(intents.isEmpty()).as("intents not empty").isFalse();
+		assertThat(intents
+				.size()).as("wrong number of elements").isEqualTo(listIntents.size());
 		for (int i = 0; i < listIntents.size(); i++) {
-			assertEquals("wrong intent value", listIntents.get(i), intents
-					.get(i));
+			assertThat(intents
+					.get(i)).as("wrong intent value").isEqualTo(listIntents.get(i));
 		}
 		testListMutability(intents);
 
 	}
 
+	@Test
 	public void testConfigurationsTypes() {
 		EndpointDescription ed;
 		Map<String, Object> props = new HashMap<String, Object>();
@@ -573,20 +580,20 @@ public class EndpointDescriptionTests extends TestCase {
 
 		ed = newEndpointDescription(props);
 		configTypes = ed.getConfigurationTypes();
-		assertNotNull("configtypes null", configTypes);
-		assertFalse("configtypes not empty", configTypes.isEmpty());
-		assertEquals("only one element", 1, configTypes.size());
-		assertEquals("wrong configtype value", scalarConfigType, configTypes
-				.get(0));
+		assertThat(configTypes).as("configtypes null").isNotNull();
+		assertThat(configTypes.isEmpty()).as("configtypes not empty").isFalse();
+		assertThat(configTypes.size()).as("only one element").isEqualTo(1);
+		assertThat(configTypes
+				.get(0)).as("wrong configtype value").isEqualTo(scalarConfigType);
 		testListMutability(configTypes);
 
 		ed = newEndpointDescription(ref, null);
 		configTypes = ed.getConfigurationTypes();
-		assertNotNull("configtypes null", configTypes);
-		assertFalse("configtypes not empty", configTypes.isEmpty());
-		assertEquals("only one element", 1, configTypes.size());
-		assertEquals("wrong configtype value", scalarConfigType, configTypes
-				.get(0));
+		assertThat(configTypes).as("configtypes null").isNotNull();
+		assertThat(configTypes.isEmpty()).as("configtypes not empty").isFalse();
+		assertThat(configTypes.size()).as("only one element").isEqualTo(1);
+		assertThat(configTypes
+				.get(0)).as("wrong configtype value").isEqualTo(scalarConfigType);
 		testListMutability(configTypes);
 
 		String[] arrayConfigTypes = new String[] {"some.configtype1",
@@ -596,25 +603,21 @@ public class EndpointDescriptionTests extends TestCase {
 
 		ed = newEndpointDescription(props);
 		configTypes = ed.getConfigurationTypes();
-		assertNotNull("configtypes null", configTypes);
-		assertFalse("configtypes not empty", configTypes.isEmpty());
-		assertEquals("wrong number of elements", arrayConfigTypes.length,
-				configTypes.size());
+		assertThat(configTypes).as("configtypes null").isNotNull();
+		assertThat(configTypes.isEmpty()).as("configtypes not empty").isFalse();
+		assertThat(configTypes.size()).as("wrong number of elements").isEqualTo(arrayConfigTypes.length);
 		for (int i = 0; i < arrayConfigTypes.length; i++) {
-			assertEquals("wrong configtype value", arrayConfigTypes[i],
-					configTypes.get(i));
+			assertThat(configTypes.get(i)).as("wrong configtype value").isEqualTo(arrayConfigTypes[i]);
 		}
 		testListMutability(configTypes);
 
 		ed = newEndpointDescription(ref, null);
 		configTypes = ed.getConfigurationTypes();
-		assertNotNull("configtypes null", configTypes);
-		assertFalse("configtypes not empty", configTypes.isEmpty());
-		assertEquals("wrong number of elements", arrayConfigTypes.length,
-				configTypes.size());
+		assertThat(configTypes).as("configtypes null").isNotNull();
+		assertThat(configTypes.isEmpty()).as("configtypes not empty").isFalse();
+		assertThat(configTypes.size()).as("wrong number of elements").isEqualTo(arrayConfigTypes.length);
 		for (int i = 0; i < arrayConfigTypes.length; i++) {
-			assertEquals("wrong configtype value", arrayConfigTypes[i],
-					configTypes.get(i));
+			assertThat(configTypes.get(i)).as("wrong configtype value").isEqualTo(arrayConfigTypes[i]);
 		}
 		testListMutability(configTypes);
 
@@ -625,30 +628,27 @@ public class EndpointDescriptionTests extends TestCase {
 
 		ed = newEndpointDescription(props);
 		configTypes = ed.getConfigurationTypes();
-		assertNotNull("configtypes null", configTypes);
-		assertFalse("configtypes not empty", configTypes.isEmpty());
-		assertEquals("wrong number of elements", listConfigTypes.size(),
-				configTypes.size());
+		assertThat(configTypes).as("configtypes null").isNotNull();
+		assertThat(configTypes.isEmpty()).as("configtypes not empty").isFalse();
+		assertThat(configTypes.size()).as("wrong number of elements").isEqualTo(listConfigTypes.size());
 		for (int i = 0; i < listConfigTypes.size(); i++) {
-			assertEquals("wrong configtype value", listConfigTypes.get(i),
-					configTypes.get(i));
+			assertThat(configTypes.get(i)).as("wrong configtype value").isEqualTo(listConfigTypes.get(i));
 		}
 		testListMutability(configTypes);
 
 		ed = newEndpointDescription(ref, null);
 		configTypes = ed.getConfigurationTypes();
-		assertNotNull("configtypes null", configTypes);
-		assertFalse("configtypes not empty", configTypes.isEmpty());
-		assertEquals("wrong number of elements", listConfigTypes.size(),
-				configTypes.size());
+		assertThat(configTypes).as("configtypes null").isNotNull();
+		assertThat(configTypes.isEmpty()).as("configtypes not empty").isFalse();
+		assertThat(configTypes.size()).as("wrong number of elements").isEqualTo(listConfigTypes.size());
 		for (int i = 0; i < listConfigTypes.size(); i++) {
-			assertEquals("wrong configtype value", listConfigTypes.get(i),
-					configTypes.get(i));
+			assertThat(configTypes.get(i)).as("wrong configtype value").isEqualTo(listConfigTypes.get(i));
 		}
 		testListMutability(configTypes);
 
 	}
 
+	@Test
 	public void testHashcode() {
 		Map<String, Object> props = new HashMap<String, Object>();
 		String someId = "someId";
@@ -673,15 +673,16 @@ public class EndpointDescriptionTests extends TestCase {
 		props.put(ENDPOINT_ID, "other.id");
 		ed3 = newEndpointDescription(props);
 
-		assertTrue("hashCode should equal", ed1.hashCode() == ed2.hashCode());
-		assertTrue("hashCode should not equal", ed1.hashCode() != ed3
-				.hashCode());
-		assertTrue("hashCode should not equal", ed2.hashCode() != ed3
-				.hashCode());
-		assertEquals("id not trimmed of whitespace", someId, ed1.getId());
+		assertThat(ed1.hashCode() == ed2.hashCode()).as("hashCode should equal").isTrue();
+		assertThat(ed1.hashCode() != ed3
+				.hashCode()).as("hashCode should not equal").isTrue();
+		assertThat(ed2.hashCode() != ed3
+				.hashCode()).as("hashCode should not equal").isTrue();
+		assertThat(ed1.getId()).as("id not trimmed of whitespace").isEqualTo(someId);
 	}
 
 	@SuppressWarnings("unlikely-arg-type")
+	@Test
 	public void testEquals() {
 		Map<String, Object> props = new HashMap<String, Object>();
 		String someId = "someId";
@@ -706,19 +707,20 @@ public class EndpointDescriptionTests extends TestCase {
 		props.put(ENDPOINT_ID, "other.id");
 		ed3 = newEndpointDescription(props);
 
-		assertTrue("should equal", ed1.equals(ed2));
-		assertTrue("should equal", ed2.equals(ed1));
-		assertFalse("should not equal", ed1.equals(ed3));
-		assertFalse("should not equal", ed3.equals(ed1));
-		assertFalse("should not equal", ed2.equals(ed3));
-		assertFalse("should not equal", ed3.equals(ed1));
-		assertTrue("should equal", ed1.equals(ed1));
-		assertTrue("should equal", ed2.equals(ed2));
-		assertTrue("should equal", ed3.equals(ed3));
-		assertFalse("should not equal", ed2.equals(this));
-		assertEquals("id not trimmed of whitespace", someId, ed1.getId());
+		assertThat(ed1.equals(ed2)).as("should equal").isTrue();
+		assertThat(ed2.equals(ed1)).as("should equal").isTrue();
+		assertThat(ed1.equals(ed3)).as("should not equal").isFalse();
+		assertThat(ed3.equals(ed1)).as("should not equal").isFalse();
+		assertThat(ed2.equals(ed3)).as("should not equal").isFalse();
+		assertThat(ed3.equals(ed1)).as("should not equal").isFalse();
+		assertThat(ed1.equals(ed1)).as("should equal").isTrue();
+		assertThat(ed2.equals(ed2)).as("should equal").isTrue();
+		assertThat(ed3.equals(ed3)).as("should equal").isTrue();
+		assertThat(ed2.equals(this)).as("should not equal").isFalse();
+		assertThat(ed1.getId()).as("id not trimmed of whitespace").isEqualTo(someId);
 	}
 
+	@Test
 	public void testIsSame() {
 		Map<String, Object> props = new HashMap<String, Object>();
 		props.put(ENDPOINT_ID, "id1");
@@ -747,16 +749,17 @@ public class EndpointDescriptionTests extends TestCase {
 		props.put(ENDPOINT_FRAMEWORK_UUID, testUUID);
 		ed4 = newEndpointDescription(props);
 
-		assertTrue("should be same", ed1.isSameService(ed1));
-		assertTrue("should be same", ed3.isSameService(ed3));
-		assertTrue("should be same", ed1.isSameService(ed3));
-		assertTrue("should be same", ed3.isSameService(ed1));
-		assertTrue("should be same", ed2.isSameService(ed4));
-		assertTrue("should be same", ed4.isSameService(ed2));
-		assertFalse("should not be same", ed1.isSameService(ed2));
-		assertFalse("should not be same", ed2.isSameService(ed1));
+		assertThat(ed1.isSameService(ed1)).as("should be same").isTrue();
+		assertThat(ed3.isSameService(ed3)).as("should be same").isTrue();
+		assertThat(ed1.isSameService(ed3)).as("should be same").isTrue();
+		assertThat(ed3.isSameService(ed1)).as("should be same").isTrue();
+		assertThat(ed2.isSameService(ed4)).as("should be same").isTrue();
+		assertThat(ed4.isSameService(ed2)).as("should be same").isTrue();
+		assertThat(ed1.isSameService(ed2)).as("should not be same").isFalse();
+		assertThat(ed2.isSameService(ed1)).as("should not be same").isFalse();
 	}
 
+	@Test
 	public void testMatches() {
 		Map<String, Object> props = new HashMap<String, Object>();
 		props.put(ENDPOINT_ID, "id1");
@@ -782,20 +785,20 @@ public class EndpointDescriptionTests extends TestCase {
 		ed2 = newEndpointDescription(ref, null);
 
 		String filter = "(" + ENDPOINT_ID + "=id1)";
-		assertTrue("filter does not match", ed1.matches(filter));
-		assertFalse("filter matches", ed2.matches(filter));
+		assertThat(ed1.matches(filter)).as("filter does not match").isTrue();
+		assertThat(ed2.matches(filter)).as("filter matches").isFalse();
 
 		filter = "(ENDPOINT.id=id2)";
-		assertTrue("filter does not match", ed2.matches(filter));
-		assertFalse("filter matches", ed1.matches(filter));
+		assertThat(ed2.matches(filter)).as("filter does not match").isTrue();
+		assertThat(ed1.matches(filter)).as("filter matches").isFalse();
 
 		filter = "(" + ENDPOINT_FRAMEWORK_UUID + "=" + testUUID + ")";
-		assertTrue("filter does not match", ed2.matches(filter));
-		assertFalse("filter matches", ed1.matches(filter));
+		assertThat(ed2.matches(filter)).as("filter does not match").isTrue();
+		assertThat(ed1.matches(filter)).as("filter matches").isFalse();
 
 		filter = "(" + ENDPOINT_FRAMEWORK_UUID + "=*)";
-		assertTrue("filter does not match", ed2.matches(filter));
-		assertFalse("filter matches", ed1.matches(filter));
+		assertThat(ed2.matches(filter)).as("filter does not match").isTrue();
+		assertThat(ed1.matches(filter)).as("filter matches").isFalse();
 
 		try {
 			ed1.matches("(xx=foo");
@@ -806,6 +809,7 @@ public class EndpointDescriptionTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testStripServiceExported() {
 		Map<String, Object> props = new HashMap<String, Object>();
 		String someId = "someId";
@@ -830,10 +834,10 @@ public class EndpointDescriptionTests extends TestCase {
 		ed1 = newEndpointDescription(props);
 		ed2 = newEndpointDescription(ref, null);
 
-		assertFalse("service.exported.* property not removed", ed1
-				.getProperties().containsKey(SERVICE_EXPORTED_CONFIGS));
-		assertFalse("service.exported.* property not removed", ed2
-				.getProperties().containsKey(SERVICE_EXPORTED_CONFIGS));
+		assertThat(ed1
+				.getProperties().containsKey(SERVICE_EXPORTED_CONFIGS)).as("service.exported.* property not removed").isFalse();
+		assertThat(ed2
+				.getProperties().containsKey(SERVICE_EXPORTED_CONFIGS)).as("service.exported.* property not removed").isFalse();
 	}
 
 	private EndpointDescription newEndpointDescription(
@@ -861,13 +865,8 @@ public class EndpointDescriptionTests extends TestCase {
 		catch (RuntimeException e) {
 			// expected
 		}
-		try {
-			p.put("foo", "bar");
-			fail("properties is mutable");
-		}
-		catch (RuntimeException e) {
-			// expected
-		}
+		assertThatExceptionOfType(RuntimeException.class).as("properties is mutable")
+				.isThrownBy(() -> p.put("foo", "bar"));
 		List<String> interfs = ed.getInterfaces();
 		testListMutability(interfs);
 	}
@@ -883,13 +882,8 @@ public class EndpointDescriptionTests extends TestCase {
 		catch (RuntimeException e) {
 			// expected
 		}
-		try {
-			list.add((T) "foo");
-			fail("list is mutable");
-		}
-		catch (RuntimeException e) {
-			// expected
-		}
+		assertThatExceptionOfType(RuntimeException.class).as("list is mutable")
+				.isThrownBy(() -> list.add((T) "foo"));
 	}
 
 	private String getPackageName(String className) {

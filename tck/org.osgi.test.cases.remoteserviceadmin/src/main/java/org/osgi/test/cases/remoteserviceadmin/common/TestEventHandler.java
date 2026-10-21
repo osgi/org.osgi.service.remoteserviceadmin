@@ -17,7 +17,7 @@
  *******************************************************************************/
 package org.osgi.test.cases.remoteserviceadmin.common;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
@@ -93,19 +93,10 @@ public class TestEventHandler implements EventHandler {
 
 	public static RemoteServiceAdminEvent verifyBasicRsaEventProperties(
 			ServiceReference<RemoteServiceAdmin> rsaRef, Event event) {
-		assertEquals("122.7: bundle has to refer to RSA bundle",
-				rsaRef.getBundle(), event.getProperty("bundle"));
-		assertEquals(
-				"122.7: bundle.symbolicname has to refer to RSA bundle SymbolicName",
-				rsaRef.getBundle().getSymbolicName(),
-				event.getProperty("bundle.symbolicname"));
-		assertEquals("122.7: bundle.id has to refer to RSA bundle id",
-				rsaRef.getBundle().getBundleId(),
-				event.getProperty("bundle.id"));
-		assertEquals(
-				"122.7: bundle.version has to refer to RSA bundle version",
-				rsaRef.getBundle().getVersion(),
-				event.getProperty("bundle.version"));
+		assertThat(event.getProperty("bundle")).as("122.7: bundle has to refer to RSA bundle").isEqualTo(rsaRef.getBundle());
+		assertThat(event.getProperty("bundle.symbolicname")).as("122.7: bundle.symbolicname has to refer to RSA bundle SymbolicName").isEqualTo(rsaRef.getBundle().getSymbolicName());
+		assertThat(event.getProperty("bundle.id")).as("122.7: bundle.id has to refer to RSA bundle id").isEqualTo(rsaRef.getBundle().getBundleId());
+		assertThat(event.getProperty("bundle.version")).as("122.7: bundle.version has to refer to RSA bundle version").isEqualTo(rsaRef.getBundle().getVersion());
 		RemoteServiceAdminEvent rsaevent = (RemoteServiceAdminEvent) event
 				.getProperty("event");
 		return rsaevent;

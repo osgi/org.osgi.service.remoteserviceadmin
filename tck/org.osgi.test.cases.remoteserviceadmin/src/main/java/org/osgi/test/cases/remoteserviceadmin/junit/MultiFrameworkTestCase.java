@@ -17,6 +17,10 @@
  *******************************************************************************/
 package org.osgi.test.cases.remoteserviceadmin.junit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.osgi.test.assertj.bundle.BundleAssert.assertThat;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -32,11 +36,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -47,13 +53,12 @@ import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.wiring.BundleCapability;
 import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.BundleWiring;
-import org.osgi.test.support.compatibility.DefaultTestBundleControl;
 
 /**
  * @author <a href="mailto:tdiekman@tibco.com">Tim Diekmann</a>
  *
  */
-public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*OSGiTestCase*/ {
+public abstract class MultiFrameworkTestCase extends RSATestSupport /*OSGiTestCase*/ {
 
 	/**
 	 * Project name. Used as a namespace for TCK (child) framework specific run
@@ -74,26 +79,22 @@ public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*
 	private FrameworkFactory frameworkFactory;
 	private String rootStorageArea;
 
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+	@BeforeEach
+	public void setUp() throws Exception {
 		
 		clearSystemProperties();
 		
 		frameworkFactoryClassName = getFrameworkFactoryClassName();
-		assertNotNull("Could not find framework factory class", frameworkFactoryClassName);
+		assertThat(frameworkFactoryClassName).as("Could not find framework factory class").isNotNull();
 		frameworkFactory = getFrameworkFactory();
 
 		rootStorageArea = getStorageAreaRoot();
-		assertNotNull("No storage area root found", rootStorageArea);
+		assertThat(rootStorageArea).as("No storage area root found").isNotNull();
 		File rootFile = new File(rootStorageArea);
 		delete(rootFile);
-		assertFalse("Root storage area is not a directory: " + rootFile.getPath(), rootFile.exists() && !rootFile.isDirectory());
+		assertThat(rootFile.exists() && !rootFile.isDirectory()).as("Root storage area is not a directory: " + rootFile.getPath()).isFalse();
 		if (!rootFile.isDirectory())
-			assertTrue("Could not create root directory: " + rootFile.getPath(), rootFile.mkdirs());
+			assertThat(rootFile.mkdirs()).as("Could not create root directory: " + rootFile.getPath()).isTrue();
 		
 		Map<String,Object> configuration = getFrameworkConfiguration();
 		String configuratorInitial = System
@@ -142,13 +143,9 @@ public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*
 		return properties;
 	}
 
-	/**
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception {
+	@AfterEach
+	public void tearDown() throws Exception {
 		stopFramework();
-		super.tearDown();
 	}
 
 	/**
@@ -175,19 +172,18 @@ public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*
 	 * @throws BundleException
 	 * @throws IOException
 	 */
-	@Override
 	public Bundle installBundle(String bundle) throws BundleException, IOException {
 		BundleContext fwkContext = getFramework().getBundleContext();
-		assertNotNull("Framework context is null", fwkContext);
+		assertThat(fwkContext).as("Framework context is null").isNotNull();
 		URL input = getBundleInput(bundle);
-		assertNotNull("Cannot find resource: " + bundle, input);
+		assertThat(input).as("Cannot find resource: " + bundle).isNotNull();
 		return fwkContext.installBundle(bundle, input.openStream());
 	}
 
 	private String getFrameworkFactoryClassName() throws IOException {
 		BundleContext context = getBundleContextWithoutFail();
         URL factoryService = context == null ? this.getClass().getResource(FRAMEWORK_FACTORY) : context.getBundle(0).getEntry(FRAMEWORK_FACTORY);
-		assertNotNull("Could not locate: " + FRAMEWORK_FACTORY, factoryService);
+		assertThat(factoryService).as("Could not locate: " + FRAMEWORK_FACTORY).isNotNull();
 		return getClassName(factoryService);
 
 	}
@@ -221,7 +217,7 @@ public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*
 		BundleContext context = getBundleContextWithoutFail();
 		if (context == null) {
 			String storageroot = getProperty(STORAGEROOT, DEFAULT_STORAGEROOT);
-			assertNotNull("Must set property: " + STORAGEROOT, storageroot);
+			assertThat(storageroot).as("Must set property: " + STORAGEROOT).isNotNull();
 			return storageroot;
 		}
 		return context.getDataFile("storageroot").getAbsolutePath();
@@ -233,7 +229,7 @@ public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*
 		@SuppressWarnings("unchecked")
 		Class<FrameworkFactory> clazz = (Class<FrameworkFactory>) (context == null
 				? Class.forName(className)
-				: getContext().getBundle(0).loadClass(className));
+				: context.getBundle(0).loadClass(className));
 		return clazz;
 	}
 
@@ -241,7 +237,7 @@ public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*
 		try {
 			if ("true".equals(getProperty("noframework")))
 				return null;
-			return getContext();
+			return context;
 		} catch (Throwable t) {
 			return null; // don't fail
 		}
@@ -286,7 +282,7 @@ public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*
 		catch (Exception e) {
 			fail("Failed to construct the framework", e);
 		}
-		assertEquals("Wrong state for newly constructed framework", Bundle.INSTALLED, framework.getState());
+		assertThat(framework).as("Wrong state for newly constructed framework").isInState(Bundle.INSTALLED);
 		return framework;
 	}
 
@@ -299,23 +295,23 @@ public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*
 	private void initFramework() {
 		try {
 			framework.init();
-			assertNotNull("BundleContext is null after init", framework.getBundleContext());
+			assertThat(framework.getBundleContext()).as("BundleContext is null after init").isNotNull();
 		}
 		catch (BundleException e) {
 			fail("Unexpected BundleException initializing", e);
 		}
-		assertEquals("Wrong framework state after init", Bundle.STARTING, framework.getState());
+		assertThat(framework).as("Wrong framework state after init").isInState(Bundle.STARTING);
 	}
 
 	private void startFramework() {
 		try {
 			framework.start();
-			assertNotNull("BundleContext is null after start", framework.getBundleContext());
+			assertThat(framework.getBundleContext()).as("BundleContext is null after start").isNotNull();
 		}
 		catch (BundleException e) {
 			fail("Unexpected BundleException initializing", e);
 		}
-		assertEquals("Wrong framework state after init", Bundle.ACTIVE, framework.getState());
+		assertThat(framework).as("Wrong framework state after init").isInState(Bundle.ACTIVE);
 
 	}
 
@@ -324,9 +320,9 @@ public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*
 		try {
             framework.stop();
 			FrameworkEvent event = framework.waitForStop(10000);
-			assertNotNull("FrameworkEvent is null", event);
-			assertEquals("Wrong event type", FrameworkEvent.STOPPED, event.getType());
-			assertNull("BundleContext is not null after stop", framework.getBundleContext());
+			assertThat(event).as("FrameworkEvent is null").isNotNull();
+			assertThat(event.getType()).as("Wrong event type").isEqualTo(FrameworkEvent.STOPPED);
+			assertThat(framework.getBundleContext()).as("BundleContext is not null after stop").isNull();
 		}
 		catch (BundleException e) {
 			fail("Unexpected BundleException stopping", e);
@@ -337,7 +333,7 @@ public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*
 		// if the framework was not STARTING STOPPING or ACTIVE then we assume the waitForStop returned immediately with a FrameworkEvent.STOPPED 
 		// and does not change the state of the framework
 		int expectedState = (previousState & (Bundle.STARTING | Bundle.ACTIVE | Bundle.STOPPING)) != 0 ? Bundle.RESOLVED : previousState;
-		assertEquals("Wrong framework state after init", expectedState, framework.getState());
+		assertThat(framework.getState()).as("Wrong framework state after init").isEqualTo(expectedState);
 	}
 
 	private void installFramework() throws Exception {
@@ -353,8 +349,8 @@ public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*
 			String bundle = st.nextToken();
 			
 			Bundle b = f.getBundleContext().installBundle("file:" + bundle);
-			assertNotNull(b);
-			assertEquals("Bundle " + b.getSymbolicName() + " is not INSTALLED", Bundle.INSTALLED, b.getState());
+			assertThat(b).isNotNull();
+			assertThat(b).as("Bundle " + b.getSymbolicName() + " is not INSTALLED").isInState(Bundle.INSTALLED);
 			
 			System.out.println("installed bundle " + b.getSymbolicName() + " " + b.getVersion());
 			bundles.add(b);
@@ -365,7 +361,7 @@ public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*
 			
 			if (b.getHeaders().get(Constants.FRAGMENT_HOST) == null) {
 				b.start();
-				assertEquals("Bundle " + b.getSymbolicName() + " is not ACTIVE", Bundle.ACTIVE, b.getState());
+				assertThat(b).as("Bundle " + b.getSymbolicName() + " is not ACTIVE").isInState(Bundle.ACTIVE);
 				
 				System.out.println("started bundle " + b.getSymbolicName());
 			}
@@ -383,9 +379,7 @@ public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*
 		
 		BundleWiring wiring = f.getBundleContext().getBundle()
 				.adapt(BundleWiring.class);
-		assertNotNull(
-				"Framework is not supplying a BundleWiring for the system bundle",
-				wiring);
+		assertThat(wiring).as("Framework is not supplying a BundleWiring for the system bundle").isNotNull();
 		List<BundleCapability> exportedPkgs = wiring
 				.getCapabilities(BundleRevision.PACKAGE_NAMESPACE);
 		
@@ -397,7 +391,7 @@ public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*
 					BundleRevision.PACKAGE_NAMESPACE);
 			pkgList.remove(name);
 		}
-		assertTrue("Framework does not export some packages " + pkgList, pkgList.isEmpty());
+		assertThat(pkgList).as("Framework does not export some packages " + pkgList).isEmpty();
 	}
 
 	/**
@@ -472,16 +466,14 @@ public abstract class MultiFrameworkTestCase extends DefaultTestBundleControl /*
 	 */
 	protected Map<String,Object> loadCTProperties() {
 		String serverconfig = getProperty("org.osgi.test.cases.remoteserviceadmin.serverconfig");
-		assertNotNull(
-				"did not find org.osgi.test.cases.remoteserviceadmin.serverconfig system property",
-				serverconfig);
+		assertThat(serverconfig).as("did not find org.osgi.test.cases.remoteserviceadmin.serverconfig system property").isNotNull();
 		Map<String,Object> properties = new HashMap<>();
 		
 		for (StringTokenizer tok = new StringTokenizer(serverconfig, ","); tok
 				.hasMoreTokens();) {
 			String propertyName = tok.nextToken();
 			String value = getProperty(propertyName);
-			assertNotNull("system property not found: " + propertyName, value);
+			assertThat(value).as("system property not found: " + propertyName).isNotNull();
 			properties.put(propertyName, value);
 		}
 		

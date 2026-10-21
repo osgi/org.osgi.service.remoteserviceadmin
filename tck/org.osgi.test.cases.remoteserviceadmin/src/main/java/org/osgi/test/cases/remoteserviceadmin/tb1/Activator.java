@@ -17,9 +17,7 @@
  *******************************************************************************/
 package org.osgi.test.cases.remoteserviceadmin.tb1;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -117,8 +115,8 @@ public class Activator implements BundleActivator, A, B {
 		properties.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "A"); // mandatory
 		endpoint = new EndpointDescription(registration.getReference(), properties);
 		
-		assertNotNull(endpoint);
-		assertEquals("Endpoint properties are supposed to trump service properties", "has been overridden", endpoint.getProperties().get("mykey"));
+		assertThat(endpoint).isNotNull();
+		assertThat(endpoint.getProperties().get("mykey")).as("Endpoint properties are supposed to trump service properties").isEqualTo("has been overridden");
 
 		// 
 		// find the EndpointListeners and call them with the endpoint description
@@ -159,9 +157,9 @@ public class Activator implements BundleActivator, A, B {
 		
 		String timeout = context.getProperty("rsa.tck.timeout");
 		
-		assertTrue("no interested EndpointListener found", semaphore
+		assertThat(semaphore
 				.tryAcquire(Long.parseLong(timeout != null ? timeout
-						: "30000"), TimeUnit.MILLISECONDS));
+						: "30000"), TimeUnit.MILLISECONDS)).as("no interested EndpointListener found").isTrue();
 	}
 
 	/**
@@ -173,7 +171,7 @@ public class Activator implements BundleActivator, A, B {
 		//
 		ServiceReference<org.osgi.service.remoteserviceadmin.EndpointListener>[] listeners = tracker
 				.getServiceReferences();
-		assertNotNull("no EndpointListeners found", listeners);
+		assertThat(listeners).as("no EndpointListeners found").isNotNull();
 		
 		boolean foundListener = false;
 		for (ServiceReference<org.osgi.service.remoteserviceadmin.EndpointListener> sr : listeners) {
@@ -189,7 +187,7 @@ public class Activator implements BundleActivator, A, B {
 				listener.endpointRemoved(endpoint, matchedFilter);
 			}
 		}
-		assertTrue("no interested EndpointListener found", foundListener);
+		assertThat(foundListener).as("no interested EndpointListener found").isTrue();
 	}
 	
 

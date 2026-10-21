@@ -4,7 +4,6 @@ Bundle-Description					: Remote Services test cases.
 
 Export-Package 					= ${p}.common;version=1.0.0
 
--conditionalpackage					= org.osgi.test.support.*
 -privatepackage						=  \
 	${p}.*
 	
@@ -22,7 +21,5 @@ p: org.osgi.test.cases.remoteservices
 # way). bnd merges all -make.* entries.
 -make.maven: (*).(jar); type=bnd; recipe="bnd/$1.bnd"
 
-testcases.junit3: ${classes;EXTENDS;junit.framework.TestCase;CONCRETE}
-testcases.junit4: ${classes;HIERARCHY_ANNOTATED;org.junit.Test;CONCRETE}
 testcases.junit5: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}
-Test-Cases: ${sort;${uniq;${testcases.junit3};${testcases.junit4};${testcases.junit5}}}
+Test-Cases: ${sort;${uniq;${testcases.junit5}}}

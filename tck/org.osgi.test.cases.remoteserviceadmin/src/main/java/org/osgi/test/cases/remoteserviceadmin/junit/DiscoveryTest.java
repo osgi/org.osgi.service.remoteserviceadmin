@@ -17,6 +17,8 @@
  *******************************************************************************/
 package org.osgi.test.cases.remoteserviceadmin.junit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -38,6 +40,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -54,7 +59,6 @@ import org.osgi.test.cases.remoteserviceadmin.common.B;
 import org.osgi.test.cases.remoteserviceadmin.common.ModifiableService;
 import org.osgi.test.cases.remoteserviceadmin.common.RemoteServiceConstants;
 import org.osgi.test.cases.remoteserviceadmin.impl.TestServiceImpl;
-import org.osgi.test.support.sleep.Sleep;
 
 /**
  * Test the discovery portion of the spec by registering a EndpointDescription
@@ -84,19 +88,19 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 	/**
 	 * @see org.osgi.test.cases.remoteserviceadmin.junit.MultiFrameworkTestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception {
+	@BeforeEach
+	public void setUp() throws Exception {
 		super.setUp();
 		timeout = getLongProperty("rsa.tck.timeout", 300000L);
 	}
 	/**
 	 * @see org.osgi.test.cases.remoteserviceadmin.junit.MultiFrameworkTestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception {
+	@AfterEach
+	public void tearDown() throws Exception {
 		super.tearDown();
 		System.out.println("Sleep for 5s before ending to allow for cleanup of ports before the next run.");
-		Sleep.sleep(5000);
+		Thread.sleep(5000);
 	}
 
 	/**
@@ -123,6 +127,7 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 	/**
 	 * 122.6 Discovery
 	 */
+	@Test
 	public void testDiscovery122_6() throws Exception {
 		// verify that the server framework is exporting the test packages
 		verifyFramework();
@@ -133,7 +138,7 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 		BundleContext childContext = getFramework().getBundleContext();
 
 		Bundle tb1Bundle = installBundle(childContext, "/tb1.jar");
-		assertNotNull(tb1Bundle);
+		assertThat(tb1Bundle).isNotNull();
 
 		//
 		// register EndpointListener in parent framework
@@ -142,7 +147,7 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 		final EndpointListenerImpl endpointListenerImpl = new SelectiveEndpointListenerImpl(
 				serviceId);
 
-		final String endpointListenerFilter = "(!(org.osgi.framework.uuid=" + getContext().getProperty("org.osgi.framework.uuid") + "))";
+		final String endpointListenerFilter = "(!(org.osgi.framework.uuid=" + context.getProperty("org.osgi.framework.uuid") + "))";
 		String secondFilter = "(mykey=has been overridden)";
 		Hashtable<String, Object> endpointListenerProperties = new Hashtable<String, Object>();
 		endpointListenerProperties.put(
@@ -151,11 +156,11 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 						endpointListenerFilter, secondFilter
 				});
 
-		ServiceRegistration<org.osgi.service.remoteserviceadmin.EndpointListener> endpointListenerRegistration = getContext()
+		ServiceRegistration<org.osgi.service.remoteserviceadmin.EndpointListener> endpointListenerRegistration = context
 				.registerService(
 						org.osgi.service.remoteserviceadmin.EndpointListener.class,
 						endpointListenerImpl, endpointListenerProperties);
-		assertNotNull(endpointListenerRegistration);
+		assertThat(endpointListenerRegistration).isNotNull();
 
 		EndpointListenerImpl emptyEndpointListener = null;
 		try {
@@ -171,33 +176,31 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 
 			System.out.println("************* wait for Signal 1 ********************");
 			// verify callback in parent framework
-			assertTrue(endpointListenerImpl.getSemAdded()
-					.tryAcquire(timeout, TimeUnit.MILLISECONDS));
+			assertThat(endpointListenerImpl.getSemAdded()
+					.tryAcquire(timeout, TimeUnit.MILLISECONDS)).isTrue();
 
 			// 122.6.2 callback has to return first matched filter
-			assertEquals("filter doesn't match the first filter", endpointListenerFilter, endpointListenerImpl.getAddedMatchedFilter());
+			assertThat(endpointListenerImpl.getAddedMatchedFilter()).as("filter doesn't match the first filter").isEqualTo(endpointListenerFilter);
 
 			EndpointDescription ep = endpointListenerImpl.getAddedEndpoint();
-			assertNotNull(ep);
-			assertEquals("remote service id is incorrect", serviceId, ep.getServiceId());
-			assertEquals("remote.id does not match", "someURI", ep.getId());
-			assertEquals("remote framework id is incorrect", getFramework()
-					.getBundleContext().getProperty("org.osgi.framework.uuid"), ep
-					.getFrameworkUUID());
-			assertFalse(
-					"remote framework id has to be UUID of remote not local framework",
-					ep.getFrameworkUUID().equals(
-							getContext().getProperty("org.osgi.framework.uuid")));
-			assertTrue("discovered interfaces don't contain " + A.class.getName(), ep.getInterfaces().contains(A.class.getName()));
-			assertFalse("discovered interfaces must not contain " + B.class.getName(), ep.getInterfaces().contains(B.class.getName()));
-			assertEquals("the property of the service should have been overridden by the EndpointDescription", "has been overridden", ep.getProperties().get("mykey"));
-			assertEquals("the property myprop is missing", "myvalue", ep.getProperties().get("myprop"));
+			assertThat(ep).isNotNull();
+			assertThat(ep.getServiceId()).as("remote service id is incorrect").isEqualTo(serviceId);
+			assertThat(ep.getId()).as("remote.id does not match").isEqualTo("someURI");
+			assertThat(ep
+					.getFrameworkUUID()).as("remote framework id is incorrect").isEqualTo(getFramework()
+					.getBundleContext().getProperty("org.osgi.framework.uuid"));
+			assertThat(ep.getFrameworkUUID().equals(
+							context.getProperty("org.osgi.framework.uuid"))).as("remote framework id has to be UUID of remote not local framework").isFalse();
+			assertThat(ep.getInterfaces().contains(A.class.getName())).as("discovered interfaces don't contain " + A.class.getName()).isTrue();
+			assertThat(ep.getInterfaces().contains(B.class.getName())).as("discovered interfaces must not contain " + B.class.getName()).isFalse();
+			assertThat(ep.getProperties().get("mykey")).as("the property of the service should have been overridden by the EndpointDescription").isEqualTo("has been overridden");
+			assertThat(ep.getProperties().get("myprop")).as("the property myprop is missing").isEqualTo("myvalue");
 
 			// verify 122.6.1
-			assertNull(emptyEndpointListener.getAddedEndpoint());
+			assertThat(emptyEndpointListener.getAddedEndpoint()).isNull();
 
 			System.out.println("************* Sleeping for 5s so that the discovery can settle ********************");
-			Sleep.sleep(5000);
+			Thread.sleep(5000);
 			//
 			// remove the endpoint
 			//
@@ -205,27 +208,25 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 
 			System.out.println("************* wait for Signal 2 ********************");
 			// verify callback in parent framework
-			assertTrue(endpointListenerImpl.getSemRemoved().tryAcquire(
-					timeout, TimeUnit.MILLISECONDS));
+			assertThat(endpointListenerImpl.getSemRemoved().tryAcquire(
+					timeout, TimeUnit.MILLISECONDS)).isTrue();
 
 			// 122.6.2 callback has to return first matched filter
-			assertEquals("filter doesn't match the first filter", endpointListenerFilter, endpointListenerImpl.getRemMatchedFilter());
+			assertThat(endpointListenerImpl.getRemMatchedFilter()).as("filter doesn't match the first filter").isEqualTo(endpointListenerFilter);
 
 			ep = endpointListenerImpl.getRemovedEndpoint();
-			assertNotNull(ep);
-			assertEquals("remote service id is incorrect", serviceId, ep.getServiceId());
-			assertEquals("remote.id does not match", "someURI", ep.getId());
-			assertEquals("remote framework id is incorrect", getFramework()
-					.getBundleContext().getProperty("org.osgi.framework.uuid"), ep
-					.getFrameworkUUID());
-			assertFalse(
-					"remote framework id has to be UUID of remote not local framework",
-					ep.getFrameworkUUID().equals(
-							getContext().getProperty("org.osgi.framework.uuid")));
-			assertTrue("discovered interfaces don't contain " + A.class.getName(), ep.getInterfaces().contains(A.class.getName()));
-			assertFalse("discovered interfaces must not contain " + B.class.getName(), ep.getInterfaces().contains(B.class.getName()));
-			assertEquals("the property of the service should have been overridden by the EndpointDescription", "has been overridden", ep.getProperties().get("mykey"));
-			assertEquals("the property myprop is missing", "myvalue", ep.getProperties().get("myprop"));
+			assertThat(ep).isNotNull();
+			assertThat(ep.getServiceId()).as("remote service id is incorrect").isEqualTo(serviceId);
+			assertThat(ep.getId()).as("remote.id does not match").isEqualTo("someURI");
+			assertThat(ep
+					.getFrameworkUUID()).as("remote framework id is incorrect").isEqualTo(getFramework()
+					.getBundleContext().getProperty("org.osgi.framework.uuid"));
+			assertThat(ep.getFrameworkUUID().equals(
+							context.getProperty("org.osgi.framework.uuid"))).as("remote framework id has to be UUID of remote not local framework").isFalse();
+			assertThat(ep.getInterfaces().contains(A.class.getName())).as("discovered interfaces don't contain " + A.class.getName()).isTrue();
+			assertThat(ep.getInterfaces().contains(B.class.getName())).as("discovered interfaces must not contain " + B.class.getName()).isFalse();
+			assertThat(ep.getProperties().get("mykey")).as("the property of the service should have been overridden by the EndpointDescription").isEqualTo("has been overridden");
+			assertThat(ep.getProperties().get("myprop")).as("the property myprop is missing").isEqualTo("myvalue");
 		} finally {
 			endpointListenerRegistration.unregister();
 			
@@ -240,6 +241,7 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 	 *
 	 * EndpointDescription via XML file
 	 */
+	@Test
 	public void testDiscovery122_6_8() throws Exception {
 		Set<String> set = new HashSet<String>();
 		set.add("one");
@@ -258,19 +260,19 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 
 		TestServiceImpl service = new TestServiceImpl();
 
-		ServiceRegistration< ? > registration = getContext()
+		ServiceRegistration< ? > registration = context
 				.registerService(new String[] {
 						A.class.getName(), B.class.getName()
 				}, service, dictionary);
-		assertNotNull(registration);
+		assertThat(registration).isNotNull();
 		
 		ServiceReference<RemoteServiceAdmin> rsaRef = null;
 		
 		try {
-			rsaRef = getContext().getServiceReference(RemoteServiceAdmin.class);
-			assertNotNull(rsaRef);
-			RemoteServiceAdmin rsa = getContext().getService(rsaRef);
-			assertNotNull(rsa);
+			rsaRef = context.getServiceReference(RemoteServiceAdmin.class);
+			assertThat(rsaRef).isNotNull();
+			RemoteServiceAdmin rsa = context.getService(rsaRef);
+			assertThat(rsa).isNotNull();
 
 			Map<String, Object> properties = loadCTProperties();
 			properties.put("mykey", "has been overridden");
@@ -282,13 +284,13 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 
 			// export the service
 			Collection<ExportRegistration> exportRegistrations = rsa.exportService(registration.getReference(), properties);
-			assertNotNull(exportRegistrations);
-			assertFalse(exportRegistrations.isEmpty());
+			assertThat(exportRegistrations).isNotNull();
+			assertThat(exportRegistrations).isNotEmpty();
 			
 			try {
 
 				EndpointDescription description = exportRegistrations.iterator().next().getExportReference().getExportedEndpoint();
-				assertNotNull(description);
+				assertThat(description).isNotNull();
 
 				// add a new property that only the XML description has
 				Map<String, Object> props = new HashMap<String, Object>();
@@ -309,7 +311,7 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 
 				Bundle tbInterfacesBundle = installBundle(childContext,
 						"/tbInterfaces.jar");
-				assertNotNull(tbInterfacesBundle);
+				assertThat(tbInterfacesBundle).isNotNull();
 				// tbInterfacesBundle.start();
 
 				// create an XML file version of the description
@@ -320,7 +322,7 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 				String testbundleloc = createBundle(xmlStr);
 
 				Bundle testbundle = childContext.installBundle(testbundleloc);
-				assertNotNull(testbundle);
+				assertThat(testbundle).isNotNull();
 
 				testbundle.start();
 
@@ -329,11 +331,11 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 				//
 
 				Bundle tb3Bundle = installBundle(childContext,"/tb3.jar");
-				assertNotNull(tb3Bundle);
+				assertThat(tb3Bundle).isNotNull();
 
 				tb3Bundle.start(); // throws Exception if test was not successful
 
-				Sleep.sleep(2000);
+				Thread.sleep(2000);
 
 				// remove the proxy
 				testbundle.stop();
@@ -346,13 +348,14 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 			}
 		} finally {
 			if (rsaRef != null) {
-				getContext().ungetService(rsaRef);
+				context.ungetService(rsaRef);
 			}
 			
 			registration.unregister();
 		}
 	}
 
+	@Test
 	public void testDiscoveryBasicEndpointEvents_122_6_3()
 			throws Exception {
 		// verify that the server framework is exporting the test packages
@@ -364,7 +367,7 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 		BundleContext childContext = getFramework().getBundleContext();
 
 		Bundle tb7Bundle = installBundle(childContext, "/tb7.jar");
-		assertNotNull(tb7Bundle);
+		assertThat(tb7Bundle).isNotNull();
 
 		//
 		// register EndpointListener in parent framework
@@ -373,17 +376,17 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 		
 		Hashtable<String, Object> endpointEventListenerProperties = new Hashtable<String, Object>();
 		final String endpointEventListenerFilter = "(&(mykey=has been overridden)(!(org.osgi.framework.uuid="
-				+ getContext().getProperty("org.osgi.framework.uuid") + ")))";
+				+ context.getProperty("org.osgi.framework.uuid") + ")))";
 		String secondFilter = "(mykey=has been overridden)";
 		endpointEventListenerProperties.put(
 				EndpointEventListener.ENDPOINT_LISTENER_SCOPE, new String[] {
 						endpointEventListenerFilter, secondFilter });
 
-		ServiceRegistration<EndpointEventListener> endpointEventListenerRegistration = getContext()
+		ServiceRegistration<EndpointEventListener> endpointEventListenerRegistration = context
 				.registerService(EndpointEventListener.class,
 						endpointEventListenerImpl,
 						endpointEventListenerProperties);
-		assertNotNull(endpointEventListenerRegistration);
+		assertThat(endpointEventListenerRegistration).isNotNull();
 		
 		EndpointEventListenerImpl emptyEndpointEventListener = null;
 		try {
@@ -400,8 +403,8 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 			System.out
 					.println("************* wait for Signal 1 (EndpointEvent:added) ********************");
 			// verify callback in parent framework
-			assertTrue(endpointEventListenerImpl.getSemAdded().tryAcquire(
-					timeout, TimeUnit.MILLISECONDS));
+			assertThat(endpointEventListenerImpl.getSemAdded().tryAcquire(
+					timeout, TimeUnit.MILLISECONDS)).isTrue();
 			System.out
 					.println("************* recieved Signal 1 (EndpointEvent:added) ********************");
 
@@ -412,19 +415,19 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 
 			System.out
 					.println("************* Sleeping for 5s so that the discovery can settle ********************");
-			Sleep.sleep(5000);
+			Thread.sleep(5000);
 
 
 			// get the service provided by our test bundle
 			ServiceReference< ? > modServiceRef = tb7Bundle
 					.getRegisteredServices()[0];
-			assertNotNull(modServiceRef);
+			assertThat(modServiceRef).isNotNull();
 			
 			// let it know that we want it to modify its registration (and raise
 			// an endpoint modified event)
 			Object modService = tb7Bundle.getBundleContext().getService(
 					modServiceRef);
-			assertNotNull(modService);
+			assertThat(modService).isNotNull();
 			modService.getClass().getDeclaredMethod("addServiceProperty")
 					.invoke(modService);
 
@@ -432,9 +435,9 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 			System.out
 					.println("************* wait for Signal 2 (EndpointEvent:modified) ********************");
 			// verify callback in parent framework
-			assertTrue(endpointEventListenerImpl.getSemModified()
+			assertThat(endpointEventListenerImpl.getSemModified()
 					.tryAcquire(
-							timeout, TimeUnit.MILLISECONDS));
+							timeout, TimeUnit.MILLISECONDS)).isTrue();
 			System.out
 					.println("************* recieved Signal 2 (EndpointEvent:modified) ********************");
 
@@ -445,7 +448,7 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 
 			System.out
 					.println("************* Sleeping for 5s so that the discovery can settle ********************");
-			Sleep.sleep(5000);
+			Thread.sleep(5000);
 
 			//
 			// remove the endpoint
@@ -455,8 +458,8 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 			 System.out
 					.println("************* wait for Signal 3 (EndpointEvent:removed) ********************");
 			 // verify callback in parent framework
-			assertTrue(endpointEventListenerImpl.getSemRemoved().tryAcquire(
-					timeout, TimeUnit.MILLISECONDS));
+			assertThat(endpointEventListenerImpl.getSemRemoved().tryAcquire(
+					timeout, TimeUnit.MILLISECONDS)).isTrue();
 			System.out
 					.println("************* recieved Signal 3 (EndpointEvent:removed) ********************");
 
@@ -466,10 +469,10 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 					endpointEventListenerFilter);
 
 			// verify that we didn't receive any other events
-			assertEquals(3, endpointEventListenerImpl.getEventCount());
+			assertThat(endpointEventListenerImpl.getEventCount()).isEqualTo(3);
 
 			// verify 122.6.1
-			assertEquals(0, emptyEndpointEventListener.getEventCount());
+			assertThat(emptyEndpointEventListener.getEventCount()).isZero();
 
 		} finally {
 			endpointEventListenerRegistration.unregister();
@@ -483,32 +486,23 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 	private void verifyBasicEndpointEventBehavior(String lastMatchedFilter,
 			EndpointDescription ep, final String endpointEventListenerFilter) {
 		// 122.6.2 callback has to return first matched filter
-		assertEquals("filter doesn't match the first filter",
-				endpointEventListenerFilter, lastMatchedFilter);
+		assertThat(lastMatchedFilter).as("filter doesn't match the first filter").isEqualTo(endpointEventListenerFilter);
 
-		assertNotNull(ep);
-		assertEquals("remote service id is incorrect", 12345,
-				ep.getServiceId());
-		assertEquals("remote.id does not match", "someURI", ep.getId());
-		assertEquals("remote framework id is incorrect", getFramework()
-				.getBundleContext().getProperty("org.osgi.framework.uuid"),
-				ep.getFrameworkUUID());
-		assertFalse(
-				"remote framework id has to be UUID of remote not local framework",
-				ep.getFrameworkUUID()
-						.equals(getContext().getProperty(
-								"org.osgi.framework.uuid")));
-		assertTrue("discovered interfaces don't contain "
-				+ ModifiableService.class.getName(), ep.getInterfaces()
-				.contains(ModifiableService.class.getName()));
-		assertFalse(
-				"discovered interfaces must not contain " + B.class.getName(),
-				ep.getInterfaces().contains(B.class.getName()));
-		assertEquals(
-				"the property of the service should have been overridden by the EndpointDescription",
-				"has been overridden", ep.getProperties().get("mykey"));
-		assertEquals("the property myprop is missing", "myvalue", ep
-				.getProperties().get("myprop"));
+		assertThat(ep).isNotNull();
+		assertThat(ep.getServiceId()).as("remote service id is incorrect").isEqualTo(12345);
+		assertThat(ep.getId()).as("remote.id does not match").isEqualTo("someURI");
+		assertThat(ep.getFrameworkUUID()).as("remote framework id is incorrect").isEqualTo(getFramework()
+				.getBundleContext().getProperty("org.osgi.framework.uuid"));
+		assertThat(ep.getFrameworkUUID()
+						.equals(context.getProperty(
+								"org.osgi.framework.uuid"))).as("remote framework id has to be UUID of remote not local framework").isFalse();
+		assertThat(ep.getInterfaces()
+				.contains(ModifiableService.class.getName())).as("discovered interfaces don't contain "
+				+ ModifiableService.class.getName()).isTrue();
+		assertThat(ep.getInterfaces().contains(B.class.getName())).as("discovered interfaces must not contain " + B.class.getName()).isFalse();
+		assertThat(ep.getProperties().get("mykey")).as("the property of the service should have been overridden by the EndpointDescription").isEqualTo("has been overridden");
+		assertThat(ep
+				.getProperties().get("myprop")).as("the property myprop is missing").isEqualTo("myvalue");
 	}
 
 	/**
@@ -701,12 +695,12 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 				scope);
 
 		EndpointListenerImpl el = new EndpointListenerImpl();
-		ServiceRegistration<org.osgi.service.remoteserviceadmin.EndpointListener> elr = getContext()
+		ServiceRegistration<org.osgi.service.remoteserviceadmin.EndpointListener> elr = context
 				.registerService(
 						org.osgi.service.remoteserviceadmin.EndpointListener.class,
 				el, elp);
-		assertNotNull(elr);
-		assertNotNull(elr.getReference());
+		assertThat(elr).isNotNull();
+		assertThat(elr.getReference()).isNotNull();
 		el.setServiceRegistration(elr);
 
 		return el;
@@ -722,10 +716,10 @@ public class DiscoveryTest extends MultiFrameworkTestCase {
 		elp.put(EndpointEventListener.ENDPOINT_LISTENER_SCOPE, scope);
 
 		EndpointEventListenerImpl el = new EndpointEventListenerImpl();
-		ServiceRegistration<EndpointEventListener> elr = getContext()
+		ServiceRegistration<EndpointEventListener> elr = context
 				.registerService(EndpointEventListener.class, el, elp);
-		assertNotNull(elr);
-		assertNotNull(elr.getReference());
+		assertThat(elr).isNotNull();
+		assertThat(elr.getReference()).isNotNull();
 		el.setServiceRegistration(elr);
 
 		return el;

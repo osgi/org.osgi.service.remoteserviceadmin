@@ -17,11 +17,7 @@
  *******************************************************************************/
 package org.osgi.test.cases.remoteserviceadmin.secure.tb.exporter;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,8 +29,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.concurrent.Semaphore;
@@ -51,8 +47,7 @@ import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminListener;
 import org.osgi.test.cases.remoteserviceadmin.secure.common.A;
-import org.osgi.test.support.OSGiTestCaseProperties;
-import org.osgi.test.support.compatibility.DefaultTestBundleControl;
+import org.osgi.test.cases.remoteserviceadmin.secure.util.TestBundleSupport;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -79,7 +74,7 @@ public class Activator implements BundleActivator, A {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
-		timeout = OSGiTestCaseProperties.getLongProperty("rsa.tck.timeout",
+		timeout = TestBundleSupport.getLongProperty("rsa.tck.timeout",
 				300000L);
 
 		Hashtable<String, String> dictionary = new Hashtable<String, String>();
@@ -115,7 +110,7 @@ public class Activator implements BundleActivator, A {
 		rsaTracker.open();
 
 		rsa = rsaTracker.waitForService(timeout);
-		assertNotNull(rsa);
+		assertThat(rsa).isNotNull();
 
 		//
 		// register a RemoteServiceAdminListener to receive the export
@@ -125,7 +120,7 @@ public class Activator implements BundleActivator, A {
 		ServiceRegistration<RemoteServiceAdminListener> sr = context
 				.registerService(RemoteServiceAdminListener.class,
 						remoteServiceAdminListener, null);
-		assertNotNull(sr);
+		assertThat(sr).isNotNull();
 
 		//
 		// 122.4.1 export the service, positive tests
@@ -138,8 +133,8 @@ public class Activator implements BundleActivator, A {
 
 		// export the service
 		exportRegistrations = rsa.exportService(registration.getReference(), properties);
-		assertNotNull(exportRegistrations);
-		assertFalse(exportRegistrations.isEmpty());
+		assertThat(exportRegistrations).isNotNull();
+		assertThat(exportRegistrations).isNotEmpty();
 
 		for (Iterator<ExportRegistration> it = exportRegistrations.iterator(); it.hasNext();) {
 			ExportRegistration er = it.next();
@@ -148,28 +143,26 @@ public class Activator implements BundleActivator, A {
 			if (exception != null) {
 				throw new InvocationTargetException(exception, "Export Failed");
 			}
-			assertNull(exception);
+			assertThat(exception).isNull();
 			ExportReference ref = er.getExportReference();
-			assertNotNull(ref);
+			assertThat(ref).isNotNull();
 
 			// 122.4.1 Exporting
-			assertEquals(registration.getReference(), ref.getExportedService());
+			assertThat(ref.getExportedService()).isEqualTo(registration.getReference());
 
-			assertEquals(DefaultTestBundleControl.arrayToString((Object[]) registration.getReference().getProperty("objectClass"), true),
-					DefaultTestBundleControl.arrayToString((Object[]) ref.getExportedService().getProperty("objectClass"), true));
-			assertEquals(registration.getReference().getProperty("service.id"), ref.getExportedService().getProperty("service.id"));
+			assertThat(TestBundleSupport.arrayToString((Object[]) ref.getExportedService().getProperty("objectClass"), true)).isEqualTo(TestBundleSupport.arrayToString((Object[]) registration.getReference().getProperty("objectClass"), true));
+			assertThat(ref.getExportedService().getProperty("service.id")).isEqualTo(registration.getReference().getProperty("service.id"));
 
 			EndpointDescription ed = ref.getExportedEndpoint();
-			assertNotNull(ed);
-			assertNotNull(ed.getProperties().get("objectClass"));
-			assertTrue(ed.getInterfaces().contains(A.class.getName()));
+			assertThat(ed).isNotNull();
+			assertThat(ed.getProperties().get("objectClass")).isNotNull();
+			assertThat(ed.getInterfaces().contains(A.class.getName())).isTrue();
 
-			assertNotNull(ed.getId());
-			assertNotNull(ed.getConfigurationTypes());
-			assertFalse(ed.getConfigurationTypes().isEmpty());
-			assertEquals(context.getProperty("org.osgi.framework.uuid"),
-					ed.getFrameworkUUID());
-			assertNotNull(ed.getProperties().get("endpoint.service.id"));
+			assertThat(ed.getId()).isNotNull();
+			assertThat(ed.getConfigurationTypes()).isNotNull();
+			assertThat(ed.getConfigurationTypes().isEmpty()).isFalse();
+			assertThat(ed.getFrameworkUUID()).isEqualTo(context.getProperty("org.osgi.framework.uuid"));
+			assertThat(ed.getProperties().get("endpoint.service.id")).isNotNull();
 
 			exportEndpointDescription(ed);
 		}
@@ -179,26 +172,26 @@ public class Activator implements BundleActivator, A {
 		// 122.10.12 verify that export notification was sent to RemoteServiceAdminListeners
 		//
 		RemoteServiceAdminEvent event = remoteServiceAdminListener.getNextEvent();
-		assertNotNull("no RemoteServiceAdminEvent received", event);
-		assertNotNull("122.10.11: source must not be null", event.getSource());
-		assertNull(event.getException());
-		assertEquals("122.10.11: event type is wrong", RemoteServiceAdminEvent.EXPORT_REGISTRATION, event.getType());
+		assertThat(event).as("no RemoteServiceAdminEvent received").isNotNull();
+		assertThat(event.getSource()).as("122.10.11: source must not be null").isNotNull();
+		assertThat(event.getException()).isNull();
+		assertThat(event.getType()).as("122.10.11: event type is wrong").isEqualTo(RemoteServiceAdminEvent.EXPORT_REGISTRATION);
 
 		ExportReference exportReference = event.getExportReference();
-		assertNotNull("ExportReference expected in event", exportReference);
-		assertEquals(registration.getReference(), exportReference.getExportedService());
+		assertThat(exportReference).as("ExportReference expected in event").isNotNull();
+		assertThat(exportReference.getExportedService()).isEqualTo(registration.getReference());
 
 		EndpointDescription ed = exportReference.getExportedEndpoint();
-		assertNotNull(ed);
-		assertTrue(ed.getInterfaces().contains(A.class.getName()));
+		assertThat(ed).isNotNull();
+		assertThat(ed.getInterfaces().contains(A.class.getName())).isTrue();
 
-		assertNotNull(ed.getId());
-		assertNotNull(ed.getConfigurationTypes());
-		assertFalse(ed.getConfigurationTypes().isEmpty());
-		assertEquals(context.getProperty("org.osgi.framework.uuid"), ed
-				.getFrameworkUUID());
+		assertThat(ed.getId()).isNotNull();
+		assertThat(ed.getConfigurationTypes()).isNotNull();
+		assertThat(ed.getConfigurationTypes().isEmpty()).isFalse();
+		assertThat(ed
+				.getFrameworkUUID()).isEqualTo(context.getProperty("org.osgi.framework.uuid"));
 
-		assertEquals(0, remoteServiceAdminListener.getEventCount());
+		assertThat(remoteServiceAdminListener.getEventCount()).isEqualTo(0);
 	}
 
 	/**
@@ -207,34 +200,34 @@ public class Activator implements BundleActivator, A {
 	 * to the RemoteServiceAdminListener that the service is no longer exported.
 	 */
 	private void teststop() throws Exception {
-		assertNotNull(exportRegistrations);
-		assertFalse(exportRegistrations.isEmpty());
+		assertThat(exportRegistrations).isNotNull();
+		assertThat(exportRegistrations).isNotEmpty();
 
 		// close ExportRegistrations
 		for (Iterator<ExportRegistration> it = exportRegistrations.iterator(); it.hasNext();) {
 			ExportRegistration er = it.next();
 
-			assertNull(er.getException());
+			assertThat(er.getException()).isNull();
 			er.close();
 		}
 
-		assertEquals(0, rsa.getExportedServices().size());
+		assertThat(rsa.getExportedServices()).isEmpty();
 
 		//
 		// 122.10.12 verify that export notification was sent to RemoteServiceAdminListeners
 		//
 		RemoteServiceAdminEvent event = remoteServiceAdminListener.getNextEvent();
-		assertNotNull("no RemoteServiceAdminEvent received", event);
-		assertNotNull("122.10.11: source must not be null", event.getSource());
-		assertNull(event.getException());
-		assertEquals("122.10.11: event type is wrong", RemoteServiceAdminEvent.EXPORT_UNREGISTRATION, event.getType());
+		assertThat(event).as("no RemoteServiceAdminEvent received").isNotNull();
+		assertThat(event.getSource()).as("122.10.11: source must not be null").isNotNull();
+		assertThat(event.getException()).isNull();
+		assertThat(event.getType()).as("122.10.11: event type is wrong").isEqualTo(RemoteServiceAdminEvent.EXPORT_UNREGISTRATION);
 
 		ExportReference exportReference = event.getExportReference();
-		assertNotNull("ExportReference expected in event", exportReference);
+		assertThat(exportReference).as("ExportReference expected in event").isNotNull();
 
-		assertNull(exportReference.getExportedEndpoint());
+		assertThat(exportReference.getExportedEndpoint()).isNull();
 
-		assertEquals(0, remoteServiceAdminListener.getEventCount());
+		assertThat(remoteServiceAdminListener.getEventCount()).isZero();
 	}
 
 	/**
@@ -313,16 +306,14 @@ public class Activator implements BundleActivator, A {
 	protected Map<String, Object> loadCTProperties() {
 		String serverconfig = context
 				.getProperty("org.osgi.test.cases.remoteserviceadmin.secure.serverconfig");
-		assertNotNull(
-				"did not find org.osgi.test.cases.remoteserviceadmin.secure.serverconfig system property",
-				serverconfig);
+		assertThat(serverconfig).as("did not find org.osgi.test.cases.remoteserviceadmin.secure.serverconfig system property").isNotNull();
 		Map<String, Object> properties = new HashMap<String, Object>();
 
 		for (StringTokenizer tok = new StringTokenizer(serverconfig, ","); tok
 				.hasMoreTokens();) {
 			String propertyName = tok.nextToken();
 			String value = context.getProperty(propertyName);
-			assertNotNull("system property not found: " + propertyName, value);
+			assertThat(value).as("system property not found: " + propertyName).isNotNull();
 			properties.put(propertyName, value);
 		}
 

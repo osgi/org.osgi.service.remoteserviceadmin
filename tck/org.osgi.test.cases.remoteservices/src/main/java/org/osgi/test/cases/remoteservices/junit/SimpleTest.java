@@ -17,7 +17,9 @@
  *******************************************************************************/
 package org.osgi.test.cases.remoteservices.junit;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.within;
 import static org.osgi.framework.Constants.BUNDLE_MANIFESTVERSION;
 import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
 import static org.osgi.framework.Constants.IMPORT_PACKAGE;
@@ -37,8 +39,8 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
@@ -52,6 +54,8 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -76,8 +80,6 @@ import org.osgi.test.cases.remoteservices.impl.AsyncTypesImpl;
 import org.osgi.test.cases.remoteservices.impl.BasicTypesTestServiceImpl;
 import org.osgi.test.cases.remoteservices.impl.SlowServiceImpl;
 import org.osgi.test.cases.remoteservices.impl.TestServiceImpl;
-import org.osgi.test.support.sleep.Sleep;
-import org.osgi.test.support.tracker.Tracker;
 import org.osgi.util.function.Predicate;
 import org.osgi.util.promise.Promise;
 import org.osgi.util.promise.Success;
@@ -104,8 +106,8 @@ public class SimpleTest extends MultiFrameworkTestCase {
 	/**
 	 * @see org.osgi.test.cases.remoteserviceadmin.junit.MultiFrameworkTestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception {
+	@BeforeEach
+	public void setUp() throws Exception {
 		super.setUp();
 		timeout = getLongProperty("rsa.tck.timeout", 30000L);
 	}
@@ -133,6 +135,7 @@ public class SimpleTest extends MultiFrameworkTestCase {
 	/**
 	 * @throws Exception
 	 */
+	@Test
 	public void testSimpleRegistration() throws Exception {
 		Hashtable<String,Object> properties = registrationTestServiceProperties();
 
@@ -140,86 +143,80 @@ public class SimpleTest extends MultiFrameworkTestCase {
 		ServiceRegistration< ? > srTestService = installTestBundleAndRegisterServiceObject(
 				TestServiceImpl.class.getName(), properties, A.class.getName(),
 				B.class.getName());
-		assertNotNull(srTestService);
+		assertThat(srTestService).isNotNull();
 
 		System.out.println("registered test service A and B on server side");
 
-		Sleep.sleep(1000);
+		Thread.sleep(1000);
 
 		try {
 			{
 				ServiceTracker<A,A> clientTracker = new ServiceTracker<>(
-						getContext(), A.class, null);
+						context, A.class, null);
 				clientTracker.open();
 
 				// the proxy should appear in this framework
-				A client = Tracker.waitForService(clientTracker, timeout);
-				assertNotNull("no proxy for service A found!", client);
+				A client = clientTracker.waitForService(timeout);
+				assertThat(client).as("no proxy for service A found!").isNotNull();
 
 				ServiceReference<A> sr = clientTracker.getServiceReference();
 				System.out.println(sr);
-				assertNotNull(sr);
-				assertNotNull(sr.getProperty("service.imported"));
-				assertNotNull(sr.getProperty("service.id"));
-				assertNotNull(sr.getProperty("endpoint.id"));
-				assertNotNull(sr.getProperty("service.imported.configs"));
-				assertNull("private properties must not be exported",
-						sr.getProperty(".myprop"));
-				assertEquals("property implementation missing from proxy", "1",
-						sr.getProperty("implementation"));
-				assertNull(sr.getProperty(
-						RemoteServiceConstants.SERVICE_EXPORTED_INTENTS));
-				assertNull(sr.getProperty(
-						RemoteServiceConstants.SERVICE_EXPORTED_INTENTS_EXTRA));
-				assertNull(sr.getProperty(
-						RemoteServiceConstants.SERVICE_EXPORTED_INTERFACES));
-				assertNull(sr.getProperty(
-						RemoteServiceConstants.SERVICE_EXPORTED_CONFIGS));
+				assertThat(sr).isNotNull();
+				assertThat(sr.getProperty("service.imported")).isNotNull();
+				assertThat(sr.getProperty("service.id")).isNotNull();
+				assertThat(sr.getProperty("endpoint.id")).isNotNull();
+				assertThat(sr.getProperty("service.imported.configs")).isNotNull();
+				assertThat(sr.getProperty(".myprop")).as("private properties must not be exported").isNull();
+				assertThat(sr.getProperty("implementation")).as("property implementation missing from proxy").isEqualTo("1");
+				assertThat(sr.getProperty(
+						RemoteServiceConstants.SERVICE_EXPORTED_INTENTS)).isNull();
+				assertThat(sr.getProperty(
+						RemoteServiceConstants.SERVICE_EXPORTED_INTENTS_EXTRA)).isNull();
+				assertThat(sr.getProperty(
+						RemoteServiceConstants.SERVICE_EXPORTED_INTERFACES)).isNull();
+				assertThat(sr.getProperty(
+						RemoteServiceConstants.SERVICE_EXPORTED_CONFIGS)).isNull();
 
 				// invoke the proxy
-				assertEquals("A", client.getA());
+				assertThat(client.getA()).isEqualTo("A");
 
 				clientTracker.close();
 
 			}
 			// now check on the hosting framework for the service to become available
 			// make sure C was not registered, since it wasn't exported
-			assertNull(
-					"service C should not have been found as it was not exported",
-					getContext().getServiceReference(C.class));
+			assertThat(context.getServiceReference(C.class)).as("service C should not have been found as it was not exported").isNull();
 
 			{
 				// check for service B
 				ServiceTracker<B,B> clientTracker = new ServiceTracker<>(
-						getContext(), B.class, null);
+						context, B.class, null);
 				clientTracker.open();
 
 				// the proxy should appear in this framework
-				B clientB = Tracker.waitForService(clientTracker, timeout);
-				assertNotNull("no proxy for service B found!", clientB);
+				B clientB = clientTracker.waitForService(timeout);
+				assertThat(clientB).as("no proxy for service B found!").isNotNull();
 
 				ServiceReference<B> sr = clientTracker.getServiceReference();
 				System.out.println(sr);
-				assertNotNull(sr);
-				assertNotNull(sr.getProperty("service.imported"));
-				assertNotNull(sr.getProperty("service.id"));
-				assertNotNull(sr.getProperty("endpoint.id"));
-				assertNotNull(sr.getProperty("service.imported.configs"));
-				assertNull("private properties must not be exported",
-						sr.getProperty(".myprop"));
-				assertEquals("property implementation missing from proxy", "1",
-						sr.getProperty("implementation"));
-				assertNull(sr.getProperty(
-						RemoteServiceConstants.SERVICE_EXPORTED_INTENTS));
-				assertNull(sr.getProperty(
-						RemoteServiceConstants.SERVICE_EXPORTED_INTENTS_EXTRA));
-				assertNull(sr.getProperty(
-						RemoteServiceConstants.SERVICE_EXPORTED_INTERFACES));
-				assertNull(sr.getProperty(
-						RemoteServiceConstants.SERVICE_EXPORTED_CONFIGS));
+				assertThat(sr).isNotNull();
+				assertThat(sr.getProperty("service.imported")).isNotNull();
+				assertThat(sr.getProperty("service.id")).isNotNull();
+				assertThat(sr.getProperty("endpoint.id")).isNotNull();
+				assertThat(sr.getProperty("service.imported.configs")).isNotNull();
+				assertThat(sr.getProperty(".myprop")).as("private properties must not be exported").isNull();
+				assertThat(sr.getProperty("implementation")).as("property implementation missing from proxy").isEqualTo("1");
+				assertThat(sr.getProperty(
+						RemoteServiceConstants.SERVICE_EXPORTED_INTENTS)).isNull();
+				assertThat(sr.getProperty(
+						RemoteServiceConstants.SERVICE_EXPORTED_INTENTS_EXTRA)).isNull();
+				assertThat(sr.getProperty(
+						RemoteServiceConstants.SERVICE_EXPORTED_INTERFACES)).isNull();
+				assertThat(sr.getProperty(
+						RemoteServiceConstants.SERVICE_EXPORTED_CONFIGS)).isNull();
 
 				// invoke the proxy
-				assertEquals("B", clientB.getB());
+				assertThat(clientB.getB()).isEqualTo("B");
 
 				clientTracker.close();
 			}
@@ -254,9 +251,7 @@ public class SimpleTest extends MultiFrameworkTestCase {
 				break;
 			}
 		}
-		assertTrue(
-				"the given service.exported.configs type is not supported by the installed Distribution Provider",
-				found);
+		assertThat(found).as("the given service.exported.configs type is not supported by the installed Distribution Provider").isTrue();
 
 		// add some properties for testing
 		properties.put(RemoteServiceConstants.SERVICE_EXPORTED_INTERFACES, "*");
@@ -269,6 +264,7 @@ public class SimpleTest extends MultiFrameworkTestCase {
 	/**
 	 * @throws Exception
 	 */
+	@Test
 	public void testBasicTypesIntent() throws Exception {
 
 		Filter filter = getFramework().getBundleContext().createFilter(
@@ -278,13 +274,13 @@ public class SimpleTest extends MultiFrameworkTestCase {
 				getFramework().getBundleContext(), filter, null);
 		dpTracker.open();
 
-		Object dp = Tracker.waitForService(dpTracker, timeout);
-		assertNotNull("No DistributionProvider found", dp);
+		Object dp = dpTracker.waitForService(timeout);
+		assertThat(dp).as("No DistributionProvider found").isNotNull();
 		ServiceReference< ? > dpReference = dpTracker.getServiceReference();
-		assertNotNull(dpReference);
+		assertThat(dpReference).isNotNull();
 		Object property = dpReference.getProperty(
 				DistributionProviderConstants.REMOTE_INTENTS_SUPPORTED);
-		assertNotNull("No intents supported", property);
+		assertThat(property).as("No intents supported").isNotNull();
 
 		Collection<String> intents;
 		if (property instanceof String) {
@@ -301,13 +297,13 @@ public class SimpleTest extends MultiFrameworkTestCase {
 							+ property.getClass());
 		}
 
-		assertTrue("Did not support osgi.basic",
-				intents.contains("osgi.basic"));
+		assertThat(intents.contains("osgi.basic")).as("Did not support osgi.basic").isTrue();
 	}
 
 	/**
 	 * @throws Exception
 	 */
+	@Test
 	public void testBasicTypes() throws Exception {
 		Hashtable<String,Object> properties = registrationTestServiceProperties();
 
@@ -326,19 +322,19 @@ public class SimpleTest extends MultiFrameworkTestCase {
 			// now check on the hosting framework for the service to become
 			// available
 			ServiceTracker<BasicTypes,BasicTypes> clientTracker = new ServiceTracker<>(
-					getContext(), BasicTypes.class, null);
+					context, BasicTypes.class, null);
 			clientTracker.open();
 
 			// the proxy should appear in this framework
-			BasicTypes client = Tracker.waitForService(clientTracker, timeout);
-			assertNotNull("no proxy for BasicTypes found!", client);
+			BasicTypes client = clientTracker.waitForService(timeout);
+			assertThat(client).as("no proxy for BasicTypes found!").isNotNull();
 
 			ServiceReference<BasicTypes> sr = clientTracker
 					.getServiceReference();
 
 			Object property = sr
 					.getProperty(RemoteServiceConstants.SERVICE_INTENTS);
-			assertNotNull("No intents supported", property);
+			assertThat(property).as("No intents supported").isNotNull();
 
 			Collection<String> intents;
 			if (property instanceof String) {
@@ -355,229 +351,201 @@ public class SimpleTest extends MultiFrameworkTestCase {
 								+ property.getClass());
 			}
 
-			assertTrue("Did not pick up the osgi.basic intent",
-					intents.contains("osgi.basic"));
+			assertThat(intents.contains("osgi.basic")).as("Did not pick up the osgi.basic intent").isTrue();
 
 			// booleans
-			assertFalse(client.getBooleanPrimitive(true));
-			assertTrue(client.getBoolean(false));
-			assertTrue(Arrays.equals(new boolean[] {
+			assertThat(client.getBooleanPrimitive(true)).isFalse();
+			assertThat(client.getBoolean(false)).isTrue();
+			assertThat(Arrays.equals(new boolean[] {
 					true, false
 			}, client.getBooleanPrimitiveArray(new boolean[] {
 					false, true
-			})));
-			assertArrayEquals(new Boolean[] {
-					false, true
-			}, client.getBooleanArray(new Boolean[] {
+			}))).isTrue();
+			assertThat(client.getBooleanArray(new Boolean[] {
 					true, false
-			}));
-			assertEquals(Arrays.asList(true, true, false),
-					client.getBooleanList(Arrays.asList(false, false, true)));
-			assertEquals(Collections.singleton(true),
-					client.getBooleanSet(Collections.singleton(false)));
+			})).isEqualTo(new Boolean[] {
+					false, true
+			});
+			assertThat(client.getBooleanList(Arrays.asList(false, false, true))).isEqualTo(Arrays.asList(true, true, false));
+			assertThat(client.getBooleanSet(Collections.singleton(false))).isEqualTo(Collections.singleton(true));
 
 			// bytes
-			assertEquals(-1, client.getBytePrimitive((byte) 1));
-			assertEquals(Byte.valueOf((byte) -1), client.getByte((byte) 1));
-			assertArrayEquals(new byte[] {
+			assertThat(client.getBytePrimitive((byte) 1)).isEqualTo((byte) -1);
+			assertThat(client.getByte((byte) 1)).isEqualTo(Byte.valueOf((byte) -1));
+			assertThat(client.getBytePrimitiveArray(new byte[] {
+					1, 2, 3
+			})).isEqualTo(new byte[] {
 					-1, -2, -3
-			}, client.getBytePrimitiveArray(new byte[] {
+			});
+			assertThat(client.getByteArray(new Byte[] {
 					1, 2, 3
-			}));
-			assertArrayEquals(new Byte[] {
+			})).isEqualTo(new Byte[] {
 					(byte) 3, (byte) 2, (byte) 1
-			}, client.getByteArray(new Byte[] {
-					1, 2, 3
-			}));
+			});
 
-			assertEquals(Arrays.asList((byte) 1, (byte) 2, (byte) 3), client
-					.getByteList(Arrays.asList((byte) 3, (byte) 2, (byte) 1)));
-			assertEquals(
-					new HashSet<>(Arrays.asList((byte) 2, (byte) 4, (byte) 6)),
-					client.getByteSet(new HashSet<>(
-							Arrays.asList((byte) 1, (byte) 2, (byte) 3))));
+			assertThat(client
+					.getByteList(Arrays.asList((byte) 3, (byte) 2, (byte) 1))).isEqualTo(Arrays.asList((byte) 1, (byte) 2, (byte) 3));
+			assertThat(client.getByteSet(new HashSet<>(
+							Arrays.asList((byte) 1, (byte) 2, (byte) 3)))).isEqualTo(new HashSet<>(Arrays.asList((byte) 2, (byte) 4, (byte) 6)));
 
 			// shorts
-			assertEquals(-1, client.getShortPrimitive((short) 1));
-			assertEquals(Short.valueOf((short) -1), client.getShort((short) 1));
-			assertArrayEquals(new short[] {
+			assertThat(client.getShortPrimitive((short) 1)).isEqualTo((short) -1);
+			assertThat(client.getShort((short) 1)).isEqualTo(Short.valueOf((short) -1));
+			assertThat(client.getShortPrimitiveArray(new short[] {
+					1, 2, 3
+			})).isEqualTo(new short[] {
 					-1, -2, -3
-			}, client.getShortPrimitiveArray(new short[] {
+			});
+			assertThat(client.getShortArray(new Short[] {
 					1, 2, 3
-			}));
-			assertArrayEquals(new Short[] {
+			})).isEqualTo(new Short[] {
 					(short) 3, (short) 2, (short) 1
-			}, client.getShortArray(new Short[] {
-					1, 2, 3
-			}));
+			});
 
-			assertEquals(Arrays.asList((short) 1, (short) 2, (short) 3),
-					client.getShortList(
-							Arrays.asList((short) 3, (short) 2, (short) 1)));
-			assertEquals(
-					new HashSet<>(
-							Arrays.asList((short) 2, (short) 4, (short) 6)),
-					client.getShortSet(new HashSet<>(
-							Arrays.asList((short) 1, (short) 2, (short) 3))));
+			assertThat(client.getShortList(
+							Arrays.asList((short) 3, (short) 2, (short) 1))).isEqualTo(Arrays.asList((short) 1, (short) 2, (short) 3));
+			assertThat(client.getShortSet(new HashSet<>(
+							Arrays.asList((short) 1, (short) 2, (short) 3)))).isEqualTo(new HashSet<>(
+							Arrays.asList((short) 2, (short) 4, (short) 6)));
 
 			// chars
-			assertEquals('b', client.getCharPrimitive('a'));
-			assertEquals(Character.valueOf('b'), client.getChar('a'));
-			assertArrayEquals(new char[] {
+			assertThat(client.getCharPrimitive('a')).isEqualTo('b');
+			assertThat(client.getChar('a')).isEqualTo(Character.valueOf('b'));
+			assertThat(client.getCharacterPrimitiveArray(new char[] {
+					'a', 'b', 'c'
+			})).isEqualTo(new char[] {
 					'b', 'c', 'd'
-			}, client.getCharacterPrimitiveArray(new char[] {
+			});
+			assertThat(client.getCharacterArray(new Character[] {
 					'a', 'b', 'c'
-			}));
-			assertArrayEquals(new Character[] {
+			})).isEqualTo(new Character[] {
 					'c', 'b', 'a'
-			}, client.getCharacterArray(new Character[] {
-					'a', 'b', 'c'
-			}));
+			});
 
-			assertEquals(Arrays.asList('c', 'b', 'a'),
-					client.getCharacterList(Arrays.asList('a', 'b', 'c')));
-			assertEquals(new HashSet<>(Arrays.asList('A', 'B', 'C')),
-					client.getCharacterSet(
-							new HashSet<>(Arrays.asList('c', 'b', 'a'))));
+			assertThat(client.getCharacterList(Arrays.asList('a', 'b', 'c'))).isEqualTo(Arrays.asList('c', 'b', 'a'));
+			assertThat(client.getCharacterSet(
+							new HashSet<>(Arrays.asList('c', 'b', 'a')))).isEqualTo(new HashSet<>(Arrays.asList('A', 'B', 'C')));
 
 			// ints
-			assertEquals(-1, client.getIntPrimitive(1));
-			assertEquals(Integer.valueOf(-1), client.getInt(1));
-			assertArrayEquals(new int[] {
+			assertThat(client.getIntPrimitive(1)).isEqualTo(-1);
+			assertThat(client.getInt(1)).isEqualTo(Integer.valueOf(-1));
+			assertThat(client.getIntPrimitiveArray(new int[] {
+					1, 2, 3
+			})).isEqualTo(new int[] {
 					-1, -2, -3
-			}, client.getIntPrimitiveArray(new int[] {
+			});
+			assertThat(client.getIntegerArray(new Integer[] {
 					1, 2, 3
-			}));
-			assertArrayEquals(new Integer[] {
+			})).isEqualTo(new Integer[] {
 					3, 2, 1
-			}, client.getIntegerArray(new Integer[] {
-					1, 2, 3
-			}));
+			});
 
-			assertEquals(Arrays.asList(1, 2, 3),
-					client.getIntegerList(Arrays.asList(3, 2, 1)));
-			assertEquals(new HashSet<>(Arrays.asList(2, 4, 6)), client
-					.getIntegerSet(new HashSet<>(Arrays.asList(1, 2, 3))));
+			assertThat(client.getIntegerList(Arrays.asList(3, 2, 1))).isEqualTo(Arrays.asList(1, 2, 3));
+			assertThat(client
+					.getIntegerSet(new HashSet<>(Arrays.asList(1, 2, 3)))).isEqualTo(new HashSet<>(Arrays.asList(2, 4, 6)));
 
 			// longs
-			assertEquals(-1, client.getLongPrimitive(1));
-			assertEquals(Long.valueOf(-1), client.getLong((long) 1));
-			assertArrayEquals(new long[] {
-					-1, -2, -3
-			}, client.getLongPrimitiveArray(new long[] {
+			assertThat(client.getLongPrimitive(1)).isEqualTo(-1);
+			assertThat(client.getLong((long) 1)).isEqualTo(Long.valueOf(-1));
+			assertThat(client.getLongPrimitiveArray(new long[] {
 					1, 2, 3
-			}));
-			assertArrayEquals(new Long[] {
-					(long) 3, (long) 2, (long) 1
-			}, client.getLongArray(new Long[] {
+			})).isEqualTo(new long[] {
+					-1, -2, -3
+			});
+			assertThat(client.getLongArray(new Long[] {
 					(long) 1, (long) 2, (long) 3
-			}));
+			})).isEqualTo(new Long[] {
+					(long) 3, (long) 2, (long) 1
+			});
 
-			assertEquals(Arrays.asList((long) 1, (long) 2, (long) 3), client
-					.getLongList(Arrays.asList((long) 3, (long) 2, (long) 1)));
-			assertEquals(
-					new HashSet<>(Arrays.asList((long) 2, (long) 4, (long) 6)),
-					client.getLongSet(new HashSet<>(
-							Arrays.asList((long) 1, (long) 2, (long) 3))));
+			assertThat(client
+					.getLongList(Arrays.asList((long) 3, (long) 2, (long) 1))).isEqualTo(Arrays.asList((long) 1, (long) 2, (long) 3));
+			assertThat(client.getLongSet(new HashSet<>(
+							Arrays.asList((long) 1, (long) 2, (long) 3)))).isEqualTo(new HashSet<>(Arrays.asList((long) 2, (long) 4, (long) 6)));
 
 			// floats
-			assertEquals(-1f, client.getFloatPrimitive(1), 0.01f);
-			assertEquals(Float.valueOf(-1), client.getFloat((float) 1));
-			assertArrayEquals(new float[] {
-					-1, -2, -3
-			}, client.getFloatPrimitiveArray(new float[] {
+			assertThat(client.getFloatPrimitive(1)).isCloseTo(-1f, within(0.01f));
+			assertThat(client.getFloat((float) 1)).isEqualTo(Float.valueOf(-1));
+			assertThat(client.getFloatPrimitiveArray(new float[] {
 					1, 2, 3
-			}), 0.01f);
-			assertArrayEquals(new Float[] {
-					(float) 3, (float) 2, (float) 1
-			}, client.getFloatArray(new Float[] {
+			})).containsExactly(new float[] {
+					-1, -2, -3
+			}, within(0.01f));
+			assertThat(client.getFloatArray(new Float[] {
 					(float) 1, (float) 2, (float) 3
-			}));
+			})).isEqualTo(new Float[] {
+					(float) 3, (float) 2, (float) 1
+			});
 
-			assertEquals(Arrays.asList((float) 1, (float) 2, (float) 3),
-					client.getFloatList(
-							Arrays.asList((float) 3, (float) 2, (float) 1)));
-			assertEquals(
-					new HashSet<>(
-							Arrays.asList((float) 2, (float) 4, (float) 6)),
-					client.getFloatSet(new HashSet<>(
-							Arrays.asList((float) 1, (float) 2, (float) 3))));
+			assertThat(client.getFloatList(
+							Arrays.asList((float) 3, (float) 2, (float) 1))).isEqualTo(Arrays.asList((float) 1, (float) 2, (float) 3));
+			assertThat(client.getFloatSet(new HashSet<>(
+							Arrays.asList((float) 1, (float) 2, (float) 3)))).isEqualTo(new HashSet<>(
+							Arrays.asList((float) 2, (float) 4, (float) 6)));
 
 			// doubles
-			assertEquals(-1d, client.getDoublePrimitive(1), 0.01d);
-			assertEquals(Double.valueOf(-1), client.getDouble((double) 1));
-			assertArrayEquals(new double[] {
-					-1, -2, -3
-			}, client.getDoublePrimitiveArray(new double[] {
+			assertThat(client.getDoublePrimitive(1)).isCloseTo(-1d, within(0.01d));
+			assertThat(client.getDouble((double) 1)).isEqualTo(Double.valueOf(-1));
+			assertThat(client.getDoublePrimitiveArray(new double[] {
 					1, 2, 3
-			}), 0.01d);
-			assertArrayEquals(new Double[] {
-					(double) 3, (double) 2, (double) 1
-			}, client.getDoubleArray(new Double[] {
+			})).containsExactly(new double[] {
+					-1, -2, -3
+			}, within(0.01d));
+			assertThat(client.getDoubleArray(new Double[] {
 					(double) 1, (double) 2, (double) 3
-			}));
+			})).isEqualTo(new Double[] {
+					(double) 3, (double) 2, (double) 1
+			});
 
-			assertEquals(Arrays.asList((double) 1, (double) 2, (double) 3),
-					client.getDoubleList(
-							Arrays.asList((double) 3, (double) 2, (double) 1)));
-			assertEquals(
-					new HashSet<>(
-							Arrays.asList((double) 2, (double) 4, (double) 6)),
-					client.getDoubleSet(new HashSet<>(Arrays.asList((double) 1,
-							(double) 2, (double) 3))));
+			assertThat(client.getDoubleList(
+							Arrays.asList((double) 3, (double) 2, (double) 1))).isEqualTo(Arrays.asList((double) 1, (double) 2, (double) 3));
+			assertThat(client.getDoubleSet(new HashSet<>(Arrays.asList((double) 1,
+							(double) 2, (double) 3)))).isEqualTo(new HashSet<>(
+							Arrays.asList((double) 2, (double) 4, (double) 6)));
 
 			// Strings
-			assertEquals("BANG", client.getString("bang"));
-			assertArrayEquals(new String[] {
-					"fum", "fo", "fi", "fee"
-			}, client.getStringArray(new String[] {
+			assertThat(client.getString("bang")).isEqualTo("BANG");
+			assertThat(client.getStringArray(new String[] {
 					"fee", "fi", "fo", "fum"
-			}));
+			})).isEqualTo(new String[] {
+					"fum", "fo", "fi", "fee"
+			});
 
-			assertEquals(Arrays.asList("fum", "fo", "fi", "fee"), client
-					.getStringList(Arrays.asList("fee", "fi", "fo", "fum")));
-			assertEquals(new HashSet<>(Arrays.asList("FEE", "FI", "FO", "FUM")),
-					client.getStringSet(new HashSet<>(
-							Arrays.asList("fee", "fi", "fo", "fum"))));
+			assertThat(client
+					.getStringList(Arrays.asList("fee", "fi", "fo", "fum"))).isEqualTo(Arrays.asList("fum", "fo", "fi", "fee"));
+			assertThat(client.getStringSet(new HashSet<>(
+							Arrays.asList("fee", "fi", "fo", "fum")))).isEqualTo(new HashSet<>(Arrays.asList("FEE", "FI", "FO", "FUM")));
 
 			// Versions
-			assertEquals(Version.parseVersion("2.3.4"),
-					client.getVersion(Version.parseVersion("1.2.3")));
-			assertArrayEquals(new Version[] {
-					Version.parseVersion("4.5.6"), Version.parseVersion("1.2.3")
-			}, client.getVersionArray(new Version[] {
+			assertThat(client.getVersion(Version.parseVersion("1.2.3"))).isEqualTo(Version.parseVersion("2.3.4"));
+			assertThat(client.getVersionArray(new Version[] {
 					Version.parseVersion("1.2.3"), Version.parseVersion("4.5.6")
-			}));
+			})).isEqualTo(new Version[] {
+					Version.parseVersion("4.5.6"), Version.parseVersion("1.2.3")
+			});
 
-			assertEquals(
-					Arrays.asList(Version.parseVersion("4.5.6"),
-							Version.parseVersion("1.2.3")),
-					client.getVersionList(
+			assertThat(client.getVersionList(
 							Arrays.asList(Version.parseVersion("1.2.3"),
-									Version.parseVersion("4.5.6"))));
-			assertEquals(
-					new HashSet<>(Arrays.asList(Version.parseVersion("2.3.4"),
-							Version.parseVersion("5.6.7"))),
-					client.getVersionSet(new HashSet<>(
+									Version.parseVersion("4.5.6")))).isEqualTo(Arrays.asList(Version.parseVersion("4.5.6"),
+							Version.parseVersion("1.2.3")));
+			assertThat(client.getVersionSet(new HashSet<>(
 							Arrays.asList(Version.parseVersion("1.2.3"),
-									Version.parseVersion("4.5.6")))));
+									Version.parseVersion("4.5.6"))))).isEqualTo(new HashSet<>(Arrays.asList(Version.parseVersion("2.3.4"),
+							Version.parseVersion("5.6.7"))));
 
 			// enums
-			assertEquals(TimeUnit.MICROSECONDS,
-					client.getEnum(TimeUnit.NANOSECONDS));
-			assertArrayEquals(new TimeUnit[] {
-					TimeUnit.HOURS, TimeUnit.DAYS
-			}, client.getEnumArray(new TimeUnit[] {
+			assertThat(client.getEnum(TimeUnit.NANOSECONDS)).isEqualTo(TimeUnit.MICROSECONDS);
+			assertThat(client.getEnumArray(new TimeUnit[] {
 					TimeUnit.DAYS, TimeUnit.HOURS
-			}));
+			})).isEqualTo(new TimeUnit[] {
+					TimeUnit.HOURS, TimeUnit.DAYS
+			});
 
-			assertEquals(Arrays.asList(TimeUnit.HOURS, TimeUnit.DAYS), client
-					.getEnumList(Arrays.asList(TimeUnit.DAYS, TimeUnit.HOURS)));
-			assertEquals(
-					new HashSet<>(
-							Arrays.asList(TimeUnit.HOURS, TimeUnit.SECONDS)),
-					client.getEnumSet(new HashSet<>(Arrays
-							.asList(TimeUnit.MILLISECONDS, TimeUnit.MINUTES))));
+			assertThat(client
+					.getEnumList(Arrays.asList(TimeUnit.DAYS, TimeUnit.HOURS))).isEqualTo(Arrays.asList(TimeUnit.HOURS, TimeUnit.DAYS));
+			assertThat(client.getEnumSet(new HashSet<>(Arrays
+							.asList(TimeUnit.MILLISECONDS, TimeUnit.MINUTES)))).isEqualTo(new HashSet<>(
+							Arrays.asList(TimeUnit.HOURS, TimeUnit.SECONDS)));
 
 			// dtos
 			DTOType typeA = new DTOType();
@@ -587,22 +555,22 @@ public class SimpleTest extends MultiFrameworkTestCase {
 			DTOType typeC = new DTOType();
 			typeC.value = "c";
 
-			assertEquals("A", client.getDTO(typeA).value);
+			assertThat(client.getDTO(typeA).value).isEqualTo("A");
 
 			DTOType[] array = client.getDTOTypeArray(new DTOType[] {
 					typeA, typeB, typeC
 			});
-			assertEquals(3, array.length);
-			assertEquals("c", array[0].value);
-			assertEquals("b", array[1].value);
-			assertEquals("a", array[2].value);
+			assertThat(array).hasSize(3);
+			assertThat(array[0].value).isEqualTo("c");
+			assertThat(array[1].value).isEqualTo("b");
+			assertThat(array[2].value).isEqualTo("a");
 
 			List<DTOType> list = client
 					.getDTOTypeList(Arrays.asList(typeA, typeB, typeC));
-			assertEquals(3, list.size());
-			assertEquals("c", list.get(0).value);
-			assertEquals("b", list.get(1).value);
-			assertEquals("a", list.get(2).value);
+			assertThat(list).hasSize(3);
+			assertThat(list.get(0).value).isEqualTo("c");
+			assertThat(list.get(1).value).isEqualTo("b");
+			assertThat(list.get(2).value).isEqualTo("a");
 
 			Set<String> values = new HashSet<>();
 			for (DTOType dtoType : client.getDTOTypeSet(
@@ -610,7 +578,7 @@ public class SimpleTest extends MultiFrameworkTestCase {
 				values.add(dtoType.value);
 			}
 
-			assertEquals(new HashSet<>(Arrays.asList("A", "B", "C")), values);
+			assertThat(values).isEqualTo(new HashSet<>(Arrays.asList("A", "B", "C")));
 
 			
 			Map<String, Integer> map = new HashMap<>();
@@ -619,7 +587,7 @@ public class SimpleTest extends MultiFrameworkTestCase {
 			
 			client.populateMap(map);
 			
-			assertEquals(map, client.getMap());
+			assertThat(client.getMap()).isEqualTo(map);
 			
 			clientTracker.close();
 
@@ -631,6 +599,7 @@ public class SimpleTest extends MultiFrameworkTestCase {
 	/**
 	 * @throws Exception
 	 */
+	@Test
 	public void testBasicTimeout() throws Exception {
 		Hashtable<String,Object> properties = registrationTestServiceProperties();
 
@@ -650,19 +619,19 @@ public class SimpleTest extends MultiFrameworkTestCase {
 			// now check on the hosting framework for the service to become
 			// available
 			ServiceTracker<SlowService,SlowService> clientTracker = new ServiceTracker<>(
-					getContext(), SlowService.class, null);
+					context, SlowService.class, null);
 			clientTracker.open();
 
 			// the proxy should appear in this framework
-			SlowService client = Tracker.waitForService(clientTracker, timeout);
-			assertNotNull("no proxy for SlowService found!", client);
+			SlowService client = clientTracker.waitForService(timeout);
+			assertThat(client).as("no proxy for SlowService found!").isNotNull();
 
 			ServiceReference<SlowService> sr = clientTracker
 					.getServiceReference();
 
 			Object property = sr
 					.getProperty(RemoteServiceConstants.SERVICE_INTENTS);
-			assertNotNull("No intents supported", property);
+			assertThat(property).as("No intents supported").isNotNull();
 
 			Collection<String> intents;
 			if (property instanceof String) {
@@ -679,17 +648,16 @@ public class SimpleTest extends MultiFrameworkTestCase {
 								+ property.getClass());
 			}
 
-			assertTrue("Did not pick up the osgi.basic intent",
-					intents.contains("osgi.basic"));
+			assertThat(intents.contains("osgi.basic")).as("Did not pick up the osgi.basic intent").isTrue();
 
 			// should work fine
-			assertEquals("ready", client.goSlow(1000));
+			assertThat(client.goSlow(1000)).isEqualTo("ready");
 
 			try {
 				client.goSlow(5000);
 				fail("Invocation should have timed out!");
 			} catch (ServiceException se) {
-				assertEquals(ServiceException.REMOTE, se.getType());
+				assertThat(se.getType()).isEqualTo(ServiceException.REMOTE);
 			}
 
 			clientTracker.close();
@@ -702,6 +670,7 @@ public class SimpleTest extends MultiFrameworkTestCase {
 	/**
 	 * @throws Exception
 	 */
+	@Test
 	public void testAsyncTypesIntent() throws Exception {
 
 		Filter filter = getFramework().getBundleContext().createFilter(
@@ -711,13 +680,13 @@ public class SimpleTest extends MultiFrameworkTestCase {
 				getFramework().getBundleContext(), filter, null);
 		dpTracker.open();
 
-		Object dp = Tracker.waitForService(dpTracker, timeout);
-		assertNotNull("No DistributionProvider found", dp);
+		Object dp = dpTracker.waitForService(timeout);
+		assertThat(dp).as("No DistributionProvider found").isNotNull();
 		ServiceReference< ? > dpReference = dpTracker.getServiceReference();
-		assertNotNull(dpReference);
+		assertThat(dpReference).isNotNull();
 		Object property = dpReference.getProperty(
 				DistributionProviderConstants.REMOTE_INTENTS_SUPPORTED);
-		assertNotNull("No intents supported", property);
+		assertThat(property).as("No intents supported").isNotNull();
 
 		Collection<String> intents;
 		if (property instanceof String) {
@@ -734,13 +703,13 @@ public class SimpleTest extends MultiFrameworkTestCase {
 							+ property.getClass());
 		}
 
-		assertTrue("Did not support osgi.async",
-				intents.contains("osgi.async"));
+		assertThat(intents.contains("osgi.async")).as("Did not support osgi.async").isTrue();
 	}
 
 	/**
 	 * @throws Exception
 	 */
+	@Test
 	public void testAsyncTypes() throws Exception {
 		Hashtable<String,Object> properties = registrationTestServiceProperties();
 
@@ -759,19 +728,19 @@ public class SimpleTest extends MultiFrameworkTestCase {
 			// now check on the hosting framework for the service to become
 			// available
 			ServiceTracker<AsyncTypes,AsyncTypes> clientTracker = new ServiceTracker<>(
-					getContext(), AsyncTypes.class, null);
+					context, AsyncTypes.class, null);
 			clientTracker.open();
 
 			// the proxy should appear in this framework
-			AsyncTypes client = Tracker.waitForService(clientTracker, timeout);
-			assertNotNull("no proxy for AsyncTypes found!", client);
+			AsyncTypes client = clientTracker.waitForService(timeout);
+			assertThat(client).as("no proxy for AsyncTypes found!").isNotNull();
 
 			ServiceReference<AsyncTypes> sr = clientTracker
 					.getServiceReference();
 
 			Object property = sr
 					.getProperty(RemoteServiceConstants.SERVICE_INTENTS);
-			assertNotNull("No intents supported", property);
+			assertThat(property).as("No intents supported").isNotNull();
 
 			Collection<String> intents;
 			if (property instanceof String) {
@@ -788,15 +757,14 @@ public class SimpleTest extends MultiFrameworkTestCase {
 								+ property.getClass());
 			}
 
-			assertTrue("Did not pick up the osgi.async intent",
-					intents.contains("osgi.async"));
+			assertThat(intents.contains("osgi.async")).as("Did not pick up the osgi.async intent").isTrue();
 
 			final Semaphore s = new Semaphore(0);
 
 			// Future
 			Future<String> f = client.getFuture(1000);
-			assertFalse(f.isDone());
-			assertEquals(AsyncTypes.RESULT, f.get(2, TimeUnit.SECONDS));
+			assertThat(f.isDone()).isFalse();
+			assertThat(f.get(2, TimeUnit.SECONDS)).isEqualTo(AsyncTypes.RESULT);
 
 			// Promise
 			Promise<String> p = client.getPromise(1000);
@@ -813,8 +781,8 @@ public class SimpleTest extends MultiFrameworkTestCase {
 					return null;
 				}
 			});
-			assertFalse(s.tryAcquire());
-			assertTrue(s.tryAcquire(2, TimeUnit.SECONDS));
+			assertThat(s.tryAcquire()).isFalse();
+			assertThat(s.tryAcquire(2, TimeUnit.SECONDS)).isTrue();
 
 			clientTracker.close();
 
@@ -826,6 +794,7 @@ public class SimpleTest extends MultiFrameworkTestCase {
 	/**
 	 * @throws Exception
 	 */
+	@Test
 	public void testAsyncJava8Types() throws Exception {
 		try {
 			Hashtable<String,Object> properties = registrationTestServiceProperties();
@@ -845,20 +814,19 @@ public class SimpleTest extends MultiFrameworkTestCase {
 				// now check on the hosting framework for the service to become
 				// available
 				ServiceTracker<AsyncJava8Types,AsyncJava8Types> clientTracker = new ServiceTracker<>(
-						getContext(), AsyncJava8Types.class, null);
+						context, AsyncJava8Types.class, null);
 				clientTracker.open();
 
 				// the proxy should appear in this framework
-				AsyncJava8Types client = Tracker.waitForService(clientTracker,
-						timeout);
-				assertNotNull("no proxy for AsyncJava8Types found!", client);
+				AsyncJava8Types client = clientTracker.waitForService(timeout);
+				assertThat(client).as("no proxy for AsyncJava8Types found!").isNotNull();
 
 				ServiceReference<AsyncJava8Types> sr = clientTracker
 						.getServiceReference();
 
 				Object property = sr
 						.getProperty(RemoteServiceConstants.SERVICE_INTENTS);
-				assertNotNull("No intents supported", property);
+				assertThat(property).as("No intents supported").isNotNull();
 
 				Collection<String> intents;
 				if (property instanceof String) {
@@ -875,8 +843,7 @@ public class SimpleTest extends MultiFrameworkTestCase {
 									+ property.getClass());
 				}
 
-				assertTrue("Did not pick up the osgi.async intent",
-						intents.contains("osgi.async"));
+				assertThat(intents.contains("osgi.async")).as("Did not pick up the osgi.async intent").isTrue();
 
 				final Semaphore s = new Semaphore(0);
 
@@ -889,9 +856,9 @@ public class SimpleTest extends MultiFrameworkTestCase {
 						s.release();
 					}
 				});
-				assertFalse(s.tryAcquire());
-				assertTrue(s.tryAcquire(2, TimeUnit.SECONDS));
-				assertEquals(AsyncJava8Types.RESULT, cf.get());
+				assertThat(s.tryAcquire()).isFalse();
+				assertThat(s.tryAcquire(2, TimeUnit.SECONDS)).isTrue();
+				assertThat(cf.get()).isEqualTo(AsyncJava8Types.RESULT);
 
 				// CompletionStage
 				CompletionStage<String> cs = client.getCompletionStage(1000);
@@ -906,8 +873,8 @@ public class SimpleTest extends MultiFrameworkTestCase {
 						}
 					}
 				});
-				assertFalse(s.tryAcquire());
-				assertTrue(s.tryAcquire(2, TimeUnit.SECONDS));
+				assertThat(s.tryAcquire()).isFalse();
+				assertThat(s.tryAcquire(2, TimeUnit.SECONDS)).isTrue();
 
 				clientTracker.close();
 
@@ -949,16 +916,14 @@ public class SimpleTest extends MultiFrameworkTestCase {
 	 */
 	private Hashtable<String,Object> loadServerTCKProperties() {
 		String serverconfig = getProperty("org.osgi.test.cases.remoteservices.serverconfig");
-		assertNotNull(
-				"did not find org.osgi.test.cases.remoteservices.serverconfig system property",
-				serverconfig);
+		assertThat(serverconfig).as("did not find org.osgi.test.cases.remoteservices.serverconfig system property").isNotNull();
 		Hashtable<String,Object> properties = new Hashtable<>();
 
 		for (StringTokenizer tok = new StringTokenizer(serverconfig, ","); tok
 				.hasMoreTokens();) {
 			String propertyName = tok.nextToken();
 			String value = getProperty(propertyName);
-			assertNotNull("system property not found: " + propertyName, value);
+			assertThat(value).as("system property not found: " + propertyName).isNotNull();
 			properties.put(propertyName, value);
 		}
 
@@ -975,11 +940,11 @@ public class SimpleTest extends MultiFrameworkTestCase {
 				getFramework().getBundleContext(), filter, null);
 		dpTracker.open();
 
-		Object dp = Tracker.waitForService(dpTracker, timeout);
-		assertNotNull("No DistributionProvider found", dp);
+		Object dp = dpTracker.waitForService(timeout);
+		assertThat(dp).as("No DistributionProvider found").isNotNull();
 		ServiceReference< ? > dpReference = dpTracker.getServiceReference();
-		assertNotNull(dpReference);
-		assertNotNull(dpReference.getProperty(DistributionProviderConstants.REMOTE_INTENTS_SUPPORTED));
+		assertThat(dpReference).isNotNull();
+		assertThat(dpReference.getProperty(DistributionProviderConstants.REMOTE_INTENTS_SUPPORTED)).isNotNull();
 
 		Set<String> supportedConfigTypes = new HashSet<>(); // collect all
 															// supported config
@@ -1017,9 +982,7 @@ public class SimpleTest extends MultiFrameworkTestCase {
 		Framework f = getFramework();
 		BundleWiring wiring = f.getBundleContext().getBundle()
 				.adapt(BundleWiring.class);
-		assertNotNull(
-				"Framework is not supplying a BundleWiring for the system bundle",
-				wiring);
+		assertThat(wiring).as("Framework is not supplying a BundleWiring for the system bundle").isNotNull();
 		List<BundleCapability> exportedPkgs = wiring
 				.getCapabilities(BundleRevision.PACKAGE_NAMESPACE);
 
@@ -1063,7 +1026,7 @@ public class SimpleTest extends MultiFrameworkTestCase {
 					"org.osgi.util.promise;version=\"[1,2)\",org.osgi.framework");
 
 			try (JarOutputStream jos = new JarOutputStream(baos, manifest)) {
-				Bundle bundle = getContext().getBundle();
+				Bundle bundle = context.getBundle();
 				writePackage(jos, "/org/osgi/test/cases/remoteservices/common",
 						bundle);
 				writePackage(jos, "/org/osgi/test/cases/remoteservices/impl",

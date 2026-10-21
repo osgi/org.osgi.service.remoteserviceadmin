@@ -1,6 +1,6 @@
 Bundle-Name:                             ${p}.tbreader
 Bundle-Version:                          1.0
--conditionalpackage					= org.osgi.test.support.*
+-conditionalpackage					= ${p}.util
 -privatepackage:                         ${p}.tb.reader*
 Export-Package:                          ${p}.common;version="1.0.0"
 Bundle-Activator: 						 ${p}.tb.reader.Activator

@@ -17,12 +17,15 @@
  *******************************************************************************/
 package org.osgi.test.cases.remoteserviceadmin.junit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -70,6 +73,7 @@ public class RemoteServiceAdminUpdateTest extends MultiFrameworkTestCase {
 	 * be updated and contains the newly added parameter that changed its
 	 * registration.
 	 * */
+	@Test
 	public void testExportImportManually() throws Exception {
 		verifyFramework();
 
@@ -93,19 +97,19 @@ public class RemoteServiceAdminUpdateTest extends MultiFrameworkTestCase {
 
 
 		Bundle tb8Bundle = installBundle(childContext, "/tb8.jar");
-		assertNotNull(tb8Bundle);
+		assertThat(tb8Bundle).isNotNull();
 		tb8Bundle.start();
 
 		//
 		// find the RSA in the parent framework and import the
 		// service
 		//
-		ServiceReference<RemoteServiceAdmin> rsaRef = getContext()
+		ServiceReference<RemoteServiceAdmin> rsaRef = context
 				.getServiceReference(RemoteServiceAdmin.class);
-		assertNotNull(rsaRef);
-		RemoteServiceAdmin rsa = getContext().getService(
+		assertThat(rsaRef).isNotNull();
+		RemoteServiceAdmin rsa = context.getService(
 				rsaRef);
-		assertNotNull(rsa);
+		assertThat(rsa).isNotNull();
 
 		try {
 			// give the child framework and tb8 some time to start and export
@@ -114,47 +118,46 @@ public class RemoteServiceAdminUpdateTest extends MultiFrameworkTestCase {
 
 			// reconstruct the endpoint description in version 1.0.0
 			EndpointDescription endpoint = Utils.reconstructEndpoint("1.0.0",
-					this);
+					context);
 			// gather all the service and exporting intents
 			List<String> endpointIntents = endpoint.getIntents();
-			assertNotNull(endpointIntents);
-			assertFalse(endpointIntents.isEmpty());
+			assertThat(endpointIntents).isNotNull();
+			assertThat(endpointIntents).isNotEmpty();
 
 			//
 			// 122.4.2: Importing
 			// positive test: import the service
 			//
 			ImportRegistration importReg = rsa.importService(endpoint);
-			assertNotNull(importReg);
-			assertNull(importReg.getException());
+			assertThat(importReg).isNotNull();
+			assertThat(importReg.getException()).isNull();
 
 			{ // check if the required IMPORT_REGISTRATION event was raised
 				Event event = eventHandler
 					.getNextEventForTopic("org/osgi/service/remoteserviceadmin/IMPORT_REGISTRATION");
-				assertNotNull(event);
+				assertThat(event).isNotNull();
 				RemoteServiceAdminEvent rsaevent = TestEventHandler
 						.verifyBasicRsaEventProperties(rsaRef, event);
-				assertNotNull(rsaevent);
-				assertNotNull(event.getProperty("timestamp"));
+				assertThat(rsaevent).isNotNull();
+				assertThat(event.getProperty("timestamp")).isNotNull();
 
 				// check event type
 				@SuppressWarnings("unused")
 				String topic = event.getTopic();
-				assertNull("cause in event", event.getProperty("cause"));
-				assertEquals(RemoteServiceAdminEvent.IMPORT_REGISTRATION,
-						rsaevent.getType());
+				assertThat(event.getProperty("cause")).as("cause in event").isNull();
+				assertThat(rsaevent.getType()).isEqualTo(RemoteServiceAdminEvent.IMPORT_REGISTRATION);
 			}
 
 			// get the modifiable service that has been exported from tb8
 			ModifiableService modifiableService = null;
 			{
-				ServiceReference<ModifiableService> modifiableServiceRef = getContext()
+				ServiceReference<ModifiableService> modifiableServiceRef = context
 						.getServiceReference(ModifiableService.class);
-				assertNotNull(modifiableServiceRef);
-				modifiableService = getContext()
+				assertThat(modifiableServiceRef).isNotNull();
+				modifiableService = context
 						.getService(
 						modifiableServiceRef);
-				assertNotNull(modifiableService);
+				assertThat(modifiableService).isNotNull();
 			}
 
 			//
@@ -177,60 +180,55 @@ public class RemoteServiceAdminUpdateTest extends MultiFrameworkTestCase {
 
 			// reconstruct the endpoint description of the modified endpoint
 			EndpointDescription endpointModified = Utils.reconstructEndpoint(
-					"1.0.0", this, 1);
+					"1.0.0", context, 1);
 
 			// request the update of the import
-			assertTrue(importReg.update(endpointModified));
-			assertNull(importReg.getException());
+			assertThat(importReg.update(endpointModified)).isTrue();
+			assertThat(importReg.getException()).isNull();
 
 			// get the modified service that has been exported by tb8
 			ModifiableService alreadyModifiedService = null;
 			{
-				Collection<ServiceReference<ModifiableService>> alreadyModifiedServiceRefs = getContext()
+				Collection<ServiceReference<ModifiableService>> alreadyModifiedServiceRefs = context
 						.getServiceReferences(
 								ModifiableService.class,
 								"(someNewProp=SomeValue)");
 
-				assertTrue(
-						"after importing the updated remote service, we need to be able to find at least one suitable service",
-						alreadyModifiedServiceRefs.size() >= 1);
+				assertThat(alreadyModifiedServiceRefs.size() >= 1).as("after importing the updated remote service, we need to be able to find at least one suitable service").isTrue();
 
 				ServiceReference<ModifiableService> alreadyModifiedServiceRef = alreadyModifiedServiceRefs
 						.iterator()
 						.next();
 				
-				assertNotNull(alreadyModifiedServiceRef);
-				alreadyModifiedService = getContext()
+				assertThat(alreadyModifiedServiceRef).isNotNull();
+				alreadyModifiedService = context
 						.getService(
 						alreadyModifiedServiceRef);
-				assertNotNull(alreadyModifiedService);
+				assertThat(alreadyModifiedService).isNotNull();
 			}
 
 			{ // check if the required IMPORT_UPDATE event was raised
 				Event event = eventHandler
 						.getNextEventForTopic("org/osgi/service/remoteserviceadmin/IMPORT_UPDATE");
-				assertNotNull(
-						"After the upddate of an imported endpoit we should have received an IMPORT_UPDATE event",
-						event);
+				assertThat(event).as("After the upddate of an imported endpoit we should have received an IMPORT_UPDATE event").isNotNull();
 
 				RemoteServiceAdminEvent rsaevent = TestEventHandler
 						.verifyBasicRsaEventProperties(
 						rsaRef, event);
-				assertNotNull(rsaevent);
-				assertNotNull(event.getProperty("timestamp"));
+				assertThat(rsaevent).isNotNull();
+				assertThat(event.getProperty("timestamp")).isNotNull();
 
 				// check event type
 				@SuppressWarnings("unused")
 				String topic = event.getTopic();
-				assertNull("cause in event", event.getProperty("cause"));
-				assertEquals(RemoteServiceAdminEvent.IMPORT_UPDATE,
-						rsaevent.getType());
+				assertThat(event.getProperty("cause")).as("cause in event").isNull();
+				assertThat(rsaevent.getType()).isEqualTo(RemoteServiceAdminEvent.IMPORT_UPDATE);
 			}
 
 		} finally {
 			// Make sure the service instance of the RSA can be closed by the
 			// RSA Service Factory
-			getContext().ungetService(rsaRef);
+			context.ungetService(rsaRef);
 		}
 	}
 }
