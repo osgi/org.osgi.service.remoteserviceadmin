@@ -1,6 +1,6 @@
 Bundle-Name:                             ${p}.tbexporter
 Bundle-Version:                          1.0
--conditionalpackage					= org.osgi.test.support.*
+-conditionalpackage					= ${p}.util
 -privatepackage:                         ${p}.tb.exporter*, \
  ${p}.common 
 Export-Package:                          ${p}.common;version="1.0.0"

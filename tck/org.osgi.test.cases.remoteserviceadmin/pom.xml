@@ -75,7 +75,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.osgi.tck</groupId>
-			<artifactId>org.osgi.test.support</artifactId>
+			<artifactId>org.osgi.tck.signature</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
@@ -95,6 +95,12 @@
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.test.assertj.framework</artifactId>
+			<version>${osgi-test.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.test.assertj.permission</artifactId>
 			<version>${osgi-test.version}</version>
 			<scope>compile</scope>
 		</dependency>

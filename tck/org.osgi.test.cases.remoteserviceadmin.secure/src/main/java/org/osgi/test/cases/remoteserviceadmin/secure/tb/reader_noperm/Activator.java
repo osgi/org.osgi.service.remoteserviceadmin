@@ -17,8 +17,7 @@
  *******************************************************************************/
 package org.osgi.test.cases.remoteserviceadmin.secure.tb.reader_noperm;
 
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
 
@@ -66,17 +65,17 @@ public class Activator implements BundleActivator {
 		// lookup RemoteServiceAdmin service 
 		ServiceReference<RemoteServiceAdmin> rsaRef = context
 				.getServiceReference(RemoteServiceAdmin.class);
-		assertNotNull(rsaRef);
+		assertThat(rsaRef).isNotNull();
 		rsa = context.getService(rsaRef);
-		assertNotNull(rsa);
+		assertThat(rsa).isNotNull();
 		try {
 			Collection<ExportReference> coll = rsa.getExportedServices();
-			assertNotNull(coll);
-			assertTrue(coll.size() == 0);
+			assertThat(coll).isNotNull();
+			assertThat(coll.size()).isEqualTo(0);
 			
 			Collection<ImportReference> icoll = rsa.getImportedEndpoints();
-			assertNotNull(icoll);
-			assertTrue(icoll.size() == 0);
+			assertThat(icoll).isNotNull();
+			assertThat(icoll.size()).isEqualTo(0);
 		} finally {
 			// Make sure the service instance of the RSA can be closed by the RSA Service Factory
 			context.ungetService(rsaRef);

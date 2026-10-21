@@ -17,6 +17,10 @@
  *******************************************************************************/
 package org.osgi.test.cases.remoteservices.junit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.osgi.test.assertj.bundle.BundleAssert.assertThat;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -26,14 +30,18 @@ import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -41,13 +49,16 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
-import org.osgi.test.support.OSGiTestCase;
+import org.osgi.test.common.annotation.InjectBundleContext;
 
 /**
  * @author <a href="mailto:tdiekman@tibco.com">Tim Diekmann</a>
  *
  */
-public abstract class MultiFrameworkTestCase extends OSGiTestCase {
+public abstract class MultiFrameworkTestCase {
+
+	@InjectBundleContext
+	BundleContext		context;
 
 	/**
 	 * Project name. Used as a namespace for TCK (child) framework specific run
@@ -69,23 +80,19 @@ public abstract class MultiFrameworkTestCase extends OSGiTestCase {
 	private FrameworkFactory frameworkFactory;
 	private String rootStorageArea;
 
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+	@BeforeEach
+	public void setUp() throws Exception {
 		frameworkFactoryClassName = getFrameworkFactoryClassName();
-		assertNotNull("Could not find framework factory class", frameworkFactoryClassName);
+		assertThat(frameworkFactoryClassName).as("Could not find framework factory class").isNotNull();
 		frameworkFactory = getFrameworkFactory();
 
 		rootStorageArea = getStorageAreaRoot();
-		assertNotNull("No storage area root found", rootStorageArea);
+		assertThat(rootStorageArea).as("No storage area root found").isNotNull();
 		File rootFile = new File(rootStorageArea);
 		delete(rootFile);
-		assertFalse("Root storage area is not a directory: " + rootFile.getPath(), rootFile.exists() && !rootFile.isDirectory());
+		assertThat(rootFile.exists() && !rootFile.isDirectory()).as("Root storage area is not a directory: " + rootFile.getPath()).isFalse();
 		if (!rootFile.isDirectory())
-			assertTrue("Could not create root directory: " + rootFile.getPath(), rootFile.mkdirs());
+			assertThat(rootFile.mkdirs()).as("Could not create root directory: " + rootFile.getPath()).isTrue();
 		
 		Map<String, Object> configuration = getFrameworkConfiguration();
 		configuration.putAll(getConfiguration());
@@ -161,13 +168,9 @@ public abstract class MultiFrameworkTestCase extends OSGiTestCase {
 		}
 	}
 
-	/**
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception {
+	@AfterEach
+	public void tearDown() throws Exception {
 		stopFramework();
-		super.tearDown();
 	}
 
 	/**
@@ -196,16 +199,16 @@ public abstract class MultiFrameworkTestCase extends OSGiTestCase {
 	 */
 	public Bundle installBundle(String bundle) throws BundleException, IOException {
 		BundleContext fwkContext = getFramework().getBundleContext();
-		assertNotNull("Framework context is null", fwkContext);
+		assertThat(fwkContext).as("Framework context is null").isNotNull();
 		URL input = getBundleInput(bundle);
-		assertNotNull("Cannot find resource: " + bundle, input);
+		assertThat(input).as("Cannot find resource: " + bundle).isNotNull();
 		return fwkContext.installBundle(bundle, input.openStream());
 	}
 
 	private String getFrameworkFactoryClassName() throws IOException {
 		BundleContext context = getBundleContextWithoutFail();
         URL factoryService = context == null ? this.getClass().getResource(FRAMEWORK_FACTORY) : context.getBundle(0).getEntry(FRAMEWORK_FACTORY);
-		assertNotNull("Could not locate: " + FRAMEWORK_FACTORY, factoryService);
+		assertThat(factoryService).as("Could not locate: " + FRAMEWORK_FACTORY).isNotNull();
 		return getClassName(factoryService);
 
 	}
@@ -239,7 +242,7 @@ public abstract class MultiFrameworkTestCase extends OSGiTestCase {
 		BundleContext context = getBundleContextWithoutFail();
 		if (context == null) {
 			String storageroot = getProperty(STORAGEROOT, DEFAULT_STORAGEROOT);
-			assertNotNull("Must set property: " + STORAGEROOT, storageroot);
+			assertThat(storageroot).as("Must set property: " + STORAGEROOT).isNotNull();
 			return storageroot;
 		}
 		return context.getDataFile("storageroot").getAbsolutePath();
@@ -251,7 +254,7 @@ public abstract class MultiFrameworkTestCase extends OSGiTestCase {
 		@SuppressWarnings("unchecked")
 		Class<FrameworkFactory> clazz = (Class<FrameworkFactory>) (context == null
 				? Class.forName(className)
-				: getContext().getBundle(0).loadClass(className));
+				: context.getBundle(0).loadClass(className));
 		return clazz;
 	}
 
@@ -259,7 +262,7 @@ public abstract class MultiFrameworkTestCase extends OSGiTestCase {
 		try {
 			if ("true".equals(getProperty("noframework")))
 				return null;
-			return getContext();
+			return context;
 		} catch (Throwable t) {
 			return null; // don't fail
 		}
@@ -304,7 +307,7 @@ public abstract class MultiFrameworkTestCase extends OSGiTestCase {
 		catch (Exception e) {
 			fail("Failed to construct the framework", e);
 		}
-		assertEquals("Wrong state for newly constructed framework", Bundle.INSTALLED, framework.getState());
+		assertThat(framework).as("Wrong state for newly constructed framework").isInState(Bundle.INSTALLED);
 		return framework;
 	}
 
@@ -317,23 +320,23 @@ public abstract class MultiFrameworkTestCase extends OSGiTestCase {
 	private void initFramework() {
 		try {
 			framework.init();
-			assertNotNull("BundleContext is null after init", framework.getBundleContext());
+			assertThat(framework.getBundleContext()).as("BundleContext is null after init").isNotNull();
 		}
 		catch (BundleException e) {
 			fail("Unexpected BundleException initializing", e);
 		}
-		assertEquals("Wrong framework state after init", Bundle.STARTING, framework.getState());
+		assertThat(framework).as("Wrong framework state after init").isInState(Bundle.STARTING);
 	}
 
 	private void startFramework() {
 		try {
 			framework.start();
-			assertNotNull("BundleContext is null after start", framework.getBundleContext());
+			assertThat(framework.getBundleContext()).as("BundleContext is null after start").isNotNull();
 		}
 		catch (BundleException e) {
 			fail("Unexpected BundleException initializing", e);
 		}
-		assertEquals("Wrong framework state after init", Bundle.ACTIVE, framework.getState());
+		assertThat(framework).as("Wrong framework state after init").isInState(Bundle.ACTIVE);
 
 	}
 
@@ -342,9 +345,9 @@ public abstract class MultiFrameworkTestCase extends OSGiTestCase {
 		try {
             framework.stop();
 			FrameworkEvent event = framework.waitForStop(10000);
-			assertNotNull("FrameworkEvent is null", event);
-			assertEquals("Wrong event type", FrameworkEvent.STOPPED, event.getType());
-			assertNull("BundleContext is not null after stop", framework.getBundleContext());
+			assertThat(event).as("FrameworkEvent is null").isNotNull();
+			assertThat(event.getType()).as("Wrong event type").isEqualTo(FrameworkEvent.STOPPED);
+			assertThat(framework.getBundleContext()).as("BundleContext is not null after stop").isNull();
 		}
 		catch (BundleException e) {
 			fail("Unexpected BundleException stopping", e);
@@ -355,7 +358,7 @@ public abstract class MultiFrameworkTestCase extends OSGiTestCase {
 		// if the framework was not STARTING STOPPING or ACTIVE then we assume the waitForStop returned immediately with a FrameworkEvent.STOPPED 
 		// and does not change the state of the framework
 		int expectedState = (previousState & (Bundle.STARTING | Bundle.ACTIVE | Bundle.STOPPING)) != 0 ? Bundle.RESOLVED : previousState;
-		assertEquals("Wrong framework state after init", expectedState, framework.getState());
+		assertThat(framework.getState()).as("Wrong framework state after init").isEqualTo(expectedState);
 	}
 
 	private void installFramework() throws Exception {
@@ -369,8 +372,8 @@ public abstract class MultiFrameworkTestCase extends OSGiTestCase {
 			String bundle = st.nextToken();
 			
 			Bundle b = f.getBundleContext().installBundle("file:" + bundle);
-			assertNotNull(b);
-			assertEquals("Bundle " + b.getSymbolicName() + " is not INSTALLED", Bundle.INSTALLED, b.getState());
+			assertThat(b).isNotNull();
+			assertThat(b).as("Bundle " + b.getSymbolicName() + " is not INSTALLED").isInState(Bundle.INSTALLED);
 			
 			System.out.println("installed bundle " + b.getSymbolicName());
 			bundles.add(b);
@@ -381,10 +384,62 @@ public abstract class MultiFrameworkTestCase extends OSGiTestCase {
 			
 			if (b.getHeaders().get(Constants.FRAGMENT_HOST) == null) {
 				b.start();
-				assertEquals("Bundle " + b.getSymbolicName() + " is not ACTIVE", Bundle.ACTIVE, b.getState());
+				assertThat(b).as("Bundle " + b.getSymbolicName() + " is not ACTIVE").isInState(Bundle.ACTIVE);
 				
 				System.out.println("started bundle " + b.getSymbolicName());
 			}
+		}
+	}
+
+	/**
+	 * Return the property value from the bundle context properties, as
+	 * OSGiTestCase.getProperty of the TCK test support did.
+	 * 
+	 * @param key The property key name.
+	 * @return The property value or null if the property is not set.
+	 */
+	public String getProperty(String key) {
+		return AccessController.doPrivileged((PrivilegedAction<String>) () -> {
+			if (context != null) {
+				return context.getProperty(key);
+			}
+			return System.getProperty(key);
+		});
+	}
+
+	/**
+	 * Return the property value from the bundle context properties.
+	 * 
+	 * @param key The property key name.
+	 * @param defaultValue The default property value to return if the property
+	 *        is not set.
+	 * @return The property value or defaultValue if the property is not set.
+	 */
+	public String getProperty(String key, String defaultValue) {
+		String propValue = getProperty(key);
+		if (propValue == null) {
+			return defaultValue;
+		}
+		return propValue;
+	}
+
+	/**
+	 * Return the long property value from the bundle context properties.
+	 * 
+	 * @param key The property key name.
+	 * @param defaultValue The default property value to return if the property
+	 *        is not set.
+	 * @return The property value or defaultValue if the property is not set.
+	 */
+	public long getLongProperty(String key, long defaultValue) {
+		String propValue = getProperty(key);
+		if (propValue == null) {
+			return defaultValue;
+		}
+		try {
+			return Long.parseLong(propValue);
+		} catch (NumberFormatException e) {
+			return defaultValue;
 		}
 	}
 }

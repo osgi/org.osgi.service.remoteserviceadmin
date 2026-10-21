@@ -1,6 +1,6 @@
 Bundle-Name:                             ${p}.tbimporter.noperm
 Bundle-Version:                          1.0
--conditionalpackage					= org.osgi.test.support.*
+-conditionalpackage					= ${p}.util
 -privatepackage:                         ${p}.tb.importer*, \
  ${p}.common 
 Import-Package:                          *,${p}.common;version="1.0.0"

@@ -17,7 +17,7 @@
  *******************************************************************************/
 package org.osgi.test.cases.remoteserviceadmin.common;
 
-import static junit.framework.TestCase.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,16 +25,17 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
-import org.osgi.test.support.OSGiTestCase;
 
 public class Utils {
 
@@ -83,18 +84,18 @@ public class Utils {
 	}
 	
 	/**
-	 * @param testCase
+	 * @param context
 	 * @return EndpointDescription reconstructed from a HEX string passed by the
 	 *         exporting bundle in the child framework
 	 * @throws IOException
 	 */
 	public static EndpointDescription reconstructEndpoint(String version,
-			OSGiTestCase testCase) throws IOException {
-		return reconstructEndpoint(version, testCase, 0);
+			BundleContext context) throws IOException {
+		return reconstructEndpoint(version, context, 0);
 	}
 
 	/**
-	 * @param testCase
+	 * @param context
 	 * @param registrationNumber
 	 *            use the nth export statement
 	 * @return EndpointDescription reconstructed from a HEX string passed by the
@@ -103,9 +104,11 @@ public class Utils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static EndpointDescription reconstructEndpoint(String version,
-			OSGiTestCase testCase, int registrationNumber) throws IOException {
-		String propstr = testCase.getProperty("RSA_TCK.EndpointDescription_"
-				+ version + "_" + registrationNumber);
+			BundleContext context, int registrationNumber) throws IOException {
+		String propstr = AccessController
+				.doPrivileged((PrivilegedAction<String>) () -> context
+						.getProperty("RSA_TCK.EndpointDescription_" + version
+								+ "_" + registrationNumber));
 
 		// see
 		// org.osgi.test.cases.remoteserviceadmin.tb2.Activator#exportEndpointDescription()
@@ -205,17 +208,14 @@ public class Utils {
 			BundleContext context) {
 		String serverconfig = context
 				.getProperty("org.osgi.test.cases.remoteserviceadmin.serverconfig");
-		assertNotNull(
-				"did not find org.osgi.test.cases.remoteserviceadmin.serverconfig system property",
-				serverconfig);
+		assertThat(serverconfig).as("did not find org.osgi.test.cases.remoteserviceadmin.serverconfig system property").isNotNull();
 		Map<String, Object> properties = new HashMap<String, Object>();
 
 		for (StringTokenizer tok = new StringTokenizer(serverconfig, ","); tok
 				.hasMoreTokens();) {
 			String propertyName = tok.nextToken();
 			String value = context.getProperty(propertyName);
-			assertNotNull("system property not found: " + propertyName,
-					value);
+			assertThat(value).as("system property not found: " + propertyName).isNotNull();
 			properties.put(propertyName, value);
 		}
 

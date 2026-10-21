@@ -17,12 +17,8 @@
  *******************************************************************************/
 package org.osgi.test.cases.remoteserviceadmin.secure.tb.importer;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -49,7 +45,7 @@ import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminListener;
 import org.osgi.test.cases.remoteserviceadmin.secure.common.A;
-import org.osgi.test.support.OSGiTestCaseProperties;
+import org.osgi.test.cases.remoteserviceadmin.secure.util.TestBundleSupport;
 
 /**
  * This class imports an endpoint.
@@ -71,7 +67,7 @@ public class Activator implements BundleActivator {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
-		timeout = OSGiTestCaseProperties.getLongProperty("rsa.tck.timeout",
+		timeout = TestBundleSupport.getLongProperty("rsa.tck.timeout",
 				300000L);
 		test();
 	}
@@ -88,9 +84,9 @@ public class Activator implements BundleActivator {
 		// lookup RemoteServiceAdmin service 
 		rsaRef = context
 				.getServiceReference(RemoteServiceAdmin.class);
-		assertNotNull(rsaRef);
+		assertThat(rsaRef).isNotNull();
 		rsa = context.getService(rsaRef);
-		assertNotNull(rsa);
+		assertThat(rsa).isNotNull();
 		
 		//
 		// register a RemoteServiceAdminListener to receive the export
@@ -100,70 +96,70 @@ public class Activator implements BundleActivator {
 		ServiceRegistration<RemoteServiceAdminListener> sr = context
 				.registerService(RemoteServiceAdminListener.class,
 						remoteServiceAdminListener, null);
-		assertNotNull(sr);
+		assertThat(sr).isNotNull();
 
 		try {
 			// reconstruct the endpoint description
 			EndpointDescription endpoint = reconstructEndpoint();
 			// gather all the service and exporting intents
 			List<String> endpointIntents = endpoint.getIntents();
-			assertNotNull(endpointIntents);
-			assertFalse(endpointIntents.isEmpty());
+			assertThat(endpointIntents).isNotNull();
+			assertThat(endpointIntents).isNotEmpty();
 
 			//
 			// 122.4.2: Importing
 			// positive test: import the service
 			//
 			importReg = rsa.importService(endpoint);
-			assertNotNull(importReg);
-			assertNull(importReg.getException());
+			assertThat(importReg).isNotNull();
+			assertThat(importReg.getException()).isNull();
 
 			ImportReference importRef = importReg.getImportReference();
-			assertNotNull(importRef);
+			assertThat(importRef).isNotNull();
 			ServiceReference< ? > sref = importRef.getImportedService();
-			assertNotNull(sref);
-			assertEquals("has been overridden", sref.getProperty("mykey"));
-			assertNotNull("122.4.2: the service.imported property has to be set", sref.getProperty(RemoteConstants.SERVICE_IMPORTED));
-			assertNotNull(sref.getProperty(RemoteConstants.SERVICE_IMPORTED_CONFIGS));
+			assertThat(sref).isNotNull();
+			assertThat(sref.getProperty("mykey")).isEqualTo("has been overridden");
+			assertThat(sref.getProperty(RemoteConstants.SERVICE_IMPORTED)).as("122.4.2: the service.imported property has to be set").isNotNull();
+			assertThat(sref.getProperty(RemoteConstants.SERVICE_IMPORTED_CONFIGS)).isNotNull();
 			List<String> intents = getPropertyAsList(sref.getProperty(RemoteConstants.SERVICE_INTENTS));
-			assertNotNull("122.4.2: service reference has to have service.intents property set", intents);
-			assertTrue("122.4.2: imported service.intents has to include all service.intents of exported service", intents.containsAll(endpointIntents));
+			assertThat(intents).as("122.4.2: service reference has to have service.intents property set").isNotNull();
+			assertThat(intents.containsAll(endpointIntents)).as("122.4.2: imported service.intents has to include all service.intents of exported service").isTrue();
 
 			// validate EndpointDescription
 			EndpointDescription description = importRef.getImportedEndpoint();
-			assertNotNull(description);
-			assertEquals("has been overridden", description.getProperties().get("mykey"));
+			assertThat(description).isNotNull();
+			assertThat(description.getProperties().get("mykey")).isEqualTo("has been overridden");
 			try {
 				new EndpointDescription(sref, description.getProperties()); // this throws an exception if
 			} catch (IllegalArgumentException ie) {
 				fail("invalid endpoint description returned from imported service");
 			}
-			assertNotNull(description.getProperties().get(RemoteConstants.SERVICE_IMPORTED));
-			assertTrue(description.getInterfaces().size() == 1);
-			assertTrue(description.getInterfaces().contains(A.class.getName()));
+			assertThat(description.getProperties().get(RemoteConstants.SERVICE_IMPORTED)).isNotNull();
+			assertThat(description.getInterfaces().size() == 1).isTrue();
+			assertThat(description.getInterfaces().contains(A.class.getName())).isTrue();
 
 			// check for event notifications
 			//
 			// 122.8 verify that import notification was sent to RemoteServiceAdminListeners
 			//
 			RemoteServiceAdminEvent rsaevent = remoteServiceAdminListener.getNextEvent();
-			assertEquals(0, remoteServiceAdminListener.getEventCount());
-			assertNotNull("no RemoteServiceAdminEvent received", rsaevent);
-			assertNotNull("122.10.11: source must not be null", rsaevent.getSource());
+			assertThat(remoteServiceAdminListener.getEventCount()).isZero();
+			assertThat(rsaevent).as("no RemoteServiceAdminEvent received").isNotNull();
+			assertThat(rsaevent.getSource()).as("122.10.11: source must not be null").isNotNull();
 
 			ImportReference importReference = null;
 			EndpointDescription importedED = null;
 
 			//
 			// check received event type whether import was successful or not
-			assertEquals(RemoteServiceAdminEvent.IMPORT_REGISTRATION, rsaevent.getType());
-			assertNull(rsaevent.getException());
+			assertThat(rsaevent.getType()).isEqualTo(RemoteServiceAdminEvent.IMPORT_REGISTRATION);
+			assertThat(rsaevent.getException()).isNull();
 			importReference = rsaevent.getImportReference();
-			assertNotNull("ImportReference expected in event", importReference);
+			assertThat(importReference).as("ImportReference expected in event").isNotNull();
 			importedED = importReference.getImportedEndpoint();
-			assertNotNull(importedED);
+			assertThat(importedED).isNotNull();
 			// compare endpoints
-			assertTrue(endpoint.isSameService(importedED));
+			assertThat(endpoint.isSameService(importedED)).isTrue();
 
 			// invoke service
 			A serviceA = null;
@@ -173,11 +169,11 @@ public class Activator implements BundleActivator {
 			//
 			// no version
 			ServiceReference<A> ref = context.getServiceReference(A.class);
-			assertNotNull(ref);
+			assertThat(ref).isNotNull();
 			serviceA = context.getService(ref);
 			try {
-				assertNotNull(serviceA);
-				assertEquals("this is A", serviceA.getA());
+				assertThat(serviceA).isNotNull();
+				assertThat(serviceA.getA()).isEqualTo("this is A");
 			} finally {
 				context.ungetService(ref);
 			}
@@ -198,7 +194,7 @@ public class Activator implements BundleActivator {
 		ServiceRegistration<RemoteServiceAdminListener> sr = context
 				.registerService(RemoteServiceAdminListener.class,
 				remoteServiceAdminListener, null);
-		assertNotNull(sr);
+		assertThat(sr).isNotNull();
 		try {
 			importReg.close();
 			importReg.close(); // calling this multiple times must not cause a
@@ -209,20 +205,15 @@ public class Activator implements BundleActivator {
 			//
 			RemoteServiceAdminEvent rsaevent = remoteServiceAdminListener
 					.getNextEvent();
-			assertNotNull("no RemoteServiceAdminEvent received",
-					rsaevent);
-			assertNotNull("122.10.11: source must not be null",
-					rsaevent.getSource());
-			assertNull(rsaevent.getException());
-			assertEquals("122.10.11: event type is wrong",
-					RemoteServiceAdminEvent.IMPORT_UNREGISTRATION,
-					rsaevent.getType());
+			assertThat(rsaevent).as("no RemoteServiceAdminEvent received").isNotNull();
+			assertThat(rsaevent.getSource()).as("122.10.11: source must not be null").isNotNull();
+			assertThat(rsaevent.getException()).isNull();
+			assertThat(rsaevent.getType()).as("122.10.11: event type is wrong").isEqualTo(RemoteServiceAdminEvent.IMPORT_UNREGISTRATION);
 
 			ImportReference importReference = rsaevent.getImportReference();
-			assertNotNull("ImportReference expected in event",
-					importReference);
+			assertThat(importReference).as("ImportReference expected in event").isNotNull();
 
-			assertNull(importReference.getImportedEndpoint());
+			assertThat(importReference.getImportedEndpoint()).isNull();
 
 		} finally {
 			sr.unregister();
@@ -257,8 +248,8 @@ public class Activator implements BundleActivator {
 		try {
 			props = (Map<String, Object>)ois.readObject();
 		} catch (ClassNotFoundException e) {e.printStackTrace();}
-		
-		assertTrue(props!=null);
+
+		assertThat(props).isNotNull();
 		
 		return new EndpointDescription(props);
 	}

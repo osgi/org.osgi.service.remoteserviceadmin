@@ -17,8 +17,7 @@
  *******************************************************************************/
 package org.osgi.test.cases.remoteserviceadmin.tb3;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -31,8 +30,7 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.test.cases.remoteserviceadmin.common.A;
-import org.osgi.test.support.OSGiTestCaseProperties;
-import org.osgi.test.support.tracker.Tracker;
+import org.osgi.test.cases.remoteserviceadmin.util.TestBundleSupport;
 import org.osgi.util.tracker.BundleTracker;
 import org.osgi.util.tracker.BundleTrackerCustomizer;
 import org.osgi.util.tracker.ServiceTracker;
@@ -56,9 +54,9 @@ public class Activator implements BundleActivator, ServiceListener {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
-		timeout = OSGiTestCaseProperties.getLongProperty("rsa.tck.timeout",
+		timeout = TestBundleSupport.getLongProperty("rsa.tck.timeout",
 				300000L);
-		factor = OSGiTestCaseProperties.getIntegerProperty(
+		factor = TestBundleSupport.getIntegerProperty(
 				"rsa.tck.timeout.factor", 3);
 		test();
 	}
@@ -97,11 +95,11 @@ public class Activator implements BundleActivator, ServiceListener {
 		tracker = new ServiceTracker<>(context, filter, null);
 		tracker.open();
 
-		A service = Tracker.waitForService(tracker, timeout);
-		assertNotNull("no service A found", service);
+		A service = tracker.waitForService(timeout);
+		assertThat(service).as("no service A found").isNotNull();
 
 		// call the service
-		assertEquals("A", service.getA());
+		assertThat(service.getA()).isEqualTo("A");
 
 		tracker.close();
 

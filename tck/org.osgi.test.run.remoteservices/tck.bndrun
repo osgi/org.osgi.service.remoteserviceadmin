@@ -20,7 +20,7 @@
 	ecf.generic.server.hostname=localhost,\
 	ecf.generic.server.port=@@FREE_PORT@@,\
 	org.eclipse.ecf.osgi.services.remoteserviceadmin.disableServiceVersionChecking=true,\
-	org.osgi.test.cases.remoteservices.bundles="${repo;assertj-core;latest},${repo;junit-jupiter-api;latest},${repo;junit-jupiter-engine;latest},${repo;junit-jupiter-params;latest},${repo;junit-platform-commons;latest},${repo;junit-platform-engine;latest},${repo;junit-platform-launcher;latest},${repo;junit-vintage-engine;latest},${repo;org.hamcrest;latest},${repo;org.awaitility;latest},${repo;org.apache.servicemix.bundles.junit;latest},${repo;org.opentest4j;latest},${repo;org.osgi.test.common;latest},${repo;org.osgi.test.assertj.framework;latest},${repo;org.osgi.test.junit5;latest},${repo;org.osgi.test.junit4;latest},${repo;org.mockito.mockito-core;latest},${repo;net.bytebuddy.byte-buddy;latest},${repo;net.bytebuddy.byte-buddy-agent;latest},${repo;org.objenesis;latest},${repo;org.osgi.service.event;latest},${repo;org.eclipse.equinox.event;latest},${repo;org.apache.felix.scr;latest},${repo;org.osgi.service.component;latest},${repo;org.osgi.util.function;latest},${repo;org.osgi.util.promise;latest},${repo;org.apache.felix.configadmin;latest},${repo;org.eclipse.equinox.metatype;latest},${repo;org.osgi.service.metatype;latest},${repo;org.apache.aries.spifly.dynamic.bundle;latest},${repo;org.apache.aries.util;latest},${repo;org.objectweb.asm.all;latest},${repo;org.apache.geronimo.specs.geronimo-json_1.1_spec;latest},${repo;org.apache.johnzon.core;latest},${repo;org.apache.felix.cm.json;latest},${repo;org.apache.felix.configurator;latest},${repo;org.osgi.util.converter;latest},${repo;org.eclipse.core.jobs;latest},${repo;org.eclipse.equinox.common;latest},${repo;org.eclipse.equinox.concurrent;latest},${repo;org.eclipse.equinox.supplement;latest},${repo;org.eclipse.ecf.identity;latest},${repo;org.eclipse.ecf;latest},${repo;org.eclipse.ecf.sharedobject;latest},${repo;org.eclipse.ecf.discovery;latest},${repo;org.eclipse.ecf.provider;latest},${repo;org.eclipse.ecf.remoteservice;latest},${repo;org.eclipse.ecf.provider.remoteservice;latest},${repo;org.eclipse.ecf.remoteservice.asyncproxy;latest},${repo;org.eclipse.ecf.osgi.services.remoteserviceadmin.proxy;latest},${repo;org.eclipse.osgi.services.remoteserviceadmin;latest},${repo;org.eclipse.ecf.osgi.services.remoteserviceadmin;latest},${repo;org.eclipse.ecf.osgi.services.distribution;latest},${repo;org.eclipse.ecf.provider.jmdns;latest}"
+	org.osgi.test.cases.remoteservices.bundles="${repo;assertj-core;latest},${repo;junit-jupiter-api;latest},${repo;junit-jupiter-engine;latest},${repo;junit-jupiter-params;latest},${repo;junit-platform-commons;latest},${repo;junit-platform-engine;latest},${repo;junit-platform-launcher;latest},${repo;org.opentest4j;latest},${repo;org.osgi.test.common;latest},${repo;org.osgi.test.assertj.framework;latest},${repo;org.osgi.test.junit5;latest},${repo;net.bytebuddy.byte-buddy;latest},${repo;org.osgi.service.event;latest},${repo;org.eclipse.equinox.event;latest},${repo;org.apache.felix.scr;latest},${repo;org.osgi.service.component;latest},${repo;org.osgi.util.function;latest},${repo;org.osgi.util.promise;latest},${repo;org.apache.felix.configadmin;latest},${repo;org.eclipse.equinox.metatype;latest},${repo;org.osgi.service.metatype;latest},${repo;org.apache.aries.spifly.dynamic.bundle;latest},${repo;org.apache.aries.util;latest},${repo;org.objectweb.asm.all;latest},${repo;org.apache.geronimo.specs.geronimo-json_1.1_spec;latest},${repo;org.apache.johnzon.core;latest},${repo;org.apache.felix.cm.json;latest},${repo;org.apache.felix.configurator;latest},${repo;org.osgi.util.converter;latest},${repo;org.eclipse.core.jobs;latest},${repo;org.eclipse.equinox.common;latest},${repo;org.eclipse.equinox.concurrent;latest},${repo;org.eclipse.equinox.supplement;latest},${repo;org.eclipse.ecf.identity;latest},${repo;org.eclipse.ecf;latest},${repo;org.eclipse.ecf.sharedobject;latest},${repo;org.eclipse.ecf.discovery;latest},${repo;org.eclipse.ecf.provider;latest},${repo;org.eclipse.ecf.remoteservice;latest},${repo;org.eclipse.ecf.provider.remoteservice;latest},${repo;org.eclipse.ecf.remoteservice.asyncproxy;latest},${repo;org.eclipse.ecf.osgi.services.remoteserviceadmin.proxy;latest},${repo;org.eclipse.osgi.services.remoteserviceadmin;latest},${repo;org.eclipse.ecf.osgi.services.remoteserviceadmin;latest},${repo;org.eclipse.ecf.osgi.services.distribution;latest},${repo;org.eclipse.ecf.provider.jmdns;latest}"
 
 -runfw: org.eclipse.osgi
 
@@ -68,7 +68,6 @@ tck.range: ${range;[===,==+);${version_cleanup;${1}}}
 	bnd.identity;id='org.eclipse.ecf.osgi.services.remoteserviceadmin';version='${tck.range;${org.eclipse.ecf.osgi.services.remoteserviceadmin.version}}',\
 	bnd.identity;id='org.eclipse.ecf.osgi.services.distribution';version='${tck.range;${org.eclipse.ecf.osgi.services.distribution.version}}',\
 	bnd.identity;id='org.eclipse.ecf.provider.jmdns';version='${tck.range;${org.eclipse.ecf.provider.jmdns.version}}',\
-	bnd.identity;id='org.apache.servicemix.bundles.junit';version='${tck.range;${servicemix-junit.version}}',\
 	bnd.identity;id='assertj-core';version='${tck.range;${assertj.version}}',\
 	bnd.identity;id='junit-jupiter-api';version='${tck.range;${junit-jupiter.version}}',\
 	bnd.identity;id='junit-jupiter-engine';version='${tck.range;${junit-jupiter.version}}',\
@@ -76,19 +75,11 @@ tck.range: ${range;[===,==+);${version_cleanup;${1}}}
 	bnd.identity;id='junit-platform-commons';version='${tck.range;${junit-platform.version}}',\
 	bnd.identity;id='junit-platform-engine';version='${tck.range;${junit-platform.version}}',\
 	bnd.identity;id='junit-platform-launcher';version='${tck.range;${junit-platform.version}}',\
-	bnd.identity;id='junit-vintage-engine';version='${tck.range;${junit-jupiter.version}}',\
-	bnd.identity;id='org.hamcrest';version='${tck.range;${hamcrest.version}}',\
-	bnd.identity;id='org.awaitility';version='${tck.range;${awaitility.version}}',\
-	bnd.identity;id='org.apache.servicemix.bundles.junit';version='[4.13.2.1,4.13.2.2)',\
 	bnd.identity;id='org.opentest4j';version='${tck.range;${opentest4j.version}}',\
 	bnd.identity;id='org.osgi.test.common';version='${tck.range;${osgi-test.version}}',\
 	bnd.identity;id='org.osgi.test.assertj.framework';version='${tck.range;${osgi-test.version}}',\
 	bnd.identity;id='org.osgi.test.junit5';version='${tck.range;${osgi-test.version}}',\
-	bnd.identity;id='org.osgi.test.junit4';version='${tck.range;${osgi-test.version}}',\
-	bnd.identity;id='org.mockito.mockito-core';version='${tck.range;${mockito.version}}',\
-	bnd.identity;id='net.bytebuddy.byte-buddy';version='${tck.range;${byte-buddy.version}}',\
-	bnd.identity;id='net.bytebuddy.byte-buddy-agent';version='${tck.range;${byte-buddy.version}}',\
-	bnd.identity;id='org.objenesis';version='${tck.range;${objenesis.version}}'
+	bnd.identity;id='net.bytebuddy.byte-buddy';version='${tck.range;${byte-buddy.version}}'
 
 # -runbundles is committed and verified by the build; after a dependency
 # change update it with: mvn bnd-resolver:resolve
@@ -100,9 +91,7 @@ tck.range: ${range;[===,==+);${version_cleanup;${1}}}
 	junit-platform-commons;version='${tck.range;${junit-platform.version}}',\
 	junit-platform-engine;version='${tck.range;${junit-platform.version}}',\
 	junit-platform-launcher;version='${tck.range;${junit-platform.version}}',\
-	junit-vintage-engine;version='${tck.range;${junit-jupiter.version}}',\
 	net.bytebuddy.byte-buddy;version='${tck.range;${byte-buddy.version}}',\
-	net.bytebuddy.byte-buddy-agent;version='${tck.range;${byte-buddy.version}}',\
 	org.apache.aries.spifly.dynamic.bundle;version='${tck.range;${org.apache.aries.spifly.dynamic.bundle.version}}',\
 	org.apache.aries.util;version='${tck.range;${org.apache.aries.util.version}}',\
 	org.apache.felix.cm.json;version='${tck.range;${org.apache.felix.cm.json.version}}',\
@@ -111,8 +100,6 @@ tck.range: ${range;[===,==+);${version_cleanup;${1}}}
 	org.apache.felix.scr;version='${tck.range;${org.apache.felix.scr.version}}',\
 	org.apache.geronimo.specs.geronimo-json_1.1_spec;version='${tck.range;${geronimo-json_1.1_spec.version}}',\
 	org.apache.johnzon.core;version='${tck.range;${johnzon-core.version}}',\
-	org.apache.servicemix.bundles.junit;version='${tck.range;${servicemix-junit.version}}',\
-	org.awaitility;version='${tck.range;${awaitility.version}}',\
 	org.eclipse.core.jobs;version='${tck.range;${org.eclipse.core.jobs.version}}',\
 	org.eclipse.ecf;version='${tck.range;${org.eclipse.ecf.version}}',\
 	org.eclipse.ecf.discovery;version='${tck.range;${org.eclipse.ecf.discovery.version}}',\
@@ -132,10 +119,7 @@ tck.range: ${range;[===,==+);${version_cleanup;${1}}}
 	org.eclipse.equinox.metatype;version='${tck.range;${org.eclipse.equinox.metatype.version}}',\
 	org.eclipse.equinox.supplement;version='${tck.range;${org.eclipse.equinox.supplement.version}}',\
 	org.eclipse.osgi.services.remoteserviceadmin;version='${tck.range;${org.eclipse.osgi.services.remoteserviceadmin.version}}',\
-	org.hamcrest;version='${tck.range;${hamcrest.version}}',\
-	org.mockito.mockito-core;version='${tck.range;${mockito.version}}',\
 	org.objectweb.asm.all;version='${tck.range;${asm-all.version}}',\
-	org.objenesis;version='${tck.range;${objenesis.version}}',\
 	org.opentest4j;version='${tck.range;${opentest4j.version}}',\
 	org.osgi.service.component;version='${tck.range;${org.osgi.service.component.version}}',\
 	org.osgi.service.event;version='[1.4.0,1.4.1)',\
@@ -143,7 +127,6 @@ tck.range: ${range;[===,==+);${version_cleanup;${1}}}
 	org.osgi.test.assertj.framework;version='${tck.range;${osgi-test.version}}',\
 	org.osgi.test.cases.remoteservices;version='${tck.range;${revision}}',\
 	org.osgi.test.common;version='${tck.range;${osgi-test.version}}',\
-	org.osgi.test.junit4;version='${tck.range;${osgi-test.version}}',\
 	org.osgi.test.junit5;version='${tck.range;${osgi-test.version}}',\
 	org.osgi.util.converter;version='${tck.range;${org.osgi.util.converter.version}}',\
 	org.osgi.util.function;version='${tck.range;${org.osgi.util.function.version}}',\

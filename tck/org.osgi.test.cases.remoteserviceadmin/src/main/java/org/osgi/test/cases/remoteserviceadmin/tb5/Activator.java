@@ -17,14 +17,12 @@
  *******************************************************************************/
 package org.osgi.test.cases.remoteserviceadmin.tb5;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.test.cases.remoteserviceadmin.common.A;
-import org.osgi.test.support.OSGiTestCaseProperties;
-import org.osgi.test.support.tracker.Tracker;
+import org.osgi.test.cases.remoteserviceadmin.util.TestBundleSupport;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -42,7 +40,7 @@ public class Activator implements BundleActivator {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
-		timeout = OSGiTestCaseProperties.getLongProperty("rsa.tck.timeout",
+		timeout = TestBundleSupport.getLongProperty("rsa.tck.timeout",
 				300000L);
 		test();
 	}
@@ -65,15 +63,15 @@ public class Activator implements BundleActivator {
 		tracker = new ServiceTracker<>(context, A.class, null);
 		tracker.open();
 
-		A service = Tracker.waitForService(tracker, timeout);
-		assertNotNull("no service A found", service);
+		A service = tracker.waitForService(timeout);
+		assertThat(service).as("no service A found").isNotNull();
 
 		// call the service
 
 		// Marc: TB4 registers the implementation of A from tb2
 		// t2 reimplements getA to return "this is A" not "A"
 
-		assertEquals("this is A", service.getA());
+		assertThat(service.getA()).isEqualTo("this is A");
 
 		tracker.close();
 	}

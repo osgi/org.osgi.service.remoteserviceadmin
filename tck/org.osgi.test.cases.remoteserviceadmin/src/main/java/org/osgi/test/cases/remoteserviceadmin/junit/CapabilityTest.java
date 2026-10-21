@@ -17,27 +17,34 @@
  *******************************************************************************/
 package org.osgi.test.cases.remoteserviceadmin.junit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 import org.osgi.framework.wiring.BundleCapability;
 import org.osgi.framework.wiring.BundleWiring;
-import org.osgi.test.support.compatibility.DefaultTestBundleControl;
+import org.osgi.test.common.annotation.InjectBundleContext;
 
-public class CapabilityTest extends DefaultTestBundleControl {
+public class CapabilityTest {
+
+	@InjectBundleContext
+	BundleContext		context;
 
 	/**
 	 * 122.9.2 Local Discovery Provider
 	 */
+	@Test
 	public void testLocalDiscoveryProviderCapability() throws Exception {
 		boolean foundDiscovery = false;
 
 		// find at least one bundle that provides the required capability
-		List<BundleCapability> capabilities = findCapabilities(getContext(),
+		List<BundleCapability> capabilities = findCapabilities(context,
 				"osgi.extender");
 		if (capabilities.size() >= 1) {
 			for (BundleCapability bc : capabilities) {
@@ -47,28 +54,27 @@ public class CapabilityTest extends DefaultTestBundleControl {
 					// this bundle is the discovery provider
 
 					Version version = (Version) attributes.get("version");
-					assertEquals(0,
-							version.compareTo(new Version(1, 1, 0)));
+					assertThat(version).isEqualByComparingTo(new Version(1, 1, 0));
 
 					String uses = bc.getDirectives().get("uses");
-					assertNotNull(uses);
-					assertTrue("org.osgi.service.remoteserviceadmin"
-							.equals(uses));
+					assertThat(uses).isNotNull();
+					assertThat("org.osgi.service.remoteserviceadmin").isEqualTo(uses);
 
 					foundDiscovery = true;
 				}
 			}
 		}
-		assertTrue(foundDiscovery);
+		assertThat(foundDiscovery).isTrue();
 	}
 
 	/**
 	 * 122.9.2 Discovery Provider Capability
 	 */
+	@Test
 	public void testDiscoveryProviderCapability() throws Exception {
 		boolean foundDiscovery = false;
 
-		List<BundleCapability> capabilities = findCapabilities(getContext(),
+		List<BundleCapability> capabilities = findCapabilities(context,
 				"osgi.remoteserviceadmin.discovery");
 
 		if (capabilities.size() >= 1) {
@@ -76,63 +82,65 @@ public class CapabilityTest extends DefaultTestBundleControl {
 				// this bundle is a discovery provider, check capability spec
 				Map<String, Object> attributes = bc.getAttributes();
 				Version version = (Version) attributes.get("version");
-				assertEquals(0, version.compareTo(new Version(1, 1, 0)));
+				assertThat(version).isEqualByComparingTo(new Version(1, 1, 0));
 				@SuppressWarnings("unchecked")
 				List<String> configs = (List<String>) attributes
 						.get("protocols");
-				assertNotNull(configs);
-				assertTrue(configs.size() > 0);
+				assertThat(configs).isNotNull();
+				assertThat(configs.size()).isGreaterThan(0);
 				foundDiscovery = true;
 			}
 		}
 
-		assertTrue(foundDiscovery);
+		assertThat(foundDiscovery).isTrue();
 	}
 
 	/**
 	 * 122.9.3 Distribution Provider Capability
 	 */
+	@Test
 	public void testDistributionProviderCapability() throws Exception {
 		boolean foundDistributionProvider = false;
-		List<BundleCapability> capabilities = findCapabilities(getContext(),
+		List<BundleCapability> capabilities = findCapabilities(context,
 				"osgi.remoteserviceadmin.distribution");
 		if (capabilities.size() >= 1) {
 			for (BundleCapability bc : capabilities) {
 				Map<String, Object> attributes = bc.getAttributes();
 				Version version = (Version) attributes.get("version");
-				assertEquals(0, version.compareTo(new Version(1, 1, 0)));
+				assertThat(version).isEqualByComparingTo(new Version(1, 1, 0));
 				@SuppressWarnings("unchecked")
 				List<String> configs = (List<String>) attributes.get("configs");
-				assertNotNull(configs);
-				assertTrue(configs.size() > 0);
+				assertThat(configs).isNotNull();
+				assertThat(configs.size()).isGreaterThan(0);
 				foundDistributionProvider = true;
 			}
 		}
-		assertTrue(foundDistributionProvider);
+		assertThat(foundDistributionProvider).isTrue();
 	}
 
 	/**
 	 * 122.9.4 Topology Manager Capability
 	 */
+	@Test
 	public void testTopologyCapability() throws Exception {
 		boolean foundTopologyManager = false;
 
-		List<BundleCapability> capabilities = findCapabilities(getContext(),
+		List<BundleCapability> capabilities = findCapabilities(context,
 				"osgi.remoteserviceadmin.topology");
 		if (capabilities.size() >= 1) {
 			for (BundleCapability bc : capabilities) {
 				Map<String, Object> attributes = bc.getAttributes();
 				Version version = (Version) attributes.get("version");
-				assertEquals(0, version.compareTo(new Version(1, 1, 0)));
+				assertThat(version).isEqualByComparingTo(new Version(1, 1, 0));
 				@SuppressWarnings("unchecked")
 				List<String> configs = (List<String>) attributes.get("policy");
-				assertNotNull(configs);
-				assertTrue(configs.size() > 0);
+				assertThat(configs).isNotNull();
+				assertThat(configs.size()).isGreaterThan(0);
 				foundTopologyManager = true;
 			}
 		}
 
-		assertTrue(foundTopologyManager);
+		assertThat(foundTopologyManager).isTrue();
 	}
 
 	/**
