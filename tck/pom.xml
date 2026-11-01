@@ -22,7 +22,7 @@
 		<org.apache.felix.configadmin.version>1.9.26</org.apache.felix.configadmin.version>
 		<org.apache.felix.configurator.version>1.0.14</org.apache.felix.configurator.version>
 		<org.apache.felix.scr.version>2.2.10</org.apache.felix.scr.version>
-		<org.eclipse.core.jobs.version>3.9.3</org.eclipse.core.jobs.version>
+		<org.eclipse.core.jobs.version>3.15.900</org.eclipse.core.jobs.version>
 		<org.eclipse.ecf.discovery.version>5.1.1</org.eclipse.ecf.discovery.version>
 		<org.eclipse.ecf.identity.version>3.9.402</org.eclipse.ecf.identity.version>
 		<org.eclipse.ecf.osgi.services.distribution.version>2.1.600</org.eclipse.ecf.osgi.services.distribution.version>
